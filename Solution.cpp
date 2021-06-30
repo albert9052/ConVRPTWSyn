@@ -42,9 +42,9 @@ void Solution::output(){
                 }
                 nDay++;
                 nRoute = 0;
-                std::cout << endl << endl <<" Day "<< nDay ;
+                std::cout << std::endl << std::endl <<" Day "<< nDay ;
             }
-            std::cout << endl <<" = Route "<< nRoute <<" : ";
+            std::cout << std::endl <<" = Route "<< nRoute <<" : ";
         }
         else {
 
@@ -69,9 +69,11 @@ void Solution::solveAlgorithm2() {
     
     // Initialize some datas
 
-    std::vector<std::<int>> solutionListOfEachDay;
-    std::vector<std::<int>> bestSolution;
+    std::vector<std::vector<Task>> solutionListOfEachDay;
+    std::vector<std::vector<Task>> bestSolution;
+	std::vector<std::vector<Task>> currentSolution;
     int bestScore;
+	int currentScore;
 
     // Since we are doing SA, our algorithm will be running several times because nodes on different day can't swtich with each other. 
 
@@ -79,21 +81,21 @@ void Solution::solveAlgorithm2() {
 
     for (int i = 0; i < nDays; i++) {
 
-        solutionListOfEachDay.push_back(std::vector<int>());
+        solutionListOfEachDay.push_back(std::vector<Task>());
         for (int j = 0; j < nNodes; j++) {
 
             if (required[i][j] == true) {
 
-                solutionListOfEachDay[i].push_back(j);
+                solutionListOfEachDay[i].push_back(Task(j));
             }
         }
-        std::vector<int> tempVectorForBoundary(nDays, -1);
+        std::vector<Task> tempVectorForBoundary(nDays, -1);
         solutionListOfEachDay[i].insert(solutionListOfEachDay[i].end(), tempVectorForBoundary.begin(), tempVectorForBoundary.end());
     }
 
     // 
     
-    for (int t = Ts, t <= Te; t = t * Alpha) {
+    for (int t = Ts; t <= Te; t = t * Alpha) {
 
         for (int iterationNum = 0; iterationNum < Ld; iterationNum) {
 
@@ -103,18 +105,35 @@ void Solution::solveAlgorithm2() {
                 tweakSolutionRandomly(solutionListOfEachDay);
             }
 
+			// Adjust the solution to its best
+			adjustDepartureTime(solutionListOfEachDay);
+
             // Calculate its score
             int newScore = calculateObjective(solutionListOfEachDay);
+
+			// Calculate and subtract the violation score
+			newScore -= calculateViolationScore(solutionListOfEachDay, scaleOfViolationScore);
             
             // Store it if it's the best one so far. 
             if (newScore >= bestScore) {
 
-                bestSolution = std::vector<std::vector<int>>(solutionListOfEachDay);
+                bestSolution.assign(solutionListOfEachDay.begin(), solutionListOfEachDay.end());
+				bestScore = newScore;
             }
 
             // Judge if it can replace the current one. 
-            
-            
+            if (newScore >= currentScore) {
+
+				currentSolution.assign(solutionListOfEachDay.begin(), solutionListOfEachDay.end());
+			}
+			else {
+
+				if (getRandomDecimal() < exp((newScore - currentScore) / t)) {
+
+					currentSolution.assign(solutionListOfEachDay.begin(), solutionListOfEachDay.end());
+					currentScore = newScore;
+				}
+			}
         }
     }
 }
@@ -124,25 +143,25 @@ double Solution::getRandomDecimal() {
     return (rand() / RAND_MAX + 1);
 }
 
-int Solution::getRandomInteger(x) {
+int Solution::getRandomInteger(int x) {
 
     return floor(rand() / (RAND_MAX + 1) * x); // The reason why RAND_MAX has to add one is to eliminate the possibility the function return x. 
 }
 
-void Solution::StweakSolutionByInsertion(std::vector<std::vector<int>>& solutionListOfEachDay) {
+void Solution::tweakSolutionByInsertion(std::vector<std::vector<Task>>& solutionListOfEachDay) {
 
     for (int day = 0; day < nDays; day++) {
 
         int positionToChoose = getRandomInteger(solutionListOfEachDay[day].size());
         int positionToInsert = getRandomInteger(solutionListOfEachDay[day].size() - 1);
 
-        int tempValueForInsertion = solutionListOfEachDay[day][positionToChoose];
+        Task tempValueForInsertion = Task(solutionListOfEachDay[day][positionToChoose]);
         solutionListOfEachDay[day].erase(solutionListOfEachDay[day].begin() + positionToChoose);
         solutionListOfEachDay[day].insert(solutionListOfEachDay[day].begin() + positionToInsert, tempValueForInsertion);
     }
 }
 
-void Solution::tweakSolutionBySwap(std::vector<std::vector<int>>& solutionListOfEachDay) {
+void Solution::tweakSolutionBySwap(std::vector<std::vector<Task>>& solutionListOfEachDay) {
 
     for (int day = 0; day < nDays; day++) {
 
@@ -153,7 +172,7 @@ void Solution::tweakSolutionBySwap(std::vector<std::vector<int>>& solutionListOf
     }
 }
 
-void Solution::tweakSolutionByReversion(std::vector<std::vector<int>>& solutionListOfEachDay) {
+void Solution::tweakSolutionByReversion(std::vector<std::vector<Task>>& solutionListOfEachDay) {
 
     for (int day = 0; day < nDays; day++) {
 
@@ -164,12 +183,12 @@ void Solution::tweakSolutionByReversion(std::vector<std::vector<int>>& solutionL
         int totalOfTwoPositions = position1 + position2;
         for (int i = std::min(position1, position2); i <= middlePosition; i++) {
 
-            std::swap(solutionListOfEachDay[day][i], solutionListOfEachDay[day][totalOfTwoPositions - i];
+            std::swap(solutionListOfEachDay[day][i], solutionListOfEachDay[day][totalOfTwoPositions - i]);
         }
     }
 }
 
-void Solution::tweakSolutionRandomly(std::vector<std::vector<int>>& solutionListOfEachDay) {
+void Solution::tweakSolutionRandomly(std::vector<std::vector<Task>>& solutionListOfEachDay) {
 
     int randomChoice = getRandomInteger(3);
 
@@ -192,16 +211,20 @@ void Solution::tweakSolutionRandomly(std::vector<std::vector<int>>& solutionList
     }
 }
 
-int Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay) {
-
-    
-}
-
-int Solution::calculateViolationScore(std::vector<std::vector<int>>& solutionListOfEachDay, int scaleOfViolationScore) {
+int Solution::calculateObjective(std::vector<std::vector<Task>>& solutionListOfEachDay) {
 
 	
 }
 
+int Solution::calculateViolationScore(std::vector<std::vector<Task>>& solutionListOfEachDay, int scaleOfViolationScore) {
+
+	
+}
+
+void Solution::adjustDepartureTime(std::vector<std::vector<Task>>& solutionListOfEachDay) {
+
+	
+}
 
 // Questions: 
 // 
