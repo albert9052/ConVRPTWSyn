@@ -1,0 +1,18 @@
+﻿  TOPTW.cpp
+TOPTW.cpp(20): warning C4305: '=': truncation from 'double' to 'float'
+TOPTW.cpp(21): warning C4305: '=': truncation from 'double' to 'float'
+TOPTW.cpp(23): warning C4305: '=': truncation from 'double' to 'float'
+TOPTW.cpp(27): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+TOPTW.cpp(70): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+TOPTW.cpp(95): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+TOPTW.cpp(308): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+TOPTW.cpp(318): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
+TOPTW.cpp(362): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
+TOPTW.cpp(291): warning C4101: 'lastTo': unreferenced local variable
+e:\code\lab\practice\toptw\toptw.cpp(162): warning C4700: uninitialized local variable 'r1' used
+e:\code\lab\practice\toptw\toptw.cpp(162): warning C4700: uninitialized local variable 'r2' used
+e:\code\lab\practice\toptw\toptw.cpp(187): warning C4700: uninitialized local variable 'r1' used
+e:\code\lab\practice\toptw\toptw.cpp(187): warning C4700: uninitialized local variable 'r2' used
+e:\code\lab\practice\toptw\toptw.cpp(229): warning C4700: uninitialized local variable 'r1' used
+e:\code\lab\practice\toptw\toptw.cpp(229): warning C4700: uninitialized local variable 'r2' used
+  TOPTW.vcxproj -> E:\Code\Lab\Practice\TOPTW\Debug\TOPTW.exe
