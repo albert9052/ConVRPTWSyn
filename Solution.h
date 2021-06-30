@@ -1,4 +1,5 @@
 #include <vector>
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -42,6 +43,8 @@ public:
 
 private: 
 
+    // Variables and functions below are for SA
+
     double Ts;
     double Te;
     int Ld;
@@ -55,14 +58,6 @@ private:
     int calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay);
 	int Solution::calculateViolationScore(std::vector<std::vector<int>> solutionListOfEachDay, int scaleOfViolationScore);
 
-    template<class T>
-    void swapValue(T& value1, T& value2) {
-
-        T temp = value1;
-        value1 = value2;
-        value2 = temp;
-    }
-
     double getRandomDecimal(); // Which is [0, 1]
     int getRandomInteger(x); // Which is [0, x - 1]
     void tweakSolutionByInsertion(std::vector<std::vector<Task>> solutionListOfEachDay);
@@ -70,4 +65,10 @@ private:
     void tweakSolutionByReversion(std::vector<std::vector<Task>> solutionListOfEachDay);
     void tweakSolutionRandomly(std::vector<std::vector<Task>> solutionListOfEachDay);
     void adjustDepartureTime(std::vector<std::vector<Task>> solutionListOfEachDay);
+
+	// --------------------------------------------------------------------
+	
+	// Variables and functions below are for LNS
+	
+	// --------------------------------------------------------------------
 };

@@ -149,7 +149,7 @@ void Solution::tweakSolutionBySwap(std::vector<std::vector<int>>& solutionListOf
         int position1 = getRandomInteger(solutionListOfEachDay[day].size());
         int position2 = getRandomInteger(solutionListOfEachDay[day].size());
 
-        swapValue(solutionListOfEachDay[day][position1], solutionListOfEachDay[day][position2]);
+        std::swap(solutionListOfEachDay[day][position1], solutionListOfEachDay[day][position2]);
     }
 }
 
@@ -164,7 +164,7 @@ void Solution::tweakSolutionByReversion(std::vector<std::vector<int>>& solutionL
         int totalOfTwoPositions = position1 + position2;
         for (int i = std::min(position1, position2); i <= middlePosition; i++) {
 
-            swapValue(solutionListOfEachDay[day][i], solutionListOfEachDay[day][totalOfTwoPositions - i];
+            std::swap(solutionListOfEachDay[day][i], solutionListOfEachDay[day][totalOfTwoPositions - i];
         }
     }
 }
