@@ -17,7 +17,9 @@ public:
 };
 
 class SA : public Solution{
+
 private:
+
     double Ts;
     double Te;
     int Ld;
@@ -38,7 +40,9 @@ private:
     void tweakSolutionByReversion(std::vector<std::vector<Task>>& solutionListOfEachDay);
     void tweakSolutionRandomly(std::vector<std::vector<Task>>& solutionListOfEachDay);
     void adjustDepartureTime(std::vector<std::vector<Task>>& solutionListOfEachDay);
+
 public:
+
     SA();
     void solve();
 };

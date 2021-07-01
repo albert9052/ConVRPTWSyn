@@ -24,7 +24,7 @@ public:
     std::vector<int> synchronizedServiceMatrix; // If j is i's fictive node, then synchronizedServiceMatrix[i] and synchronizedServiceMatrix[j] will be i and j. 
     std::vector<std::vector<float>> serviceTime, earliestTime, lastTime; 
     std::vector<std::vector<float>> timeMat; // Commuting time between each nodes
-    std::vector<int> solutionList; // Indexes of nodes, ex:1~6, 0 for boundary of day, -1 for boundary of route
+    std::vector<int> solutionList; // Indexes of nodes, ex:1~6, 0 for the boundary of day, -1 for the boundary of route
 
     Solution() {
 
