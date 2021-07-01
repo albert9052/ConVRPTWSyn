@@ -22,35 +22,34 @@ void Solution::input() {
                 {12.751, 100000, 9.8491, 8.2998, 10.341, 5.2756, 100000, 9.8491},
                 {3.302, 9.8491, 100000, 2.82, 0.717, 5.809, 9.8491, 100000} };
 
-    solutionList = {0, 1, 5, 0, 4, 0, 6, 3, 0, 2, 1, 5, 0, 4, 0, 7, 6, 0, 1, 0, 0, 6, 3, 0};
+    solutionList = {1, 5, -1, 4, -1, 6, 3, -1, 0, 2, 1, 5, -1, 4, -1, 7, 6, -1, 0, 1, -1, -1, 6, 3, -1, 0};
 }
 
 void Solution::output(){
 
-    int nRoute = nRoutes - 1;
-    int nDay = 0;
+    int nRoute = 1;
+    int nDay = 1;
+    std::cout << std::endl << std::endl << " Day 1";
+    std::cout << std::endl << "   Route 1 :";
     for (int i = 0; i < solutionList.size(); i++) {
-
-        if (solutionList[i] == 0) {
-            
+        if (solutionList[i] == 0) 
+            continue;
+        if (solutionList[i] == -1) {            
             nRoute++;
-            if (nRoute == nRoutes) {
-                
-                if (nDay == nDays) {
-
+            if (nRoute > nRoutes) {
+                if (nDay == nDays)
                     break;
-                }
                 nDay++;
-                nRoute = 0;
-                std::cout << std::endl << std::endl <<" Day "<< nDay ;
+                nRoute = 1;
+                std::cout << std::endl << std::endl << " Day " << nDay ;
             }
-            std::cout << std::endl <<" = Route "<< nRoute <<" : ";
+            std::cout << std::endl << "   Route " << nRoute << " : ";
         }
         else {
-
             std::cout << "=> " << solutionList[i] << " ";
         }
     }
+    std::cout << std::endl << std::endl;
 }
 
 void Solution::solveAlgorithm2() {

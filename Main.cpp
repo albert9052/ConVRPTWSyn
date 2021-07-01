@@ -6,7 +6,8 @@ using namespace std;
 int main(){
     srand(time(NULL));
     Solution test1;
-    //test1.input();
+    //cout << "test";
+    test1.input();
     //test1.solveAlgorithm1();
-    //test1.output();
+    test1.output();
 }
