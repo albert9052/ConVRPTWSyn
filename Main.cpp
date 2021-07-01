@@ -8,7 +8,7 @@ int main(){
     srand(time(NULL));
     SA sa;
     LNS lns;
-    sa.input();
-    sa.solve();
-    sa.output();
+    lns.input();
+    lns.solve();
+    lns.output();
 }
