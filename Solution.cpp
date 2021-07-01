@@ -23,12 +23,21 @@ void Solution::input() {
                 {12.751, 100000, 9.8491, 8.2998, 10.341, 5.2756, 100000, 9.8491},
                 {3.302, 9.8491, 100000, 2.82, 0.717, 5.809, 9.8491, 100000} };
 
-    solutionList = {1, 5, -1, 4, -1, 6, 3, -1, 0, 2, 1, 5, -1, 4, -1, 7, 6, -1, 0, 1, -1, -1, 6, 3, -1, 0};
+    //solutionList = {1, 5, -1, 4, -1, 6, 3, -1, 0, 2, 1, 5, -1, 4, -1, 7, 6, -1, 0, 1, -1, -1, 6, 3, -1, 0};
 }
 
 void Solution::output(){
-
-    int nRoute = 1;
+    for(int i = 0; i < nDays; i++){
+        std::cout << "Day " << i + 1 << std::endl;
+        for(int j = 0; j < nRoutes; j++){
+            std::cout << "   Route " << j + 1 << ":";
+            for(int& k : solutionList[i][j]){
+                std::cout << " => " << k;
+            }
+            std::cout << std::endl;
+        }
+    }
+    /*int nRoute = 1;
     int nDay = 1;
     std::cout << std::endl << std::endl << " Day 1";
     std::cout << std::endl << "   Route 1 :";
@@ -50,7 +59,7 @@ void Solution::output(){
             std::cout << "=> " << solutionList[i] << " ";
         }
     }
-    std::cout << std::endl << std::endl;
+    std::cout << std::endl << std::endl;*/
 }
 
 int calculateObjective(){

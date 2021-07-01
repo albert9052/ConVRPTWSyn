@@ -12,7 +12,7 @@ Iter(_Iter), T0(_T0), Alpha(_Alpha), Lambdam(_Lambdam), Nu(_Nu), Xi(_Xi){
 }
 void LNS::solve() {
     float T = T0;
-    vector<int> S = genInitSolution(), Saft;
+    vector<int> S = genInitSolution();
     for (int i = 0; i < Iter; i++) {
         removal();
         repair();
@@ -27,7 +27,44 @@ void LNS::solve() {
 
 }
 vector<int> LNS::genInitSolution(){
-    
+    S.resize(nDays);
+    for(vector<vector<int>>& v : S)
+        v.resize(nRoutes);
+
+    vector<int> notInserted(nNormals);
+    for(int i = 0; i < nNormals; i++)
+        notInserted[i] = i;
+    for(int i = 0; i < nNormals; i++)
+        swap(notInserted[i], notInserted[rand() % nNormals]);
+    for(int& i : notInserted)
+        for(int d = 0; d < nDays; d++)
+            if(required[i][d])
+                S[d][rand() % nRoutes].push_back(i + 1);
+
+    notInserted.resize(nFictives);
+    for(int i = 0; i < nFictives; i++)
+        notInserted[i] = nNormals + i;
+    for(int i = 0; i < nFictives; i++)
+        swap(notInserted[i], notInserted[rand() % nFictives]);
+    for(int& i : notInserted){
+        int norm = fictiveLink[i] - 1;
+        for(int d = 0; d < nDays; d++){
+            if(required[norm][d]){
+                int route;
+                bool valid = false;
+                while(!valid){
+                    valid = true;
+                    route = rand() % nRoutes;
+                    for(int n : S[d][route]) if(n == norm) valid = false;               
+                }
+                S[d][route].push_back(i + 1);
+            }
+        }
+    }
+        
+
+    solutionList = S;
+    output();
 }
 void LNS::removal(){
     int req_sum = 0;
@@ -56,7 +93,7 @@ void LNS::removal(){
 }
 void LNS::randomRemoval(int u){
     while(u > 0){
-        int rmNode = rand() % n_fictives;
+        int rmNode = rand() % nNodes;
     }
 }
 void LNS::relatedRemoval(int u){

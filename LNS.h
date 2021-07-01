@@ -7,6 +7,8 @@ private:
     int Iter;
     float T0, Alpha, Lambdam, Nu, Xi;
 
+    vector<vector<vector<int>>> S;
+
     vector<int> genInitSolution();
 
     void removal();
