@@ -9,22 +9,25 @@
 #include <time.h>
 #include <math.h>
 
-
-
 class Solution {
 public:
 
     int nNodes; // Number of nodes
-    int n_normals; // Number of normal nodes
-    int n_fictives; // Number of fictive nodes
+    int nNormals; // Number of normal nodes
+    int nFictives; // Number of fictive nodes
     int nDays; // Number of days
     int nRoutes; // Number of routes
-
+    std::vector<int> fictiveLink; // 0 for normal nodes, n>0 for fictive nodes and it's normal node is n
     std::vector<std::vector<bool>> required; // Required day (false for not required, true for required.)
     std::vector<int> synchronizedServiceMatrix; // If j is i's fictive node, then synchronizedServiceMatrix[i] and synchronizedServiceMatrix[j] will be i and j. 
     std::vector<std::vector<float>> serviceTime, earliestTime, lastTime; 
     std::vector<std::vector<float>> timeMat; // Commuting time between each nodes
+<<<<<<< HEAD
     std::vector<int> solutionList; // Indexes of nodes, ex:1~6, 0 for the boundary of day, -1 for the boundary of route
+=======
+    //std::vector<int> solutionList; // Indexes of nodes, ex:1~6, 0 for boundary of day, -1 for boundary of route
+    std::vector<std::vector<std::vector<int>>> solutionList;
+>>>>>>> 70ae0c3aa66b08b6872088bbce4102cf1d64b885
 
     Solution() {
 

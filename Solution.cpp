@@ -5,10 +5,11 @@
 void Solution::input() {
     
     nNodes = 7;
-    n_normals = 5;
-    n_fictives = 2;
+    nNormals = 5;
+    nFictives = 2;
     nRoutes = 3;
     nDays = 3;
+    fictiveLink = {0, 0, 0, 0, 0, 1, 2};
     serviceTime = { {15, 15, 15}, {18, 18, 18}, {23, 23, 23}, {45, 45, 45}, {30, 30, 30}, {15, 15, 15}, {18, 18, 18} };
     required = { {1, 1, 1}, {0, 1, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 0}, {1, 1, 1}, {0, 1, 0} };
     earliestTime = { {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {15, 15, 15}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0} };
@@ -22,12 +23,21 @@ void Solution::input() {
                 {12.751, 100000, 9.8491, 8.2998, 10.341, 5.2756, 100000, 9.8491},
                 {3.302, 9.8491, 100000, 2.82, 0.717, 5.809, 9.8491, 100000} };
 
-    solutionList = {1, 5, -1, 4, -1, 6, 3, -1, 0, 2, 1, 5, -1, 4, -1, 7, 6, -1, 0, 1, -1, -1, 6, 3, -1, 0};
+    //solutionList = {1, 5, -1, 4, -1, 6, 3, -1, 0, 2, 1, 5, -1, 4, -1, 7, 6, -1, 0, 1, -1, -1, 6, 3, -1, 0};
 }
 
 void Solution::output(){
-
-    int nRoute = 1;
+    for(int i = 0; i < nDays; i++){
+        std::cout << "Day " << i + 1 << std::endl;
+        for(int j = 0; j < nRoutes; j++){
+            std::cout << "   Route " << j + 1 << ":";
+            for(int& k : solutionList[i][j]){
+                std::cout << " => " << k;
+            }
+            std::cout << std::endl;
+        }
+    }
+    /*int nRoute = 1;
     int nDay = 1;
     std::cout << std::endl << std::endl << " Day 1";
     std::cout << std::endl << "   Route 1 :";
@@ -49,7 +59,7 @@ void Solution::output(){
             std::cout << "=> " << solutionList[i] << " ";
         }
     }
-    std::cout << std::endl << std::endl;
+    std::cout << std::endl << std::endl;*/
 }
 
 int calculateObjective(){

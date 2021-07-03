@@ -22,9 +22,9 @@ void SA::solve() {
     
     // Initialize some datas
 
-    std::vector<std::vector<Task>> SAListOfEachDay;
-    std::vector<std::vector<Task>> bestSA;
-	std::vector<std::vector<Task>> currentSA;
+    std::vector<std::vector<int>> SAListOfEachDay;
+    std::vector<std::vector<int>> bestSA;
+	std::vector<std::vector<int>> currentSA;
     int bestScore;
 	int currentScore;
 
@@ -34,15 +34,15 @@ void SA::solve() {
 
     for (int i = 0; i < nDays; i++) {
 
-        SAListOfEachDay.push_back(std::vector<Task>());
+        SAListOfEachDay.push_back(std::vector<int>());
         for (int j = 0; j < nNodes; j++) {
 
             if (required[i][j] == true) {
 
-                SAListOfEachDay[i].push_back(Task(j));
+                SAListOfEachDay[i].push_back(j);
             }
         }
-        std::vector<Task> tempVectorForBoundary(nDays, -1);
+        std::vector<int> tempVectorForBoundary(nDays, -1);
         SAListOfEachDay[i].insert(SAListOfEachDay[i].end(), tempVectorForBoundary.begin(), tempVectorForBoundary.end());
     }
 
@@ -81,7 +81,7 @@ void SA::solve() {
 			}
 			else {
 
-				if (getRandomDecimal() < exp((newScore - currentScore) / t)) {
+				if (getRandomDecimal() < exp(-(newScore - currentScore) / t)) {
 
 					currentSA.assign(SAListOfEachDay.begin(), SAListOfEachDay.end());
 					currentScore = newScore;
@@ -101,20 +101,20 @@ int SA::getRandomInteger(int x) {
     return floor(rand() / (RAND_MAX + 1) * x); // The reason why RAND_MAX has to add one is to eliminate the possibility the function return x. 
 }
 
-void SA::tweakSolutionByInsertion(std::vector<std::vector<Task>>& SAListOfEachDay) {
+void SA::tweakSolutionByInsertion(std::vector<std::vector<int>>& SAListOfEachDay) {
 
     for (int day = 0; day < nDays; day++) {
 
         int positionToChoose = getRandomInteger(SAListOfEachDay[day].size());
         int positionToInsert = getRandomInteger(SAListOfEachDay[day].size() - 1);
 
-        Task tempValueForInsertion = Task(SAListOfEachDay[day][positionToChoose]);
+        int tempValueForInsertion = SAListOfEachDay[day][positionToChoose];
         SAListOfEachDay[day].erase(SAListOfEachDay[day].begin() + positionToChoose);
         SAListOfEachDay[day].insert(SAListOfEachDay[day].begin() + positionToInsert, tempValueForInsertion);
     }
 }
 
-void SA::tweakSolutionBySwap(std::vector<std::vector<Task>>& SAListOfEachDay) {
+void SA::tweakSolutionBySwap(std::vector<std::vector<int>>& SAListOfEachDay) {
 
     for (int day = 0; day < nDays; day++) {
 
@@ -125,7 +125,7 @@ void SA::tweakSolutionBySwap(std::vector<std::vector<Task>>& SAListOfEachDay) {
     }
 }
 
-void SA::tweakSolutionByReversion(std::vector<std::vector<Task>>& SAListOfEachDay) {
+void SA::tweakSolutionByReversion(std::vector<std::vector<int>>& SAListOfEachDay) {
 
     for (int day = 0; day < nDays; day++) {
 
@@ -141,7 +141,7 @@ void SA::tweakSolutionByReversion(std::vector<std::vector<Task>>& SAListOfEachDa
     }
 }
 
-void SA::tweakSolutionRandomly(std::vector<std::vector<Task>>& SAListOfEachDay) {
+void SA::tweakSolutionRandomly(std::vector<std::vector<int>>& SAListOfEachDay) {
 
     int randomChoice = getRandomInteger(3);
 
@@ -164,17 +164,17 @@ void SA::tweakSolutionRandomly(std::vector<std::vector<Task>>& SAListOfEachDay) 
     }
 }
 
-int SA::calculateObjective(std::vector<std::vector<Task>>& SAListOfEachDay) {
+int SA::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay) {
 
 	
 }
 
-int SA::calculateViolationScore(std::vector<std::vector<Task>>& SAListOfEachDay, int scaleOfViolationScore) {
+int SA::calculateViolationScore(std::vector<std::vector<int>>& SAListOfEachDay, int scaleOfViolationScore) {
 
 	
 }
 
-void SA::adjustDepartureTime(std::vector<std::vector<Task>>& SAListOfEachDay) {
+void SA::adjustDepartureTime(std::vector<std::vector<int>>& SAListOfEachDay) {
 
 	
 }
