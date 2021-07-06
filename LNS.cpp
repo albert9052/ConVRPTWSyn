@@ -28,9 +28,10 @@ void LNS::solve() {
 }
 vector<int> LNS::genInitSolution(){
     S.resize(nDays);
-    for(vector<vector<int>>& v : S)
-        v.resize(nRoutes);
-
+    for(vector<vector<int>>& v : S){
+        v.resize(nRoutes, {0});
+    }
+    
     vector<int> notInserted(nNormals);
     for(int i = 0; i < nNormals; i++)
         notInserted[i] = i;
@@ -47,9 +48,9 @@ vector<int> LNS::genInitSolution(){
     for(int i = 0; i < nFictives; i++)
         swap(notInserted[i], notInserted[rand() % nFictives]);
     for(int& i : notInserted){
-        int norm = fictiveLink[i] - 1;
+        int norm = fictiveLink[i];
         for(int d = 0; d < nDays; d++){
-            if(required[norm][d]){
+            if(required[i][d]){
                 int route;
                 bool valid = false;
                 while(!valid){
@@ -60,9 +61,12 @@ vector<int> LNS::genInitSolution(){
                 S[d][route].push_back(i + 1);
             }
         }
+    }        
+    for(int i = 0; i < nDays; i++){
+        for(int j = 0; j < nRoutes; j++){
+            S[i][j].push_back(0);
+        }
     }
-        
-
     solutionList = S;
     output();
 }
@@ -71,9 +75,9 @@ void LNS::removal(){
     for (vector<bool> v : required)
         for (bool b : v)
             req_sum += b ? 1 : 0;
-    int up_bnd = fmin(ceil(req_sum * 0.4), 30), low_bnd = fmin(round(req_sum * 0.1), 30);
+    int up_bnd = fmin(round(req_sum * 0.4), 30), low_bnd = fmin(ceil(req_sum * 0.1), 30);
     int u = rand() % (up_bnd - low_bnd) + low_bnd;
-    switch (rand() % 5) {
+    switch (/*rand() % 5*/0) {
     case 0:
         randomRemoval(u);
         break;
@@ -93,8 +97,29 @@ void LNS::removal(){
 }
 void LNS::randomRemoval(int u){
     while(u > 0){
-        int rmNode = rand() % nNodes;
+        int rmNode;
+        bool valid = false;
+        while(!valid){
+            valid = true;
+            rmNode = rand() % nNodes + 1;
+            for(int& i : rmdNodes)
+                if(i == rmNode)
+                    valid = false;
+        }
+        rmdNodes.push_back(rmNode);
+        for(int i = 0; i < nDays; i++){
+            for(int j = 0; j < nRoutes; j++){
+                for(int k = 0; k < S[i][j].size(); k++){
+                    if(S[i][j][k] == rmNode){
+                        S[i][j].erase(S[i][j].begin() + k);
+                        u--;
+                    }
+                }
+            }
+        }
     }
+    solutionList = S;
+    output();
 }
 void LNS::relatedRemoval(int u){
     
@@ -119,10 +144,78 @@ void LNS::repair(){
     }
 }
 void LNS::greedyRepair(){
-    
+    for(int i = 0; i < nDays; i++){        
+        vector<int> tmpRmd = rmdNodes;
+        while(tmpRmd.size() > 0){
+            double minCost = 100000.0;
+            int bestIdxInRmd = -1, bestRoute, bestIdxInRut;
+            for(int nodeIdx = 0; nodeIdx < tmpRmd.size(); nodeIdx++){
+                int node = tmpRmd[nodeIdx];
+                if(!required[node-1][i])
+                    continue;           
+                for(int j = 0; j < nRoutes; j++){
+                    for(int k = 1; k < S[i][j].size(); k++){
+                        double cost = timeMat[node][S[i][j][k]] + timeMat[node][S[i][j][k - 1]];
+                        if(cost < minCost){
+                            minCost = cost;
+                            bestRoute = j;
+                            bestIdxInRut = k;
+                            bestIdxInRmd = nodeIdx;
+                        }
+                    }
+                }
+            }
+            if(bestIdxInRmd == -1)
+                break;
+            S[i][bestRoute].insert(S[i][bestRoute].begin() + bestIdxInRut, tmpRmd[bestIdxInRmd]);
+            tmpRmd.erase(tmpRmd.begin()+bestIdxInRmd);
+        }
+    }
+    solutionList = S;
+    output();
 }
 void LNS::regretRepair(){
-    
+    for(int i = 0; i < nDays; i++){        
+        vector<int> tmpRmd = rmdNodes;
+        while(tmpRmd.size() > 0){
+            double maxDiff = 0;
+            int bestIdxInRmd = -1, bestRoute, bestIdxInRut;
+            for(int nodeIdx = 0; nodeIdx < tmpRmd.size(); nodeIdx++){
+                double minCost1 = 100000.0, minCost2 = 100000.0;
+                int bestIdxInRmd1 = -1, bestRoute1, bestIdxInRut1;
+                int node = tmpRmd[nodeIdx];
+                if(!required[node-1][i])
+                    continue;           
+                for(int j = 0; j < nRoutes; j++){
+                    for(int k = 1; k < S[i][j].size(); k++){
+                        double cost = timeMat[node][S[i][j][k]] + timeMat[node][S[i][j][k - 1]];
+                        if(cost < minCost1){
+                            minCost2 = minCost1;
+                            minCost1 = cost;
+                            bestRoute1 = j;
+                            bestIdxInRut1 = k;
+                            bestIdxInRmd1 = nodeIdx;
+                        }
+                        else if(cost < minCost2){
+                            minCost2 = cost;
+                        }
+                    }
+                }
+                if(minCost2 - minCost1 > maxDiff){
+                    maxDiff = minCost2 - minCost1;
+                    bestIdxInRmd = bestIdxInRmd1;
+                    bestRoute = bestRoute1;
+                    bestIdxInRut = bestIdxInRut1;
+                }
+            }
+            if(bestIdxInRmd == -1)
+                break;
+            S[i][bestRoute].insert(S[i][bestRoute].begin() + bestIdxInRut, tmpRmd[bestIdxInRmd]);
+            tmpRmd.erase(tmpRmd.begin()+bestIdxInRmd);
+        }
+    }
+    solutionList = S;
+    output();
 }
 void LNS::adjustDepartureTime(){
     

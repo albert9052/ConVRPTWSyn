@@ -8,6 +8,7 @@ private:
     float T0, Alpha, Lambdam, Nu, Xi;
 
     vector<vector<vector<int>>> S;
+    vector<int> rmdNodes; //tmp rmd nodes, 1~nNodes
 
     vector<int> genInitSolution();
 
@@ -21,6 +22,7 @@ private:
     void repair();
     void greedyRepair();
     void regretRepair();
+    vector<int> getMinCost(int day, vector<int> rmd, double& minCost);
 
     void adjustDepartureTime();
 public:
