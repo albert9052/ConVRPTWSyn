@@ -18,6 +18,7 @@ private:
     void clusterRemoval(int u);
     void worstRemoval_timeConsistency(int u);
     void synchronized_servicesCustomerRemoval(int u);
+    int rmFromEachday(int node);
 
     void repair();
     void greedyRepair();
