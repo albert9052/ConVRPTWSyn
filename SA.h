@@ -1,5 +1,20 @@
 #include "Solution.h"
 
+class Smallest {
+
+public: 
+	
+	double* value;
+	int* index;
+	int quantity;
+
+	Smallest(int _value);
+
+	int getTheSmallest();
+	void increaseAValue(int _index, _value);
+	void resetAll(int _value);
+};
+
 class SA : public Solution{
 
 private:
@@ -13,8 +28,8 @@ private:
     static bool isFirstTime;
 
     std::vector<std::vector<bool>> modifiedRequiredMatrix;
-	std::vector<std::vector<int>> arrivalTimes;
-	std::vector<std::vector<int>> departureTimes;
+	std::vector<std::vector<double>> arrivalTimes;
+	std::vector<std::vector<double>> departureTimes;
 
     int calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay);
 	int calculateViolationScore(std::vector<std::vector<int>>& solutionListOfEachDay, int scaleOfViolationScore);
@@ -26,6 +41,8 @@ private:
     void tweakSolutionByReversion(std::vector<std::vector<int>>& solutionListOfEachDay);
     void tweakSolutionRandomly(std::vector<std::vector<int>>& solutionListOfEachDay);
     void adjustDepartureTime(std::vector<std::vector<int>>& solutionListOfEachDay);
+	void improveTimeConsistency(std::vector<std::vector<int>>& solutionListOfEachDay);
+	bool isFeasible(std::vector<std::vector<int>>$ solutionListOfEachDay);
 
 public:
 

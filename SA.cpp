@@ -4,6 +4,24 @@ bool SA::isFirstTime = true;
 
 SA::SA(/* args */)
 {
+
+	for (int i = 0; i < nNodes; i++) {
+
+		arrivalTimes.push_back(std::vector<double>());
+		for (int j = 0; j < nDays; j++) {
+
+			arrivalTimes[i].push_back(-1);
+		}
+	}
+
+	for (int i = 0; i < nNodes; i++) {
+
+		departureTimes.push_back(std::vector<double>());
+		for (int j = 0; j < nDays; j++) {
+
+			departureTimes[i].push_back(-1);
+		}
+	}
 }
 
 void SA::solve() {
@@ -22,7 +40,7 @@ void SA::solve() {
     
     // Initialize some datas
 
-    std::vector<std::vector<int>> SAListOfEachDay;
+    std::vector<std::vector<int>> SAListOfEachDay; // It contains all the normal and fictive nodes, and (nRoutes - 1) -1 for boundaries of routes. 
     std::vector<std::vector<int>> bestSA;
 	std::vector<std::vector<int>> currentSA;
     int bestScore;
@@ -42,7 +60,7 @@ void SA::solve() {
                 SAListOfEachDay[i].push_back(j);
             }
         }
-        std::vector<int> tempVectorForBoundary(nDays, -1);
+        std::vector<int> tempVectorForBoundary(nRoutes - 1, -1);
         SAListOfEachDay[i].insert(SAListOfEachDay[i].end(), tempVectorForBoundary.begin(), tempVectorForBoundary.end());
     }
 
@@ -166,15 +184,179 @@ void SA::tweakSolutionRandomly(std::vector<std::vector<int>>& SAListOfEachDay) {
 
 int SA::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay) {
 
+	// Directly arrange the arrival time. 
 	
+	for (int day = 0; day < nDays; day++) {
+
+		double currentTime = earliestTime[0][day];
+		int previousNode = 0;
+		for (int j = 0; j < SAListOfEachDay[day].size(); j++) {
+
+			int currentNode = SAListOfEachDay[day][j];
+			if (currentNode == -1) {
+
+				// Next routes
+				currentTime = earliestTime[0][day];
+			}
+			else {
+
+				double commutingTime = timeMat[previousNode][currentNode];
+				if (currentTime + commutingTime > earliestTime[currnetNode][day]) {
+
+					arrivalTimes[currentNode][day] = currentTime + commutingTime;
+				}
+				else {
+
+					arrivalTimes[currentNode][day] = earliestTime[currentNode][day];
+				}
+				currentTime = arrivalTimes[currentNode][day] + serviceTime[currentNode][day];
+				departureTimes[currentNode][day] = currentTime;
+			}
+			previousNode = currentNode;
+		}
+	}
+	
+	// Rearrange the arrival time of each synchorized service. 
+	while (1) {
+
+		for (int day = 0; day < nDays; day++) {
+
+			for (int i = 0; i < fictiveLink; i++) {
+
+				if (fictiveLink[i] != 0) {
+					
+					firstNode = i + 1;
+					secondNode = fictiveLink[i];
+					firstArrivalTime = arrivalTimes[firstNode][day];
+					secondArrivalTime = arrivalTimes[secondNode][day];
+
+					if (firstArrivalTime == secondArrivalTime) {
+
+						continue;
+					}
+
+					if (firstArrivalTime > secondArrivalTime) {
+
+						std::swap(firstNode, secondNode);
+						std::swap(firstArrivalTime, secondArrivalTime);
+					}
+
+					bool found = false;
+					double maxPostponeDuration = secondArrivalTime - firstArrivalTime;
+					for (int j = 0; j < SAListOfEachDay[day].size(); j++) {
+
+						if (found == true) {
+
+							int currentNode = SAListOfEachDay[day][j];
+							if (lastTime[currentNode][day] - departureTimes[currentNode][day] < maxPostponeDuration) {
+
+								maxPostponeDuration = lastTime[currentNode][day] - departureTimes[currentNode][day];
+							}
+						}
+						if (SAListOfEachDay[day][j] == firstNode) {
+
+							found = true;
+						}
+					}
+					if (maxPostponeDuration > 0) {
+
+						arrivalTimes[firstNode][day] += maxPostponeDuration;
+						departureTimes[firstNode][day] += maxPostponeDuration;
+						bool found = false;
+						for (int j = 0; j < SAListOfEachDay[day].size(); j++) {
+
+							if (found == true) {
+
+								if (SAListOfEachDay[day][j] == -1) {
+
+									break;
+								}
+								int currentNode = SAListOfEachDay[day][j];
+								arrivalTimes[currentNode][day] += maxPostponeDuration;
+								departureTimes[currentNode][day] += maxPostponeDuration;
+							}
+							if (SAListOfEachDay[day][j] == firstNode) {
+
+								found = true;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 }
 
 int SA::calculateViolationScore(std::vector<std::vector<int>>& SAListOfEachDay, int scaleOfViolationScore) {
 
-	
+	// Pure calculation. 
 }
 
 void SA::adjustDepartureTime(std::vector<std::vector<int>>& SAListOfEachDay) {
 
+	// First adjust the arrival times of those non-synchoronized one. 
 	
+	// Then adjust the arrival times of those synchoronized one. 
+}
+
+void SA::improveTimeConsistency(std::vector<std::vector<int>>& solutionListOfEachDay) {
+	
+	
+}
+
+bool SA::isFeasible(std::vector<std::vector<int>>$ solutionListOfEachDay) {
+
+	
+}
+
+Smallest::Smallest(int _value, int _quantity) {
+
+	quantity = _quantity;
+	value = new int[quantity];
+	index = new int[quantity];
+
+	for (int i = 0; i < quantity; i++) {
+
+		value[i] = _value;
+		index[i] = i;
+	}
+}
+
+int Smallest::getTheSmallest() {
+
+	return index[0];
+}
+
+void increaseAValue(int _index, _value) {
+
+	bool found = false;
+	for (int i = 0; i < quantity; i++) {
+
+		if (found == true) {
+
+			if (value[i] < value[i - 1]) {
+
+				std::swap(value[i], value[i - 1]);
+			}
+			else {
+
+				break;
+			}
+		}
+
+		if (_index == index[i]) {
+
+			found = true;
+			value[i] = _value;
+		}
+	}
+}
+
+void resetAll(int _value) {
+
+	for (int i = 0; i < quantity; i++) {
+
+		value[i] = _value;
+	}
 }
