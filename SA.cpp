@@ -201,7 +201,7 @@ int SA::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay) {
 			else {
 
 				double commutingTime = timeMat[previousNode][currentNode];
-				if (currentTime + commutingTime > earliestTime[currnetNode][day]) {
+				if (currentTime + commutingTime > earliestTime[currentNode][day]) {
 
 					arrivalTimes[currentNode][day] = currentTime + commutingTime;
 				}
@@ -221,14 +221,14 @@ int SA::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay) {
 
 		for (int day = 0; day < nDays; day++) {
 
-			for (int i = 0; i < fictiveLink; i++) {
+			for (int i = 0; i < fictiveLink.size(); i++) {
 
 				if (fictiveLink[i] != 0) {
 					
-					firstNode = i + 1;
-					secondNode = fictiveLink[i];
-					firstArrivalTime = arrivalTimes[firstNode][day];
-					secondArrivalTime = arrivalTimes[secondNode][day];
+					int firstNode = i + 1;
+					int secondNode = fictiveLink[i];
+					double firstArrivalTime = arrivalTimes[firstNode][day];
+					double secondArrivalTime = arrivalTimes[secondNode][day];
 
 					if (firstArrivalTime == secondArrivalTime) {
 
@@ -302,25 +302,12 @@ void SA::adjustDepartureTime(std::vector<std::vector<int>>& SAListOfEachDay) {
 
 void SA::improveTimeConsistency(std::vector<std::vector<int>>& solutionListOfEachDay) {
 	
-	
+	return;
 }
 
-bool SA::isFeasible(std::vector<std::vector<int>>$ solutionListOfEachDay) {
+bool SA::isFeasible(std::vector<std::vector<int>>& solutionListOfEachDay) {
 
-	
-}
-
-Smallest::Smallest(int _value, int _quantity) {
-
-	quantity = _quantity;
-	value = new int[quantity];
-	index = new int[quantity];
-
-	for (int i = 0; i < quantity; i++) {
-
-		value[i] = _value;
-		index[i] = i;
-	}
+	return true;
 }
 
 int Smallest::getTheSmallest() {
@@ -328,7 +315,7 @@ int Smallest::getTheSmallest() {
 	return index[0];
 }
 
-void increaseAValue(int _index, _value) {
+void Smallest::increaseAValue(int _index, int _value) {
 
 	bool found = false;
 	for (int i = 0; i < quantity; i++) {
@@ -353,7 +340,7 @@ void increaseAValue(int _index, _value) {
 	}
 }
 
-void resetAll(int _value) {
+void Smallest::resetAll(int _value) {
 
 	for (int i = 0; i < quantity; i++) {
 
