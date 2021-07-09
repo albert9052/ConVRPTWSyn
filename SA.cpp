@@ -4,22 +4,27 @@ bool SA::isFirstTime = true;
 
 SA::SA(/* args */)
 {
+	numberOfNodes = nNodes + 1;
+	numberOfNormalNodes = nNormals + 1;
+	numberOfFictiveNodes = nFictives;
+	numberOfRoutes = nRoutes;
+	numberOfDays = nDays;
 
-	for (int i = 0; i < nNodes; i++) {
+	arrivalTimes = std::vector<std::vector<double>>(numberOfNodes, (std::vector<double>(numberOfDays, -1)));
 
-		arrivalTimes.push_back(std::vector<double>());
-		for (int j = 0; j < nDays; j++) {
+	departureTimes = std::vector<std::vector<double>>(numberOfNodes, (std::vector<double>(numberOfDays, -1)));
+	
 
-			arrivalTimes[i].push_back(-1);
-		}
-	}
+	postponedDuration = std::vector<std::vector<std::vector<double>>>(numberOfDays, std::vector<std::vector<double>>(numberOfNodes, std::vector<double>(numberOfNodes, 0)));
 
-	for (int i = 0; i < nNodes; i++) {
+	correspondingList.resize(numberOfNodes + 1);
+	correspondingList[0] = -1;
+	for (int i = 1; i < numberOfNodes + 1; i++) {
 
-		departureTimes.push_back(std::vector<double>());
-		for (int j = 0; j < nDays; j++) {
+		correspondingList[i] = fictiveLink[i - 1];
+		if (fictiveLink[i - 1] != 0) {
 
-			departureTimes[i].push_back(-1);
+			correspondingList[fictiveLink[i - 1]] = i;
 		}
 	}
 }
@@ -40,7 +45,7 @@ void SA::solve() {
     
     // Initialize some datas
 
-    std::vector<std::vector<int>> SAListOfEachDay; // It contains all the normal and fictive nodes, and (nRoutes - 1) -1 for boundaries of routes. 
+    std::vector<std::vector<int>> SAListOfEachDay; // It contains all the normal and fictive nodes, and (numberOfRoutes - 1) -1 for boundaries of routes. 
     std::vector<std::vector<int>> bestSA;
 	std::vector<std::vector<int>> currentSA;
     int bestScore;
@@ -50,17 +55,17 @@ void SA::solve() {
 
     // Generate initial datas, like initial SA. 
 
-    for (int i = 0; i < nDays; i++) {
+    for (int i = 0; i < numberOfDays; i++) {
 
         SAListOfEachDay.push_back(std::vector<int>());
-        for (int j = 0; j < nNodes; j++) {
+        for (int j = 0; j < numberOfNodes; j++) {
 
             if (required[i][j] == true) {
 
                 SAListOfEachDay[i].push_back(j);
             }
         }
-        std::vector<int> tempVectorForBoundary(nRoutes - 1, -1);
+        std::vector<int> tempVectorForBoundary(numberOfRoutes - 1, -1);
         SAListOfEachDay[i].insert(SAListOfEachDay[i].end(), tempVectorForBoundary.begin(), tempVectorForBoundary.end());
     }
 
@@ -71,7 +76,7 @@ void SA::solve() {
         for (int iterationNum = 0; iterationNum < Ld; iterationNum) {
 
             // Tweak the SA
-            for (int day = 0; day < nDays; day++) {
+            for (int day = 0; day < numberOfDays; day++) {
 
                 tweakSolutionRandomly(SAListOfEachDay);
             }
@@ -121,7 +126,7 @@ int SA::getRandomInteger(int x) {
 
 void SA::tweakSolutionByInsertion(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-    for (int day = 0; day < nDays; day++) {
+    for (int day = 0; day < numberOfDays; day++) {
 
         int positionToChoose = getRandomInteger(SAListOfEachDay[day].size());
         int positionToInsert = getRandomInteger(SAListOfEachDay[day].size() - 1);
@@ -134,7 +139,7 @@ void SA::tweakSolutionByInsertion(std::vector<std::vector<int>>& SAListOfEachDay
 
 void SA::tweakSolutionBySwap(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-    for (int day = 0; day < nDays; day++) {
+    for (int day = 0; day < numberOfDays; day++) {
 
         int position1 = getRandomInteger(SAListOfEachDay[day].size());
         int position2 = getRandomInteger(SAListOfEachDay[day].size());
@@ -145,7 +150,7 @@ void SA::tweakSolutionBySwap(std::vector<std::vector<int>>& SAListOfEachDay) {
 
 void SA::tweakSolutionByReversion(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-    for (int day = 0; day < nDays; day++) {
+    for (int day = 0; day < numberOfDays; day++) {
 
         int position1 = getRandomInteger(SAListOfEachDay[day].size());
         int position2 = getRandomInteger(SAListOfEachDay[day].size());
@@ -185,8 +190,7 @@ void SA::tweakSolutionRandomly(std::vector<std::vector<int>>& SAListOfEachDay) {
 int SA::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay) {
 
 	// Directly arrange the arrival time. 
-	
-	for (int day = 0; day < nDays; day++) {
+	for (int day = 0; day < numberOfDays; day++) {
 
 		double currentTime = earliestTime[0][day];
 		int previousNode = 0;
@@ -207,6 +211,7 @@ int SA::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay) {
 				}
 				else {
 
+					postponedDuration[day][previousNode][currentNode] = earliestTime[currentNode][day] - currentTime - commutingTime;
 					arrivalTimes[currentNode][day] = earliestTime[currentNode][day];
 				}
 				currentTime = arrivalTimes[currentNode][day] + serviceTime[currentNode][day];
@@ -216,76 +221,153 @@ int SA::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay) {
 		}
 	}
 	
-	// Rearrange the arrival time of each synchorized service. 
-	while (1) {
+	// Rearrange the arrival time of each synchronized service. 
+	// Haven't consider about 0's last time. (latest time)
+	while (1)  {
 
-		for (int day = 0; day < nDays; day++) {
+		for (int day = 0; day < numberOfDays; day++) {
 
-			for (int i = 0; i < fictiveLink.size(); i++) {
+			std::vector<int> wholeList = SAListOfEachDay[day];
 
-				if (fictiveLink[i] != 0) {
-					
-					int firstNode = i + 1;
-					int secondNode = fictiveLink[i];
-					double firstArrivalTime = arrivalTimes[firstNode][day];
-					double secondArrivalTime = arrivalTimes[secondNode][day];
+			// Sort all synchronized nodes
+			std::vector<std::vector<int>> nonSortedLists = std::vector<std::vector<int>>(numberOfRoutes);;
+			int temp = 0; 
+			for (int i = 0; i < wholeList.size(); i++) {
 
-					if (firstArrivalTime == secondArrivalTime) {
+				if (wholeList[i] == -1) {
+
+					temp++;
+					continue;
+				}
+				nonSortedLists[temp].push_back(wholeList[i]);
+			}
+
+			int* currentIndexes = new int[numberOfRoutes];
+			std::memset(currentIndexes, 0, numberOfRoutes);
+			int lengthOfSortedList = 0;
+			for (int i = 0; i < numberOfRoutes; i++) {
+
+				lengthOfSortedList += wholeList[i];
+			}
+			int* sortedList = new int[lengthOfSortedList];
+			int tempIndex = 0;
+			while(1) {
+
+				int smallest = INT_MAX;
+				bool finished = true;
+				int chosenOne = 0;
+				for (int i = 0; i < numberOfRoutes; i++) {
+
+					if (currentIndexes[i] >= nonSortedLists[i].size()) {
 
 						continue;
 					}
+					int currentNode = nonSortedLists[i][currentIndexes[i]];
+					if (correspondingList[currentNode - 1] == 0) {
 
-					if (firstArrivalTime > secondArrivalTime) {
-
-						std::swap(firstNode, secondNode);
-						std::swap(firstArrivalTime, secondArrivalTime);
+						i--;
+						currentIndexes[i]++;
+						continue;
 					}
+					if (arrivalTimes[day][currentNode] < smallest) {
 
-					bool found = false;
-					double maxPostponeDuration = secondArrivalTime - firstArrivalTime;
-					for (int j = 0; j < SAListOfEachDay[day].size(); j++) {
-
-						if (found == true) {
-
-							int currentNode = SAListOfEachDay[day][j];
-							if (lastTime[currentNode][day] - departureTimes[currentNode][day] < maxPostponeDuration) {
-
-								maxPostponeDuration = lastTime[currentNode][day] - departureTimes[currentNode][day];
-							}
-						}
-						if (SAListOfEachDay[day][j] == firstNode) {
-
-							found = true;
-						}
-					}
-					if (maxPostponeDuration > 0) {
-
-						arrivalTimes[firstNode][day] += maxPostponeDuration;
-						departureTimes[firstNode][day] += maxPostponeDuration;
-						bool found = false;
-						for (int j = 0; j < SAListOfEachDay[day].size(); j++) {
-
-							if (found == true) {
-
-								if (SAListOfEachDay[day][j] == -1) {
-
-									break;
-								}
-								int currentNode = SAListOfEachDay[day][j];
-								arrivalTimes[currentNode][day] += maxPostponeDuration;
-								departureTimes[currentNode][day] += maxPostponeDuration;
-							}
-							if (SAListOfEachDay[day][j] == firstNode) {
-
-								found = true;
-							}
-						}
+						chosenOne = i;
+						finished = false;
 					}
 				}
+				if (finished == true) {
+
+					break;
+				}
+				currentIndexes[chosenOne]++;
+				sortedList[tempIndex] = smallest;
+				tempIndex++;
 			}
+
+			bool* nodesDone = new bool[numberOfNodes];
+			std::memset(nodesDone, false, numberOfNodes);
+			for (int i = 0; i < lengthOfSortedList; i++) {
+
+				// Get the earliest. 
+				int chosenOne = sortedList[i];
+				int correspondingOne = correspondingList[chosenOne];
+
+				// Find all the nodes that will be affected
+				int chosenRoute = 0;
+				int positionOfChosenNode = 0;
+				int* affectedNodes = NULL;
+				int lengthOfAffectedNodes = 0;
+				for (int j = 0; j < numberOfRoutes; j++) {
+
+					auto position = std::find(nonSortedLists[j].begin(), nonSortedLists[j].end(), chosenOne);
+					if (position != nonSortedLists[j].end()) {
+
+						positionOfChosenNode = (int)(position - nonSortedLists[j].begin());
+						lengthOfAffectedNodes = nonSortedLists[j].size() - positionOfChosenNode;
+						affectedNodes = new int[lengthOfAffectedNodes];
+						tempIndex = 0;
+						for (int k = positionOfChosenNode + 1; k < nonSortedLists[j].size(); k++) {
+
+							affectedNodes[tempIndex] = nonSortedLists[j][k];
+							tempIndex++;
+						}
+						chosenRoute = j;
+						break;
+					}
+				}
+
+				// Calculate how long it would take to postpone to match its corresponding node. 
+				int maxPostponedDuration = arrivalTimes[correspondingOne][day] - arrivalTimes[chosenOne][day];
+			
+				// Calculate all the maximum distance that each node which will be affected if we move the node we picked before can move. 
+				// In order to get our maximum moving distance for the picked node. 
+				int numberOfGoodNodes = 1;
+				int numberOfBadNodes = 0;
+				std::vector<int> types; // 1 for Synchronized, 2 for duration between its departure time and last time(latest time). . 
+				std::vector<int> durations;
+
+				int previousNode = chosenOne;
+				double accumulatedPostponedDuration = postponedDuration[day][previousNode][affectedNodes[0]];
+				for (int j = 0; j < lengthOfAffectedNodes; j++) {
+
+					int theOneToCalculate = affectedNodes[j];
+					if (departureTimes[theOneToCalculate][day] > lastTime[theOneToCalculate][day]) {
+
+						numberOfBadNodes++;
+					}
+					else {
+
+						types.push_back(2);
+						durations.push_back(lastTime[theOneToCalculate][day] - departureTimes[theOneToCalculate][day] + accumulatedPostponedDuration);
+					}
+
+					if (correspondingList[theOneToCalculate] != 0) {
+
+						if (arrivalTimes[correspondingList[theOneToCalculate]] < arrivalTimes[theOneToCalculate]) {
+
+							numberOfBadNodes++;
+						}
+						else {
+
+							types.push_back(1);
+							durations.push_back(arrivalTimes[correspondingList[theOneToCalculate]][day] - arrivalTimes[theOneToCalculate][day] + accumulatedPostponedDuration);
+							numberOfGoodNodes++;
+						}
+						
+					}
+
+					accumulatedPostponedDuration += postponedDuration[day][previousNode][theOneToCalculate];
+					previousNode = theOneToCalculate;
+				}
+
+				// Sort the durations and types together. 
+				
+				// By go over the durations and types, we can get our best moving distance. 
+			}
+
+			// Remove the picked one and its corresponding node. 
 		}
 	}
-
 }
 
 int SA::calculateViolationScore(std::vector<std::vector<int>>& SAListOfEachDay, int scaleOfViolationScore) {
@@ -295,9 +377,9 @@ int SA::calculateViolationScore(std::vector<std::vector<int>>& SAListOfEachDay, 
 
 void SA::adjustDepartureTime(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-	// First adjust the arrival times of those non-synchoronized one. 
+	// First adjust the arrival times of those non-synchronized one. 
 	
-	// Then adjust the arrival times of those synchoronized one. 
+	// Then adjust the arrival times of those synchronized one. 
 }
 
 void SA::improveTimeConsistency(std::vector<std::vector<int>>& solutionListOfEachDay) {

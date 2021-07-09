@@ -1,4 +1,7 @@
 #include "Solution.h"
+#include <algorithm>
+#include <cstring>
+#include <climits>
 
 class Smallest {
 
@@ -41,6 +44,13 @@ private:
     std::vector<std::vector<bool>> modifiedRequiredMatrix;
 	std::vector<std::vector<double>> arrivalTimes;
 	std::vector<std::vector<double>> departureTimes;
+	std::vector<std::vector<std::vector<double>>> postponedDuration;
+	std::vector<int> correspondingList; // 0 means no corresponding nodes
+	int numberOfNodes;
+	int numberOfNormalNodes;
+	int numberOfFictiveNodes;
+	int numberOfRoutes;
+	int numberOfDays;
 
     int calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay);
 	int calculateViolationScore(std::vector<std::vector<int>>& solutionListOfEachDay, int scaleOfViolationScore);
