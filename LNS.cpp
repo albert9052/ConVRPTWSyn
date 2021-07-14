@@ -28,7 +28,7 @@ Iter(_Iter), T0(_T0), Alpha(_Alpha), Lambda(_Lambda), Nu(_Nu), Xi(_Xi){
 }
 void LNS::solve() {
     float T = T0;
-    vector<int> S = genInitSolution();
+    genInitSolution();
     for (int i = 0; i < /*Iter*/10; i++) {
         cout <<endl <<endl<<"   ====  "<<i<<"  ====" <<endl;
         removal();
