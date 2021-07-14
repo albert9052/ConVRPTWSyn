@@ -2,17 +2,25 @@
 
 template <class T> 
 T in(T item, vector<T> arr){
-    for(T& it : arr)
+    for(T it : arr)
         if(it == item)
             return true;
     return false;
 }
 
+template <class T> 
+T avr(vector<T> arr){
+    T ans = 0;
+    for(T it : arr)
+        ans += it;
+    return ans / arr.size();
+}
+
 LNS::LNS(){
     
 }
-LNS::LNS(int _Iter, float _T0, float _Alpha, float _Lambdam, float _Nu, float _Xi): 
-Iter(_Iter), T0(_T0), Alpha(_Alpha), Lambdam(_Lambdam), Nu(_Nu), Xi(_Xi){
+LNS::LNS(int _Iter, float _T0, float _Alpha, float _Lambda, float _Nu, float _Xi): 
+Iter(_Iter), T0(_T0), Alpha(_Alpha), Lambda(_Lambda), Nu(_Nu), Xi(_Xi){
     // I : number of iterations proceeds from the beginning of the algorithm
     // T0 : represents the initial temperature
     // Alpha : the cooling rate, 0 < Alpha < 1
@@ -83,28 +91,30 @@ vector<int> LNS::genInitSolution(){
     solutionList = S;
     output();
 }
-void LNS::removal(){
+int LNS::getu(){
     int req_sum = 0;
     for (vector<bool> v : required)
         for (bool b : v)
             req_sum += b ? 1 : 0;
     int up_bnd = fmin(floor(req_sum * 0.4), 30), low_bnd = fmin(ceil(req_sum * 0.1), 30);
-    int u = rand() % (up_bnd - low_bnd) + low_bnd;
+    return rand() % (up_bnd - low_bnd) + low_bnd;
+}
+void LNS::removal(){
     switch (/*rand() % 5*/0) {
     case 0:
-        randomRemoval(u);
+        randomRemoval();
         break;
     case 1:
-        relatedRemoval(u);
+        relatedRemoval();
         break;
     case 2:
-        clusterRemoval(u);
+        clusterRemoval();
         break;
     case 3:
-        worstRemoval_timeConsistency(u);
+        worstRemoval_timeConsistency();
         break;
     case 4:
-        synchronized_servicesCustomerRemoval(u);
+        synchronized_servicesCustomerRemoval();
         break;
     }
 }
@@ -122,7 +132,8 @@ int LNS::rmFromEachday(int node){
     }
     return ans;
 }
-void LNS::randomRemoval(int u){
+void LNS::randomRemoval(){
+    int u = getu();
     while(u > 0){
         int rmNode;
         while(1){
@@ -136,23 +147,52 @@ void LNS::randomRemoval(int u){
     solutionList = S;
     output();
 }
-void LNS::relatedRemoval(int u){
-    int initNode = rand() % nNodes + 1;
-    u -= rmFromEachday(initNode);
-    rmdNodes.push_back(initNode);
+int LNS::r(int i, int j){
+    int ans = nDays;
+    for(int d = 0; d < nDays; d++)
+        if(required[i][d] != required[j][d])
+            ans--;
+    return ans;
+}
+int LNS::R(int i, int j){
+    int v=1;
+    return Lambda * timeMat[i][j] + v * (abs(avr(required[i])-avr(required[j]))) + Xi * r(i, j);
+}
+void LNS::relatedRemoval(){
+    int rmNode = rand() % nNodes + 1, u = getu();
+    u -= rmFromEachday(rmNode);
+    rmdNodes.push_back(rmNode);
     while(u > 0){
-        int refNode = rmdNodes[rand() % rmdNodes.size()];
-        
+        int refNode = rmdNodes[rand() % rmdNodes.size()], minSimilarity = INT_MAX;
+        for(int i = 1; i <= nNodes; i++){
+            if(!in(i, rmdNodes)){
+                int similarity = R(refNode, i);
+                if(similarity < minSimilarity){
+                    minSimilarity = similarity;
+                    rmNode = i;
+                }
+            }
+        }
+        u -= rmFromEachday(rmNode);
+        rmdNodes.push_back(rmNode);
     }
 }
-void LNS::clusterRemoval(int u){
+void LNS::clusterRemoval(){
+    for(int day = 1; day <= nDays; day++){
+        int u = getu();
+        while(u > 0){
+
+        }
+    }
+}
+void LNS::worstRemoval_timeConsistency(){
     
 }
-void LNS::worstRemoval_timeConsistency(int u){
-    
-}
-void LNS::synchronized_servicesCustomerRemoval(int u){
-    
+void LNS::synchronized_servicesCustomerRemoval(){
+    for(int i = nNormals + 1; i <= nNodes; i++){
+        rmFromEachday(i);
+        rmdNodes.push_back(i);
+    }
 }
 void LNS::repair(){
     switch (/*rand() % 2*/1) {

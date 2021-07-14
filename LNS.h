@@ -5,7 +5,7 @@ class LNS :  public Solution
 {
 private:
     int Iter;
-    float T0, Alpha, Lambdam, Nu, Xi;
+    float T0, Alpha, Lambda, Nu, Xi;
 
     vector<vector<vector<int>>> S;
     vector<int> rmdNodes; //tmp rmd nodes, 1~nNodes
@@ -13,12 +13,15 @@ private:
     vector<int> genInitSolution();
 
     void removal();
-    void randomRemoval(int u);
-    void relatedRemoval(int u);
-    void clusterRemoval(int u);
-    void worstRemoval_timeConsistency(int u);
-    void synchronized_servicesCustomerRemoval(int u);
+    void randomRemoval();
+    void relatedRemoval();
+    void clusterRemoval();
+    void worstRemoval_timeConsistency();
+    void synchronized_servicesCustomerRemoval();
     int rmFromEachday(int node);
+    int R(int i, int j);
+    int r(int i, int j);
+    int getu();
 
     void repair();
     void greedyRepair();
@@ -28,7 +31,7 @@ private:
     void adjustDepartureTime();
 public:
     LNS();
-    LNS(int Iter, float T0, float Alpha, float Lambdam, float Nu, float Xi);
+    LNS(int Iter, float T0, float Alpha, float Lambda, float Nu, float Xi);
     void solve();
 };
 
