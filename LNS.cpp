@@ -47,7 +47,7 @@ void LNS::solve() {
     }
 
 }
-vector<int> LNS::genInitSolution(){
+void LNS::genInitSolution(){
     S.resize(nDays);
     for(vector<vector<int>>& v : S){
         v.resize(nRoutes, {0});
