@@ -2,32 +2,7 @@
 
 bool SA::isFirstTime = true;
 
-SA::SA(/* args */)
-{
-	numberOfNodes = nNodes + 1;
-	numberOfNormalNodes = nNormals + 1;
-	numberOfFictiveNodes = nFictives;
-	numberOfRoutes = nRoutes;
-	numberOfDays = nDays;
-
-	arrivalTimes = std::vector<std::vector<double>>(numberOfNodes, (std::vector<double>(numberOfDays, -1)));
-
-	departureTimes = std::vector<std::vector<double>>(numberOfNodes, (std::vector<double>(numberOfDays, -1)));
-	
-
-	postponedDuration = std::vector<std::vector<std::vector<double>>>(numberOfDays, std::vector<std::vector<double>>(numberOfNodes, std::vector<double>(numberOfNodes, 0)));
-
-	correspondingList.resize(numberOfNodes + 1);
-	correspondingList[0] = -1;
-	for (int i = 1; i < numberOfNodes + 1; i++) {
-
-		correspondingList[i] = fictiveLink[i - 1];
-		if (fictiveLink[i - 1] != 0) {
-
-			correspondingList[fictiveLink[i - 1]] = i;
-		}
-	}
-}
+SA::SA(/* args */) {}
 
 void SA::solve() {
 
@@ -45,7 +20,7 @@ void SA::solve() {
     
     // Initialize some datas
 
-    std::vector<std::vector<int>> SAListOfEachDay; // It contains all the normal and fictive nodes, and (numberOfRoutes - 1) -1 for boundaries of routes. 
+    std::vector<std::vector<int>> SAListOfEachDay; // It contains all the normal and fictive nodes, and (nRoutes - 1) -1 for boundaries of routes. 
     std::vector<std::vector<int>> bestSA;
 	std::vector<std::vector<int>> currentSA;
     int bestScore;
@@ -55,17 +30,17 @@ void SA::solve() {
 
     // Generate initial datas, like initial SA. 
 
-    for (int i = 0; i < numberOfDays; i++) {
+    for (int i = 0; i < nDays; i++) {
 
         SAListOfEachDay.push_back(std::vector<int>());
-        for (int j = 0; j < numberOfNodes; j++) {
+        for (int j = 0; j < nNodes; j++) {
 
             if (required[i][j] == true) {
 
                 SAListOfEachDay[i].push_back(j);
             }
         }
-        std::vector<int> tempVectorForBoundary(numberOfRoutes - 1, -1);
+        std::vector<int> tempVectorForBoundary(nRoutes - 1, -1);
         SAListOfEachDay[i].insert(SAListOfEachDay[i].end(), tempVectorForBoundary.begin(), tempVectorForBoundary.end());
     }
 
@@ -76,7 +51,7 @@ void SA::solve() {
         for (int iterationNum = 0; iterationNum < Ld; iterationNum) {
 
             // Tweak the SA
-            for (int day = 0; day < numberOfDays; day++) {
+            for (int day = 0; day < nDays; day++) {
 
                 tweakSolutionRandomly(SAListOfEachDay);
             }
@@ -84,11 +59,18 @@ void SA::solve() {
 			// Adjust the SA to its best
 			adjustDepartureTime(SAListOfEachDay);
 
-            // Calculate its score
-            int newScore = calculateObjective(SAListOfEachDay);
+            // Get its minimized violation score by giving each node arrival and departure times. 
+            calculateObjective(SAListOfEachDay);
 
 			// Calculate and subtract the violation score
-			newScore -= calculateViolationScore(SAListOfEachDay, scaleOfViolationScore);
+			int violationScore = calculateViolationScore(SAListOfEachDay, scaleOfViolationScore);
+
+			// Do Step 4 to minimize maximum arrival time differences. 
+
+			// If it's feasible, do Step 5 to find the best local score using 2-opt algorithm. 
+			// This one may cost too much time. In one of the references, there's a way to reduce the time it might take. 
+
+			int newScore;// = getScore();
             
             // Store it if it's the best one so far. 
             if (newScore >= bestScore) {
@@ -116,17 +98,18 @@ void SA::solve() {
 
 double SA::getRandomDecimal() {
 
-    return (rand() / RAND_MAX + 1);
+    return (rand() / RAND_MAX);
 }
 
 int SA::getRandomInteger(int x) {
 
-    return floor(rand() / (RAND_MAX + 1) * x); // The reason why RAND_MAX has to add one is to eliminate the possibility the function return x. 
+	int randomInteger = floor(rand() / (RAND_MAX) * x);
+    return randomInteger == x ? x - 1 : randomInteger; // The reason why RAND_MAX has to add one is to eliminate the possibility the function return x. 
 }
 
 void SA::tweakSolutionByInsertion(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-    for (int day = 0; day < numberOfDays; day++) {
+    for (int day = 0; day < nDays; day++) {
 
         int positionToChoose = getRandomInteger(SAListOfEachDay[day].size());
         int positionToInsert = getRandomInteger(SAListOfEachDay[day].size() - 1);
@@ -139,7 +122,7 @@ void SA::tweakSolutionByInsertion(std::vector<std::vector<int>>& SAListOfEachDay
 
 void SA::tweakSolutionBySwap(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-    for (int day = 0; day < numberOfDays; day++) {
+    for (int day = 0; day < nDays; day++) {
 
         int position1 = getRandomInteger(SAListOfEachDay[day].size());
         int position2 = getRandomInteger(SAListOfEachDay[day].size());
@@ -150,7 +133,7 @@ void SA::tweakSolutionBySwap(std::vector<std::vector<int>>& SAListOfEachDay) {
 
 void SA::tweakSolutionByReversion(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-    for (int day = 0; day < numberOfDays; day++) {
+    for (int day = 0; day < nDays; day++) {
 
         int position1 = getRandomInteger(SAListOfEachDay[day].size());
         int position2 = getRandomInteger(SAListOfEachDay[day].size());

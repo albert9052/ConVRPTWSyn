@@ -29,29 +29,6 @@ public:
 	void resetAll(int _value);
 };
 
-class TypeAndDuration {
-
-public: 
-
-	int type; // 1 for Synchronized, 2 for duration between its departure time and last time(latest time). 
-	double duration;
-
-	TypeAndDuration(int _type, int _duration) {
-
-		type = _type;
-		duration = _duration;
-	}
-
-	bool operator<(const TypeAndDuration& anotherOne) {
-
-		if (this.duration < anotherOne.duration) {
-
-			return true;
-		}
-		return false;
-	}
-}
-
 class SA : public Solution{
 
 private:
@@ -65,15 +42,6 @@ private:
     static bool isFirstTime;
 
     std::vector<std::vector<bool>> modifiedRequiredMatrix;
-	std::vector<std::vector<double>> arrivalTimes;
-	std::vector<std::vector<double>> departureTimes;
-	std::vector<std::vector<std::vector<double>>> postponedDuration;
-	std::vector<int> correspondingList; // 0 means no corresponding nodes
-	int numberOfNodes;
-	int numberOfNormalNodes;
-	int numberOfFictiveNodes;
-	int numberOfRoutes;
-	int numberOfDays;
 
 	int calculateViolationScore(std::vector<std::vector<int>>& solutionListOfEachDay, int scaleOfViolationScore);
 

@@ -1,7 +1,5 @@
 #include "Solution.h"
 
-
-
 void Solution::input() {
     
     nNodes = 7;
@@ -62,16 +60,16 @@ void Solution::output(){
     std::cout << std::endl << std::endl;*/
 }
 
-void Solution::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay) {
+void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay) {
 
 	// Directly arrange the arrival time. 
-	for (int day = 0; day < numberOfDays; day++) {
+	for (int day = 0; day < nDays; day++) {
 
 		double currentTime = earliestTime[0][day];
 		int previousNode = 0;
-		for (int j = 0; j < SAListOfEachDay[day].size(); j++) {
+		for (int j = 0; j < solutionListOfEachDay[day].size(); j++) {
 
-			int currentNode = SAListOfEachDay[day][j];
+			int currentNode = solutionListOfEachDay[day][j];
 			if (currentNode == -1) {
 
 				// Next routes
@@ -100,12 +98,12 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay
 	// Haven't consider about 0's last time. (latest time) This needs to be implemented. 
 	while (1)  {
 
-		for (int day = 0; day < numberOfDays; day++) {
+		for (int day = 0; day < nDays; day++) {
 
-			std::vector<int> wholeList = SAListOfEachDay[day];
+			std::vector<int> wholeList = solutionListOfEachDay[day];
 
 			// Sort all synchronized nodes
-			std::vector<std::vector<int>> nonSortedLists = std::vector<std::vector<int>>(numberOfRoutes);;
+			std::vector<std::vector<int>> nonSortedLists = std::vector<std::vector<int>>(nRoutes);;
 			int temp = 0; 
 			for (int i = 0; i < wholeList.size(); i++) {
 
@@ -117,10 +115,10 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay
 				nonSortedLists[temp].push_back(wholeList[i]);
 			}
 
-			int* currentIndexes = new int[numberOfRoutes];
-			std::memset(currentIndexes, 0, numberOfRoutes);
+			int* currentIndexes = new int[nRoutes];
+			std::memset(currentIndexes, 0, nRoutes);
 			int lengthOfSortedList = 0;
-			for (int i = 0; i < numberOfRoutes; i++) {
+			for (int i = 0; i < nRoutes; i++) {
 
 				lengthOfSortedList += wholeList[i];
 			}
@@ -130,7 +128,7 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay
 				int smallest = INT_MAX;
 				bool finished = true;
 				int chosenOne = 0;
-				for (int i = 0; i < numberOfRoutes; i++) {
+				for (int i = 0; i < nRoutes; i++) {
 
 					if (currentIndexes[i] >= nonSortedLists[i].size()) {
 
@@ -157,8 +155,8 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay
 				sortedList.push_back(smallest);
 			}
 
-			bool* nodesDone = new bool[numberOfNodes];
-			std::memset(nodesDone, false, numberOfNodes);
+			bool* nodesDone = new bool[nNodes];
+			std::memset(nodesDone, false, nNodes);
 			while (1) {
 
 				// Get the earliest. 
@@ -170,7 +168,7 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay
 				int positionOfChosenNode = 0;
 				int* affectedNodes = NULL;
 				int lengthOfAffectedNodes = 0;
-				for (int j = 0; j < numberOfRoutes; j++) {
+				for (int j = 0; j < nRoutes; j++) {
 
 					auto position = std::find(nonSortedLists[j].begin(), nonSortedLists[j].end(), chosenOne);
 					if (position != nonSortedLists[j].end()) {
@@ -215,7 +213,7 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay
 
 							continue;
 						}
-						typesAndDurations.push_back(TypeAndDuration(2, duration);
+						typesAndDurations.push_back(TypeAndDuration(2, duration));
 					}
 
 					if (correspondingList[theOneToCalculate] != 0) {
@@ -231,7 +229,7 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay
 
 								continue;
 							}
-							typesAndDurations.push_back(1, duration);
+							typesAndDurations.push_back(TypeAndDuration(1, duration));
 							numberOfGoodNodes++;
 						}
 					}
@@ -252,7 +250,7 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay
 
 					if (numberOfGoodNodes > numberOfBadNodes) {
 
-						currentPostponedDuration = typesAndDurations[j];
+						currentPostponedDuration = typesAndDurations[j].duration;
 						if (typesAndDurations[j].type == 1) {
 
 							numberOfGoodNodes--;
@@ -275,27 +273,31 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay
 				}
 
 				// Postpone it by currentPostpondDuration. 
-				for (int j = 0; j < SAListOfEachDay[day].size(); j++) {
+				previousNode = 0; // Have been defined before. May need to come up a way to fix this problem. Or may not?
+				for (int j = 0; j < solutionListOfEachDay[day].size(); j++) {
 
-					if (SAListOfEachDay[day][j] == chosenOne) {
+					if (solutionListOfEachDay[day][j] == chosenOne) {
 
 						arrivalTimes[chosenOne][day] += currentPostponedDuration;
-						for (int k = j + 1; k < SAListOfEachDay[day].size(); k++) {
+						previousNode = solutionListOfEachDay[day][j];
+						for (int k = j + 1; k < solutionListOfEachDay[day].size(); k++) {
 
-							if (SAListOfEachDay[day][k] == -1) {
+							if (solutionListOfEachDay[day][k] == -1) {
 
 								break;
 							}
-							currentPostponedDuration -= postponedDuration[day][SAListOfEachDay[day][k]];
+							currentPostponedDuration -= postponedDuration[day][previousNode][solutionListOfEachDay[day][k]];
 							if (currentPostponedDuration <= 0) {
 
 								break;
 							}
-							arrivalTimes[SAListOfEachDay[day][k]][day] += currentPostponedDuration;
-							departureTimes[SAListOfEachDay[day][k]][day] += currentPostponedDuration;
+							arrivalTimes[solutionListOfEachDay[day][k]][day] += currentPostponedDuration;
+							departureTimes[solutionListOfEachDay[day][k]][day] += currentPostponedDuration;
+							previousNode = solutionListOfEachDay[day][k];
 						}
 						break;
 					}
+					previousNode = solutionListOfEachDay[day][j];
 				}
 				
 				// Remove the picked one and its corresponding node. 

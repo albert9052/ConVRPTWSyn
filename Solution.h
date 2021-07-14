@@ -8,6 +8,31 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <cstring>
+#include <climits>
+
+class TypeAndDuration {
+
+public: 
+
+	int type; // 1 for Synchronized, 2 for duration between its departure time and last time(latest time). 
+	double duration;
+
+	TypeAndDuration(int _type, int _duration) {
+
+		type = _type;
+		duration = _duration;
+	}
+
+	bool operator<(const TypeAndDuration& anotherOne) {
+
+		if (this->duration < anotherOne.duration) {
+
+			return true;
+		}
+		return false;
+	}
+};
 
 class Solution {
 public:
@@ -28,11 +53,35 @@ public:
     Solution() {
 
         input();
+
+		arrivalTimes = std::vector<std::vector<double>>(nNodes, (std::vector<double>(nDays, -1)));
+
+		departureTimes = std::vector<std::vector<double>>(nNodes, (std::vector<double>(nDays, -1)));
+		
+		postponedDuration = std::vector<std::vector<std::vector<double>>>(nDays, std::vector<std::vector<double>>(nNodes, std::vector<double>(nNodes, 0)));
+
+		correspondingList.resize(nNodes);
+		correspondingList[0] = 0;
+		for (int i = 1; i < fictiveLink.size(); i++) {
+
+			correspondingList[i] = fictiveLink[i - 1];
+			if (fictiveLink[i - 1] != 0) {
+
+				correspondingList[fictiveLink[i - 1]] = i;
+			}
+		}
     }
     void input();
     void output();
     virtual void solve() = 0;
+
+protected: 
+
     void calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay);
+	std::vector<std::vector<double>> arrivalTimes;
+	std::vector<std::vector<double>> departureTimes;
+	std::vector<std::vector<std::vector<double>>> postponedDuration;
+	std::vector<int> correspondingList; // 0 means no corresponding nodes
 
 };
 
