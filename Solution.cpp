@@ -2,7 +2,8 @@
 
 void Solution::input() {
     
-    nNodes = 7;
+	nCustomer = 7;
+    nNodes = 8;
     nNormals = 5;
     nFictives = 2;
     nRoutes = 3;

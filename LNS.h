@@ -10,7 +10,7 @@ private:
     vector<vector<vector<int>>> S;
     vector<int> rmdNodes; //tmp rmd nodes, 1~nNodes
 
-    vector<int> genInitSolution();
+    void genInitSolution();
 
     void removal();
     void randomRemoval();

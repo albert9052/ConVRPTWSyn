@@ -38,6 +38,7 @@ class Solution {
 public:
 
     int nNodes; // Number of nodes
+	int nCustomer;
     int nNormals; // Number of normal nodes
     int nFictives; // Number of fictive nodes
     int nDays; // Number of days
