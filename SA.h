@@ -29,6 +29,29 @@ public:
 	void resetAll(int _value);
 };
 
+class TypeAndDuration {
+
+public: 
+
+	int type; // 1 for Synchronized, 2 for duration between its departure time and last time(latest time). 
+	double duration;
+
+	TypeAndDuration(int _type, int _duration) {
+
+		type = _type;
+		duration = _duration;
+	}
+
+	bool operator<(const TypeAndDuration& anotherOne) {
+
+		if (this.duration < anotherOne.duration) {
+
+			return true;
+		}
+		return false;
+	}
+}
+
 class SA : public Solution{
 
 private:
@@ -52,7 +75,6 @@ private:
 	int numberOfRoutes;
 	int numberOfDays;
 
-    int calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay);
 	int calculateViolationScore(std::vector<std::vector<int>>& solutionListOfEachDay, int scaleOfViolationScore);
 
     double getRandomDecimal(); // Which is [0, 1]

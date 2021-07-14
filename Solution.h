@@ -32,7 +32,7 @@ public:
     void input();
     void output();
     virtual void solve() = 0;
-    int calculateObjective();
+    void calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay);
 
 };
 

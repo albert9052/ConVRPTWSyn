@@ -62,11 +62,272 @@ void Solution::output(){
     std::cout << std::endl << std::endl;*/
 }
 
-int calculateObjective(){
+void Solution::calculateObjective(std::vector<std::vector<int>>& SAListOfEachDay) {
 
+	// Directly arrange the arrival time. 
+	for (int day = 0; day < numberOfDays; day++) {
+
+		double currentTime = earliestTime[0][day];
+		int previousNode = 0;
+		for (int j = 0; j < SAListOfEachDay[day].size(); j++) {
+
+			int currentNode = SAListOfEachDay[day][j];
+			if (currentNode == -1) {
+
+				// Next routes
+				currentTime = earliestTime[0][day];
+			}
+			else {
+
+				double commutingTime = timeMat[previousNode][currentNode];
+				if (currentTime + commutingTime > earliestTime[currentNode][day]) {
+
+					arrivalTimes[currentNode][day] = currentTime + commutingTime;
+				}
+				else {
+
+					postponedDuration[day][previousNode][currentNode] = earliestTime[currentNode][day] - currentTime - commutingTime;
+					arrivalTimes[currentNode][day] = earliestTime[currentNode][day];
+				}
+				currentTime = arrivalTimes[currentNode][day] + serviceTime[currentNode][day];
+				departureTimes[currentNode][day] = currentTime;
+			}
+			previousNode = currentNode;
+		}
+	}
+	
+	// Rearrange the arrival time of each synchronized service. 
+	// Haven't consider about 0's last time. (latest time) This needs to be implemented. 
+	while (1)  {
+
+		for (int day = 0; day < numberOfDays; day++) {
+
+			std::vector<int> wholeList = SAListOfEachDay[day];
+
+			// Sort all synchronized nodes
+			std::vector<std::vector<int>> nonSortedLists = std::vector<std::vector<int>>(numberOfRoutes);;
+			int temp = 0; 
+			for (int i = 0; i < wholeList.size(); i++) {
+
+				if (wholeList[i] == -1) {
+
+					temp++;
+					continue;
+				}
+				nonSortedLists[temp].push_back(wholeList[i]);
+			}
+
+			int* currentIndexes = new int[numberOfRoutes];
+			std::memset(currentIndexes, 0, numberOfRoutes);
+			int lengthOfSortedList = 0;
+			for (int i = 0; i < numberOfRoutes; i++) {
+
+				lengthOfSortedList += wholeList[i];
+			}
+			std::vector<int> sortedList = std::vector<int>(lengthOfSortedList);
+			while(1) {
+
+				int smallest = INT_MAX;
+				bool finished = true;
+				int chosenOne = 0;
+				for (int i = 0; i < numberOfRoutes; i++) {
+
+					if (currentIndexes[i] >= nonSortedLists[i].size()) {
+
+						continue;
+					}
+					int currentNode = nonSortedLists[i][currentIndexes[i]];
+					if (correspondingList[currentNode - 1] == 0) {
+
+						i--;
+						currentIndexes[i]++;
+						continue;
+					}
+					if (arrivalTimes[day][currentNode] < smallest) {
+
+						chosenOne = i;
+						finished = false;
+					}
+				}
+				if (finished == true) {
+
+					break;
+				}
+				currentIndexes[chosenOne]++;
+				sortedList.push_back(smallest);
+			}
+
+			bool* nodesDone = new bool[numberOfNodes];
+			std::memset(nodesDone, false, numberOfNodes);
+			while (1) {
+
+				// Get the earliest. 
+				int chosenOne = sortedList[0];
+				int correspondingOne = correspondingList[chosenOne];
+
+				// Find all the nodes that will be affected
+				int chosenRoute = 0;
+				int positionOfChosenNode = 0;
+				int* affectedNodes = NULL;
+				int lengthOfAffectedNodes = 0;
+				for (int j = 0; j < numberOfRoutes; j++) {
+
+					auto position = std::find(nonSortedLists[j].begin(), nonSortedLists[j].end(), chosenOne);
+					if (position != nonSortedLists[j].end()) {
+
+						positionOfChosenNode = (int)(position - nonSortedLists[j].begin());
+						lengthOfAffectedNodes = nonSortedLists[j].size() - positionOfChosenNode;
+						affectedNodes = new int[lengthOfAffectedNodes];
+						int tempIndex = 0;
+						for (int k = positionOfChosenNode + 1; k < nonSortedLists[j].size(); k++) {
+
+							affectedNodes[tempIndex] = nonSortedLists[j][k];
+							tempIndex++;
+						}
+						chosenRoute = j;
+						break;
+					}
+				}
+
+				// Calculate how long it would take to postpone to match its corresponding node. 
+				int maxPostponedDuration = arrivalTimes[correspondingOne][day] - arrivalTimes[chosenOne][day];
+			
+				// Calculate all the maximum distance that each node which will be affected if we move the node we picked before can move. 
+				// In order to get our maximum moving distance for the picked node. 
+				// If the duration is longer than the maxPostponedDuration, there's no reason to record it, since we can only postpone that much time. 
+				int numberOfGoodNodes = 1; // We already got a good node which is the one we are targeting. 
+				int numberOfBadNodes = 0;
+				std::vector<TypeAndDuration> typesAndDurations;
+
+				int previousNode = chosenOne;
+				double accumulatedPostponedDuration = postponedDuration[day][previousNode][affectedNodes[0]];
+				for (int j = 0; j < lengthOfAffectedNodes; j++) {
+
+					int theOneToCalculate = affectedNodes[j];
+					if (departureTimes[theOneToCalculate][day] > lastTime[theOneToCalculate][day]) {
+
+						numberOfBadNodes++;
+					}
+					else {
+
+						double duration = (lastTime[theOneToCalculate][day] - departureTimes[theOneToCalculate][day] + accumulatedPostponedDuration);
+						if (duration > maxPostponedDuration) {
+
+							continue;
+						}
+						typesAndDurations.push_back(TypeAndDuration(2, duration);
+					}
+
+					if (correspondingList[theOneToCalculate] != 0) {
+
+						if (arrivalTimes[correspondingList[theOneToCalculate]] < arrivalTimes[theOneToCalculate]) {
+
+							numberOfBadNodes++;
+						}
+						else {
+
+							double duration = (arrivalTimes[correspondingList[theOneToCalculate]][day] - arrivalTimes[theOneToCalculate][day] + accumulatedPostponedDuration);
+							if (duration > maxPostponedDuration) {
+
+								continue;
+							}
+							typesAndDurations.push_back(1, duration);
+							numberOfGoodNodes++;
+						}
+					}
+						
+					
+
+					accumulatedPostponedDuration += postponedDuration[day][previousNode][theOneToCalculate];
+					previousNode = theOneToCalculate;
+				}
+
+				// Sort the durations and types together. 
+				// This part needs to be checked, once we finished other parts. 
+				std::sort(typesAndDurations.begin(), typesAndDurations.end());
+				
+				// By go over the durations and types, we can get our best moving distance. 
+				double currentPostponedDuration = 0;
+				for (int j = 0; j < typesAndDurations.size(); j++) {
+
+					if (numberOfGoodNodes > numberOfBadNodes) {
+
+						currentPostponedDuration = typesAndDurations[j];
+						if (typesAndDurations[j].type == 1) {
+
+							numberOfGoodNodes--;
+							numberOfBadNodes++;
+						}
+						else if (typesAndDurations[j].type == 2) {
+
+							numberOfBadNodes++;
+						}
+						else {
+
+							std::cout << "Error occurred when we try to find our best moving distance by going over the durations and types. " << std::endl;
+							exit(1);
+						}
+					}
+					else {
+
+						break;
+					}
+				}
+
+				// Postpone it by currentPostpondDuration. 
+				for (int j = 0; j < SAListOfEachDay[day].size(); j++) {
+
+					if (SAListOfEachDay[day][j] == chosenOne) {
+
+						arrivalTimes[chosenOne][day] += currentPostponedDuration;
+						for (int k = j + 1; k < SAListOfEachDay[day].size(); k++) {
+
+							if (SAListOfEachDay[day][k] == -1) {
+
+								break;
+							}
+							currentPostponedDuration -= postponedDuration[day][SAListOfEachDay[day][k]];
+							if (currentPostponedDuration <= 0) {
+
+								break;
+							}
+							arrivalTimes[SAListOfEachDay[day][k]][day] += currentPostponedDuration;
+							departureTimes[SAListOfEachDay[day][k]][day] += currentPostponedDuration;
+						}
+						break;
+					}
+				}
+				
+				// Remove the picked one and its corresponding node. 
+				sortedList.erase(std::find(sortedList.begin(), sortedList.end(), chosenOne));
+				sortedList.erase(std::find(sortedList.begin(), sortedList.end(), correspondingOne));
+
+				// Then, rearrange every node, since the arrival time of some of them has been changed. 
+				for (int j = sortedList.size() - 1; j >= 1; j--) { 
+
+					if (arrivalTimes[sortedList[j]][day] < arrivalTimes[sortedList[j - 1]][day]) {
+
+						std::swap(sortedList[j], sortedList[j - 1]);
+						for (int k = j; k < sortedList.size() - 1; k++) {
+
+							if (arrivalTimes[sortedList[k]][day] < arrivalTimes[sortedList[k + 1]][day]) {
+
+								std::swap(sortedList[k], sortedList[k + 1]);
+							}
+							else {
+
+								break;
+							}
+						}
+					}
+				}
+				
+				// Make sure that we still have elements in sortedList, or we will need to break this loop. 
+				if (sortedList.size() == 0) {
+
+					break;
+				}
+			}
+		}
+	}
 }
-
-// Questions: 
-// 
-// P.25 This pseudo code shows that it calculate the objective function before step 4, but seems like it perform the function againa after step4 and step5. 
-// My question is what is the use of objective function before those optimized functions? 
