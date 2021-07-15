@@ -22,6 +22,7 @@ private:
     int R(int i, int j);
     int r(int i, int j);
     int getu();
+    vector<vector<int>>& KruskalMST(vector<int> nodes);
 
     void repair();
     void greedyRepair();
@@ -29,6 +30,8 @@ private:
     vector<int> getMinCost(int day, vector<int> rmd, double& minCost);
 
     void adjustDepartureTime();
+
+    void calTmp(const vector<vector<vector<int>>>& bef);
 public:
     LNS();
     LNS(int Iter, float T0, float Alpha, float Lambda, float Nu, float Xi);

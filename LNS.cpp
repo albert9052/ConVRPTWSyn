@@ -26,17 +26,47 @@ Iter(_Iter), T0(_T0), Alpha(_Alpha), Lambda(_Lambda), Nu(_Nu), Xi(_Xi){
     // Alpha : the cooling rate, 0 < Alpha < 1
     // Lambdam, Nu, Xi : used in the related removal operator
 }
+void LNS::calTmp(const vector<vector<vector<int>>>& bef){
+    // for calculate obj
+    vector<vector<int>> aft;
+    for(const vector<vector<int>>& vvbef:bef){
+        vector<int> v;
+        for(const vector<int>& vbef:vvbef){
+            v.insert(v.end(), vbef.begin()+1, vbef.end()-1);
+            v.push_back(-1);
+        }
+        v.pop_back();
+        aft.push_back(v);
+    }
+
+    cout<<"calculateObjective start \n";
+    for(vector<int> v:aft){
+        for(int i:v){
+            cout<<i<<", ";
+        }
+        cout<<endl;
+    }
+    calculateObjective(aft);
+    cout<<"calculateObjective end ";
+}
 void LNS::solve() {
     float T = T0;
     genInitSolution();
-    for (int i = 0; i < /*Iter*/10; i++) {
+    for (int i = 0; i < /*Iter*/1; i++) {
         cout <<endl <<endl<<"   ====  "<<i<<"  ====" <<endl;
         removal();
-        cout<<" ==== rmdNodes : ";
-        for(int i : rmdNodes) cout<<i<<" "; 
-        cout<<endl;
+            cout<<" ==== rmdNodes : ";
+            for(int i : rmdNodes) cout<<i<<" "; 
+            cout<<endl;
         repair();
         rmdNodes.clear();
+        calTmp(S);
+        for(vector<double> v:arrivalTimes){
+            for(double f:v){
+                cout<<f<<" ";
+            }
+            cout<<endl;
+        }
         /*float Fbef, Faft = calculateObjective(S);
         adjustDepartureTime();
         if (isFeasible()) ImproveTimeConsistency();
@@ -100,7 +130,7 @@ int LNS::getu(){
     return rand() % (up_bnd - low_bnd) + low_bnd;
 }
 void LNS::removal(){
-    switch (/*rand() % 5*/0) {
+    switch (/*rand() % 5*/2) {
     case 0:
         randomRemoval();
         break;
@@ -177,10 +207,77 @@ void LNS::relatedRemoval(){
         rmdNodes.push_back(rmNode);
     }
 }
+vector<vector<int>>& LNS::KruskalMST(vector<int> nodes){
+    // return edge
+    cout<<" => test KruskalMST "<<endl<<" nodes :";
+    for(int i:nodes)cout<<i<<" ";
+    cout<<endl;
+    vector<vector<int>> groups, edges, ans;
+    vector<int> times;
+    for(int i=0; i<nodes.size(); i++){
+        for(int j=i+1; j<nodes.size(); j++){
+            edges.push_back({nodes[i], nodes[j]});
+            times.push_back(timeMat[nodes[i]][nodes[j]]);
+        }
+    }
+    for(int i=0; i<times.size(); i++){
+        for(int j=i+1; j<times.size(); j++){
+            if(times[i] > times[j]){
+                swap(times[i], times[j]);
+                swap(edges[i], edges[j]);
+            }
+        }
+    }
+    cout<<" sorted edges : "<<endl;
+    for(int i=0; i<times.size(); i++)
+        cout<<edges[i][0]<<" "<<edges[i][1]<<" "<<times[i]<<endl;
+    cout<<endl;
+    for(vector<int>& edge : edges) {
+
+        int groupIdxOfij[2] = {-1, -1}; //i, j
+        for(int idx=0; idx<groups.size(); idx++){
+            if(in(edge[0], groups[idx]))
+                groupIdxOfij[0] = idx;
+            if(in(edge[1], groups[idx]))
+                groupIdxOfij[1] = idx;          
+        }
+        
+        if(groupIdxOfij[0]>=0 && groupIdxOfij[1]>=0 && groupIdxOfij[0] != groupIdxOfij[1]){
+            groups[groupIdxOfij[0]].insert(groups[groupIdxOfij[0]].end(), groups[groupIdxOfij[1]].begin(), groups[groupIdxOfij[1]].end());
+            groups.erase(groups.begin()+groupIdxOfij[1]);
+            ans.push_back(edge);
+        }
+        else if(groupIdxOfij[0]>=0 && groupIdxOfij[1]<0){
+            groups[groupIdxOfij[0]].push_back(nodes[edge[1]]);
+            ans.push_back(edge);
+        }
+        else if(groupIdxOfij[0]<0 && groupIdxOfij[1]>=0){
+            groups[groupIdxOfij[1]].push_back(nodes[edge[0]]);
+            ans.push_back(edge);
+        }
+        else if(groupIdxOfij[0]<0 && groupIdxOfij[1]<0){
+            groups.push_back({edge[0], edge[1]});
+            ans.push_back(edge);
+        }
+    }
+    cout<<" edges :";
+    for(vector<int> v:ans){
+        for(int i:v){
+            cout<<i<<" ";
+        }
+        cout<<endl;
+    }
+}
 void LNS::clusterRemoval(){
     for(int day = 1; day <= nDays; day++){
+        cout<<day;
         int u = getu();
         while(u > 0){
+            int route = rand() % nRoutes;
+            while(S[day][route].size() < 5)
+                route = rand() % nDays;
+            vector<int> tmpNodes(S[day][route].begin()+1, S[day][route].end()-1);
+            vector<vector<int>> edges = KruskalMST(tmpNodes);
 
         }
     }
