@@ -10,6 +10,7 @@
 #include <math.h>
 #include <cstring>
 #include <climits>
+#include <set>
 
 class TypeAndDuration {
 
@@ -45,7 +46,8 @@ public:
     int nRoutes; // Number of routes
     std::vector<int> fictiveLink; // 0 for normal nodes, n>0 for fictive nodes and it's normal node is n
     std::vector<std::vector<bool>> required; // Required day (false for not required, true for required.)
-    std::vector<int> synchronizedServiceMatrix; // If j is i's fictive node, then synchronizedServiceMatrix[i] and synchronizedServiceMatrix[j] will be i and j. 
+	std::vector<std::vector<int>> requiredList;
+	std::vector<int> synchronizedServiceMatrix; // If j is i's fictive node, then synchronizedServiceMatrix[i] and synchronizedServiceMatrix[j] will be i and j. 
     std::vector<std::vector<float>> serviceTime, earliestTime, lastTime; 
     std::vector<std::vector<float>> timeMat; // Commuting time between each nodes, size: nDays+1, 0 for begin and end
     //std::vector<int> solutionList; // Indexes of nodes, ex:1~6, 0 for boundary of day, -1 for boundary of route

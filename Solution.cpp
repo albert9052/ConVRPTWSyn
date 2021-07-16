@@ -22,7 +22,12 @@ void Solution::input() {
                 {12.751, 100000, 9.8491, 8.2998, 10.341, 5.2756, 100000, 9.8491},
                 {3.302, 9.8491, 100000, 2.82, 0.717, 5.809, 9.8491, 100000} };
 
-    //solutionList = {1, 5, -1, 4, -1, 6, 3, -1, 0, 2, 1, 5, -1, 4, -1, 7, 6, -1, 0, 1, -1, -1, 6, 3, -1, 0};
+    // below are data processing
+	requiredList.resize(nDays);
+	for (int n = 0; n < nCustomer; n++)
+		for (int d = 0; d < nDays; d++)
+			if (required[n][d])
+				requiredList[d].push_back(n);
 }
 
 void Solution::output(){

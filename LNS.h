@@ -8,7 +8,7 @@ private:
     float T0, Alpha, Lambda, Nu, Xi;
 
     vector<vector<vector<int>>> S;
-    vector<int> rmdNodes; //tmp rmd nodes, 1~nNodes
+    vector<vector<int>> rmdNodes; //day * tmp rmd nodes, 1~nNodes
 
     void genInitSolution();
 
@@ -22,12 +22,11 @@ private:
     int R(int i, int j);
     int r(int i, int j);
     int getu();
-    vector<vector<int>>& KruskalMST(vector<int> nodes);
+    //vector<int>& findMSTAndCutIntoTwo(vector<int> nodes);
 
     void repair();
     void greedyRepair();
     void regretRepair();
-    vector<int> getMinCost(int day, vector<int> rmd, double& minCost);
 
     void adjustDepartureTime();
 
@@ -36,5 +35,6 @@ public:
     LNS();
     LNS(int Iter, float T0, float Alpha, float Lambda, float Nu, float Xi);
     void solve();
+    vector<int> findMSTAndCutIntoTwo(vector<int> nodes);
 };
 
