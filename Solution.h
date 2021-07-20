@@ -9,14 +9,23 @@
 #include <time.h>
 #include <math.h>
 #include <cstring>
+//<<<<<<< Updated upstream
 #include <climits>
 #include <set>
+//=======
+#include <limits>
+//>>>>>>> Stashed changes
 
 class TypeAndDuration {
 
 public: 
 
-	int type; // 1 for Synchronized, 2 for duration between its departure time and last time(latest time). 
+	int type; 
+	// 0 indicates the final one, which is our goal. 
+	// 1 for duration between its arrival time and last time(latest time). after push to this duration, numberOfBadNodes + 1. 
+	// 2 indicates that when the duration is pushed, numberOfGoodNodes + 1. 
+	// 3 indicates that when the duration is pushed, numberOfGoodNodes - 1, and numberOfBadNodes + 1. 
+	// 4 indicates that when the duration is pushed, numberOfGoodNodes - 1. 
 	double duration;
 
 	TypeAndDuration(int _type, int _duration) {
@@ -25,9 +34,18 @@ public:
 		duration = _duration;
 	}
 
-	bool operator<(const TypeAndDuration& anotherOne) {
+	bool operator<(const TypeAndDuration& anotherOne) const{
 
 		if (this->duration < anotherOne.duration) {
+
+			return true;
+		}
+		return false;
+	}
+
+	bool operator>(const TypeAndDuration& anotherOne) const{
+
+		if (this->duration > anotherOne.duration) {
 
 			return true;
 		}
