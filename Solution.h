@@ -15,6 +15,39 @@
 //=======
 #include <limits>
 //>>>>>>> Stashed changes
+#include <iomanip>
+
+class PointAndType {
+
+public:
+
+	PointAndType(int _point, int _type, int _value) {
+	
+		point = _point;
+		type = _type;
+		value = _value;
+	}
+	int point;
+	int type;
+	int value;
+
+	bool operator<(const PointAndType& anotherOne) const{
+
+		if (this->point < anotherOne.point) {
+
+			if (this->type < anotherOne.type) {
+
+				return true;
+			}
+			else {
+
+				return false;
+			}
+		}
+		return false;
+	}
+
+};
 
 class TypeAndDuration {
 
@@ -103,7 +136,9 @@ protected:
 	std::vector<std::vector<double>> departureTimes;
 	std::vector<std::vector<std::vector<double>>> postponedDuration;
 	std::vector<int> correspondingList; // 0 means no corresponding nodes
-
+	
+	void printGraph(const std::vector<std::vector<int>>& solutionListOfEachDay, double limit);
+	void printVerticalLines(int lines);
 };
 
 #endif

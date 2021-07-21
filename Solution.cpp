@@ -1,4 +1,5 @@
 #include "Solution.h"
+#define GRAPH_LIMIT 200
 
 void Solution::input() {
     
@@ -9,10 +10,10 @@ void Solution::input() {
     nRoutes = 3;
     nDays = 3;
     fictiveLink = {0, 0, 0, 0, 0, 1, 2};
-    serviceTime = { {15, 15, 15}, {18, 18, 18}, {23, 23, 23}, {45, 45, 45}, {30, 30, 30}, {15, 15, 15}, {18, 18, 18} };
-    required = { {1, 1, 1}, {0, 1, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 0}, {1, 1, 1}, {0, 1, 0} };
-    earliestTime = { {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {15, 15, 15}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0} };
-    lastTime = { {100, 100, 100}, {50, 50, 50}, {30, 30, 30}, {95, 95, 95}, {25, 25, 25}, {80, 80, 80}, {50, 50, 50}, {30, 30, 30} };
+    serviceTime = { {15, 15, 15}, {18, 18, 18}, {23, 23, 23}, {45, 45, 45}, {30, 30, 30}, {15, 15, 15}, {18, 18, 18}, {18, 18, 18}, {23, 23, 23} };
+    required = { {1, 1, 1}, {0, 1, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 0}, {1, 1, 1}, {0, 1, 0}, {0, 1, 0}, {1, 0, 1} };
+    earliestTime = { {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {15, 15, 15}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0} };
+    lastTime = { {100, 100, 100}, {50, 50, 50}, {30, 30, 30}, {95, 95, 95}, {25, 25, 25}, {80, 80, 80}, {50, 50, 50}, {30, 30, 30}, {50, 50, 50}, {30, 30, 30} };
     timeMat = { {100000, 12.751, 3.302, 4.6204, 2.6174, 9.0958, 12.751, 3.302},
                 {12.751, 100000, 9.8491, 8.2998, 10.341, 5.2756, 100000, 9.8491},
                 {3.302, 9.8491, 100000, 2.82, 0.717, 5.809, 9.8491, 100000},
@@ -80,17 +81,22 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 
 				// Next routes
 				currentTime = earliestTime[0][day];
+				previousNode = 0;
+				continue;
 			}
-			else {
-
-				double commutingTime = timeMat[previousNode][currentNode];
-				arrivalTimes[currentNode][day] = currentTime + commutingTime;
-				currentTime = arrivalTimes[currentNode][day] + serviceTime[currentNode][day];
-				departureTimes[currentNode][day] = currentTime;
-			}
+			double commutingTime = timeMat[previousNode][currentNode];
+			arrivalTimes[currentNode][day] = currentTime + commutingTime;
+			currentTime = arrivalTimes[currentNode][day] + serviceTime[currentNode][day];
+			departureTimes[currentNode][day] = currentTime;
 			previousNode = currentNode;
 		}
 	}
+	std::cout << "Diretly arraning the arrival time successes. " << std::endl;
+	printGraph(solutionListOfEachDay, GRAPH_LIMIT);
+	std::cout << "///////////////" << std::endl;
+	std::cout << "6's arrival time: " << arrivalTimes[6][1] << std::endl;
+	std::cout << "6's departure time: " << departureTimes[6][1] << std::endl;
+	std::cout << "///////////////" << std::endl;
 
 	// Rearrange the arrival time to minimize the violation of time windows. 
 	// Needs to consider 0's last time. (IMPORTANT)
@@ -226,6 +232,8 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 			std::sort(typesAndDurations.begin(), typesAndDurations.end(), std::greater<TypeAndDuration>());
 		}
 	}
+	std::cout << "Rearranging the arrival time to minimize the violation of time window successes. " << std::endl;
+	printGraph(solutionListOfEachDay, GRAPH_LIMIT);
 	
 	// Rearrange the arrival time of each synchronized service. 
 	// Haven't consider about 0's last time (latest time). This needs to be implemented. 
@@ -254,7 +262,7 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 			int lengthOfSortedList = 0;
 			for (int i = 0; i < nRoutes; i++) {
 
-				lengthOfSortedList += wholeList[i];
+				lengthOfSortedList += nonSortedLists[i].size();
 			}
 			std::vector<int> sortedList = std::vector<int>(lengthOfSortedList);
 			while(1) {
@@ -271,11 +279,11 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 					int currentNode = nonSortedLists[i][currentIndexes[i]];
 					if (correspondingList[currentNode - 1] == 0) {
 
-						i--;
 						currentIndexes[i]++;
+						i--;
 						continue;
 					}
-					if (arrivalTimes[day][currentNode] < smallest) {
+					if (arrivalTimes[currentNode][day] < smallest) {
 
 						chosenOne = i;
 						finished = false;
@@ -294,6 +302,39 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 				// Get the earliest. 
 				int chosenOne = sortedList[0];
 				int correspondingOne = correspondingList[chosenOne];
+
+				// If the normal and fictive node are on the same route, don't try to reduce the violation. 
+				int routeOfTheChosenOne = 0;
+				bool onTheSameRoute = false;
+				for (int i = 0; i < nRoutes; i++) {
+
+					if (std::find(nonSortedLists[i].begin(), nonSortedLists[i].end(), chosenOne) != nonSortedLists[i].end()) {
+
+						if (std::find(nonSortedLists[i].begin(), nonSortedLists[i].end(), correspondingOne) != nonSortedLists[i].end()) {
+
+							onTheSameRoute = true;
+							break;
+						}
+						else {
+
+							break;
+						}
+					}
+				}
+				if (onTheSameRoute) {
+				
+					// Remove the picked one and its corresponding node. 
+					sortedList.erase(std::find(sortedList.begin(), sortedList.end(), chosenOne));
+					sortedList.erase(std::find(sortedList.begin(), sortedList.end(), correspondingOne));
+					
+					// Make sure that we still have elements in sortedList, or we will need to break this loop. 
+					if (sortedList.size() == 0) {
+
+						break;
+					}
+
+					continue;
+				}
 
 				// Find all the nodes that will be affected
 				int chosenRoute = 0;
@@ -487,5 +528,122 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 				}
 			}
 		}
+	}
+	std::cout << "Rearranging the arrival time of each synchronized service successes. " << std::endl;
+}
+
+// Width: 159 characters. 
+void Solution::printGraph(const std::vector<std::vector<int>>& solutionListOfEachDay, double limit) {
+
+	for (int day = 0; day < nDays; day++) {
+
+		std::cout << "Day " << day << ": ";
+		for (int i = 0; i < solutionListOfEachDay[day].size(); i++) {
+
+			std::cout << solutionListOfEachDay[day][i] << " ";
+		}
+		std::cout << std::endl << std::endl;
+		std::vector<PointAndType> pointsAndTypes;
+
+		int route = 1;
+		std::cout << "Route 1: " << std::endl;
+		double unit = 10.0 / 159.0 * GRAPH_LIMIT;
+		for (int i = 0; i < 4; i++) {
+
+			std::cout << " ";
+		}
+		for (int i = 1; i <= 15; i++) {
+
+			std::cout << std::setfill(' ') << std::setw(10) << std::left << unit * i;
+		}
+		std::cout << std::endl;
+		printVerticalLines(2);
+
+		for (int i = 0; i < solutionListOfEachDay[day].size(); i++) {
+
+			int currentNode = solutionListOfEachDay[day][i];
+			if (currentNode == -1) {
+
+				int currentCursor = 0;
+				for (int i = 0; i < pointsAndTypes.size(); i++) {
+
+					if (pointsAndTypes[i].point > currentCursor) {
+
+						for (int j = 0; j < pointsAndTypes[i].point - currentCursor; j++) {
+
+							std::cout << "-";
+						}
+						currentCursor = pointsAndTypes[i].point;
+					}
+					else if (pointsAndTypes[i].point < currentCursor) {
+
+						continue;
+					}
+
+					if (pointsAndTypes[i].type == 1) {
+
+						std::cout << "\033[1;42m" << pointsAndTypes[i].value << "\033[0m";
+					}
+					else if (pointsAndTypes[i].type == 2) {
+
+						std::cout << "\033[1;41m" << pointsAndTypes[i].value << "\033[0m";
+					}
+
+					currentCursor++;
+				}
+				std::cout << std::endl;
+				printVerticalLines(1);
+
+				pointsAndTypes.clear();
+
+				route++;
+				std::cout << "Route " << route << ":  |";
+				for (int i = 1; i <= 14; i++) {
+
+					for (int j = 0; j < 9; j++) {
+
+						std::cout << " ";
+					}
+					std::cout << "|";
+				}
+				std::cout << std::endl;
+				printVerticalLines(1);
+
+				continue;
+			}
+
+			if (arrivalTimes[currentNode][day] > limit) {
+
+				continue;
+			}
+
+			int point = std::floor(arrivalTimes[currentNode][day] / limit * 159);
+			pointsAndTypes.push_back(PointAndType(point, 1, currentNode));
+
+			if (departureTimes[currentNode][day] > limit) {
+
+				continue;
+			}
+
+			point = std::floor(departureTimes[currentNode][day] / limit * 159);
+			pointsAndTypes.push_back(PointAndType(point, 2, currentNode));
+		}
+	}
+}
+
+void Solution::printVerticalLines(int lines) {
+
+	for (int k = 0; k < lines; k++) {
+
+		std::cout << " ";
+		for (int i = 1; i <= 15; i++) {
+
+			for (int j = 0; j < 9; j++) {
+
+				std::cout << " ";
+			}
+			std::cout << "|";
+		}
+		std::cout << std::endl;
 	}
 }

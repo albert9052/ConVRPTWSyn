@@ -43,7 +43,7 @@ private:
 
     double Ts;
     double Te;
-    int Ld;
+    int numberOfIterations;
     double Alpha;
 	int scaleOfViolationScore;
 
@@ -64,7 +64,7 @@ private:
 	// This version can only deal with solutions with no violation. 
 	double getMaxPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double accumulatedPostponedDuration, bool firstLoop);
 	// This version can only deal with solutions with no violation. 
-	void applyPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double PF);
+	std::vector<int>* applyPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double PF, bool firstLoop);
 	// This version can only deal with solutions with no violation. 
 	// Haven't consider about 0's lastTime. 
     void adjustDepartureTime(std::vector<std::vector<int>>& solutionListOfEachDay);
