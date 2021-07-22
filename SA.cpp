@@ -194,6 +194,9 @@ void SA::tweakSolutionRandomly(std::vector<std::vector<int>>& SAListOfEachDay) {
 int SA::calculateViolationScore(std::vector<std::vector<int>>& solutionListOfEachDay, int scaleOfViolationScore) {
 
 	// Pure calculation. 
+
+	// just for compile
+	return -1;
 }
 
 double SA::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double accumulatedPostponedDuration, bool firstLoop) {
