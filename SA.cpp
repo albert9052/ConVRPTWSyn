@@ -6,7 +6,7 @@ SA::SA(/* args */) {
 
 	Ts = 10;
 	Te = 10;
-	numberOfIterations = 10;
+	numberOfIterations = 20;
 	Alpha = 0.0001;
 }
 
@@ -40,15 +40,11 @@ void SA::solve() {
     for (int day = 0; day < nDays; day++) {
 
         SAListOfEachDay.push_back(std::vector<int>());
-        for (int j = 1; j <= nNormals; j++) {
+        for (int j = 1; j < nNodes; j++) {
 
             if (required[j][day] == 1) {
 
                 SAListOfEachDay[day].push_back(j);
-				if (correspondingList[j] != 0) {
-
-					SAListOfEachDay[day].push_back(numberOfCorrespondingNode);
-				}
             }
         }
         std::vector<int> tempVectorForBoundary(nRoutes - 1, -1);
@@ -67,9 +63,9 @@ void SA::solve() {
 
     // 
     
-    for (int t = Ts; t <= Te; t = t * Alpha) {
+    for (double t = Ts; t >= Te; t = t * Alpha) {
 
-        for (int iterationNum = 0; iterationNum < numberOfIterations; iterationNum) {
+        for (int iterationNum = 0; iterationNum < numberOfIterations; iterationNum++) {
 
             // Tweak the SA
             for (int day = 0; day < nDays; day++) {
@@ -77,8 +73,21 @@ void SA::solve() {
                 tweakSolutionRandomly(SAListOfEachDay);
             }
 
+			//for (int day = 0; day < nDays; day++) {
+
+			//	std::cout << "Day " << day << ": ";
+			//	for (int i = 0; i < SAListOfEachDay[day].size(); i++) {
+
+			//		std::cout << SAListOfEachDay[day][i] << " ";
+			//	}
+			//	std::cout << std::endl;
+			//}
+
+			std::cout << iterationNum << " times" << std::endl;
+
 			// Adjust the arrival time and departure time to get the minimum violation. 
-            calculateObjective(SAListOfEachDay);
+            if (iterationNum == 19) calculateObjective(SAListOfEachDay);
+			//if (iterationNum == 19) adjustDepartureTime(SAListOfEachDay);
 
 			//// Adjust the arrival time and departure time to get the minimum score. (Approximately) 
 			//adjustDepartureTime(SAListOfEachDay);
@@ -119,12 +128,12 @@ void SA::solve() {
 
 double SA::getRandomDecimal() {
 
-    return (rand() / RAND_MAX);
+    return ((double)rand() / RAND_MAX);
 }
 
 int SA::getRandomInteger(int x) {
 
-	int randomInteger = floor(rand() / (RAND_MAX) * x);
+	int randomInteger = floor((double)rand() / (RAND_MAX) * x);
     return randomInteger == x ? x - 1 : randomInteger; // The reason why RAND_MAX has to add one is to eliminate the possibility the function return x. 
 }
 

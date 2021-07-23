@@ -116,7 +116,7 @@ public:
 
 		correspondingList.resize(nNodes);
 		correspondingList[0] = 0;
-		for (int i = 1; i < fictiveLink.size(); i++) {
+		for (int i = 1; i <= fictiveLink.size(); i++) {
 
 			correspondingList[i] = fictiveLink[i - 1];
 			if (fictiveLink[i - 1] != 0) {
@@ -138,6 +138,7 @@ protected:
 	std::vector<int> correspondingList; // 0 means no corresponding nodes
 	
 	void printGraph(const std::vector<std::vector<int>>& solutionListOfEachDay, double limit);
+	void printTimeLine(const std::vector<PointAndType>& pointsAndTypes);
 	void printVerticalLines(int lines);
 };
 

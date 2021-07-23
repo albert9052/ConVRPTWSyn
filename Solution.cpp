@@ -10,10 +10,10 @@ void Solution::input() {
     nRoutes = 3;
     nDays = 3;
     fictiveLink = {0, 0, 0, 0, 0, 1, 2};
-    serviceTime = { {15, 15, 15}, {18, 18, 18}, {23, 23, 23}, {45, 45, 45}, {30, 30, 30}, {15, 15, 15}, {18, 18, 18}, {18, 18, 18}, {23, 23, 23} };
-    required = { {1, 1, 1}, {0, 1, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 0}, {1, 1, 1}, {0, 1, 0}, {0, 1, 0}, {1, 0, 1} };
-    earliestTime = { {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {15, 15, 15}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0} };
-    lastTime = { {100, 100, 100}, {50, 50, 50}, {30, 30, 30}, {95, 95, 95}, {25, 25, 25}, {80, 80, 80}, {50, 50, 50}, {30, 30, 30}, {50, 50, 50}, {30, 30, 30} };
+    serviceTime = { {0, 0, 0}, {15, 15, 15}, {18, 18, 18}, {23, 23, 23}, {45, 45, 45}, {30, 30, 30}, {15, 15, 15}, {18, 18, 18} };
+    required = { {0, 0, 0}, {1, 1, 1}, {0, 1, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 0}, {1, 1, 1}, {0, 1, 0} };
+    earliestTime = { {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {15, 15, 15}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0} };
+    lastTime = { {100, 100, 100}, {50, 50, 50}, {30, 30, 30}, {95, 95, 95}, {25, 25, 25}, {80, 80, 80}, {50, 50, 50}, {30, 30, 30} };
     timeMat = { {100000, 12.751, 3.302, 4.6204, 2.6174, 9.0958, 12.751, 3.302},
                 {12.751, 100000, 9.8491, 8.2998, 10.341, 5.2756, 100000, 9.8491},
                 {3.302, 9.8491, 100000, 2.82, 0.717, 5.809, 9.8491, 100000},
@@ -31,10 +31,7 @@ void Solution::input() {
 				requiredList[d].push_back(n);
 }
 
-void Solution::output(){
-    for(int i = 0; i < nDays; i++){
-        std::cout << "Day " << i + 1 << std::endl;
-        for(int j = 0; j < nRoutes; j++){
+void Solution::output(){ for(int i = 0; i < nDays; i++){ std::cout << "Day " << i + 1 << std::endl; for(int j = 0; j < nRoutes; j++){
             std::cout << "   Route " << j + 1 << ":";
             for(int& k : solutionList[i][j]){
                 std::cout << " => " << k;
@@ -93,10 +90,6 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 	}
 	std::cout << "Diretly arraning the arrival time successes. " << std::endl;
 	printGraph(solutionListOfEachDay, GRAPH_LIMIT);
-	std::cout << "///////////////" << std::endl;
-	std::cout << "6's arrival time: " << arrivalTimes[6][1] << std::endl;
-	std::cout << "6's departure time: " << departureTimes[6][1] << std::endl;
-	std::cout << "///////////////" << std::endl;
 
 	// Rearrange the arrival time to minimize the violation of time windows. 
 	// Needs to consider 0's last time. (IMPORTANT)
@@ -136,13 +129,18 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 			
 			if (arrivalTimes[currentNode][day] < earliestTime[currentNode][day]) {
 
+				//std::cout << "////////////" << std::endl;
+				//std::cout << "Postpone This One" << std::endl;
+				//std::cout << "Day: " << day << ", node: " << currentNode << std::endl;
+				//std::cout << "////////////" << std::endl;
+
 				numberOfGoodNodes++;
 
 				// Start moving. 
 				// Find the movingDuration. 
 				double targetDuration = earliestTime[currentNode][day] - arrivalTimes[currentNode][day];
-				double movingDuration = 0;
-				while (numberOfGoodNodes > numberOfBadNodes) {
+				double movingDuration = targetDuration;
+				while (numberOfGoodNodes > numberOfBadNodes && typesAndDurations.size() != 0) {
 
 					movingDuration = typesAndDurations.end() -> duration;
 					if (movingDuration < targetDuration) {
@@ -174,11 +172,14 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 					else {
 
 						movingDuration = targetDuration;
+						// Because this node has been pushed to its best. 
+						numberOfGoodNodes--;
 						break;
 					}
 				}
 				
 				// Move the current node and the nodes that will be pushed. 
+				//std::cout << "Size: " << typesAndDurations.size() << ", moving duration: " << movingDuration << std::endl;
 				arrivalTimes[currentNode][day] += movingDuration;
 				departureTimes[currentNode][day] += movingDuration;
 				postponedDuration[day][previousNode][currentNode] += movingDuration;
@@ -186,6 +187,10 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 				for (int j = i + 1; j < solutionListOfEachDay[day].size(); j++) {
 
 					int currentNodeForPushing = solutionListOfEachDay[day][j];
+					if (currentNodeForPushing == -1) {
+
+						break;
+					}
 					movingDuration -= postponedDuration[day][previousNodeForPushing][currentNodeForPushing];
 					if (movingDuration <= 0) {
 
@@ -199,33 +204,41 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 				}
 			}
 
+			// No need for this section, because you don't need to adjust typesAndDurations everytime. you can use some objects or drawings to help yourself understand this. 
 			// Readjust typesAndDurations
-			for (int j = 0; j < typesAndDurations.size(); j++) {
+			//for (int j = 0; j < typesAndDurations.size(); j++) {
 
-				typesAndDurations[j].duration += (timeMat[currentNode][nextNode] + serviceTime[currentNode][day]);
-			}
+			//	//typesAndDurations[j].duration += (timeMat[currentNode][nextNode] + serviceTime[currentNode][day]);
+			//	typesAndDurations[j].duration += postponedDuration[day][previousNode][currentNode];
+			//}
 
-			// Add new time stamp, which is TypeAndDuration. 
-			double tempDuration = earliestTime[currentNode][day] - arrivalTimes[currentNode][day] + postponedDuration[day][previousNode][currentNode];
+			// Add new timestamp, whose data type is TypeAndDuration. 
+			double tempDuration = earliestTime[currentNode][day] - arrivalTimes[currentNode][day];
 			if (tempDuration > 0) {
 
-				typesAndDurations.push_back(TypeAndDuration(4, tempDuration));
+				typesAndDurations.push_back(TypeAndDuration(2, postponedDuration[day][previousNode][currentNode]));
+				typesAndDurations.push_back(TypeAndDuration(4, tempDuration + postponedDuration[day][previousNode][currentNode]));
 			}
 			
-			tempDuration = lastTime[currentNode][day] - arrivalTimes[currentNode][day] + postponedDuration[day][previousNode][currentNode];
+			tempDuration = lastTime[currentNode][day] - arrivalTimes[currentNode][day];
 			if (tempDuration > 0) {
 
-				typesAndDurations.push_back(TypeAndDuration(1, tempDuration));
+				typesAndDurations.push_back(TypeAndDuration(1, tempDuration + postponedDuration[day][previousNode][currentNode]));
+			}
+			else {
+
+				typesAndDurations.push_back(TypeAndDuration(1, postponedDuration[day][previousNode][currentNode]));
 			}
 
-			if (arrivalTimes[currentNode][day] < earliestTime[currentNode][day]) {
+			// No need for this section, because we have done this above. If the while loop is broken by the else in it, then numberOfGoodNodes--. On the other hand, it won't subtract 1 from numberOfGoodNodes. 
+			//if (arrivalTimes[currentNode][day] < earliestTime[currentNode][day]) {
 
-				numberOfGoodNodes++;
-			}
-			else if (arrivalTimes[currentNode][day] >= lastTime[currentNode][day]) {
+			//	numberOfGoodNodes++;
+			//}
+			//else if (arrivalTimes[currentNode][day] >= lastTime[currentNode][day]) {
 
-				numberOfBadNodes++;
-			}
+			//	numberOfBadNodes++;
+			//}
 
 			// Reorder typesAndDurations (Decreasing)
 			// This can be optimized, since most of them were sorted before. 
@@ -238,73 +251,95 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 	// Rearrange the arrival time of each synchronized service. 
 	// Haven't consider about 0's last time (latest time). This needs to be implemented. 
 	// Needs to check the part about duration. (TypeAndDuration)
-	while (1) {
+	for (int day = 0; day < nDays; day++) {
+		
+		std::cout << "Day " << day << " started. " << std::endl;
 
-		for (int day = 0; day < nDays; day++) {
+		std::vector<int> wholeList = solutionListOfEachDay[day];
 
-			std::vector<int> wholeList = solutionListOfEachDay[day];
+		// Sort all synchronized nodes
+		std::vector<std::vector<int>> nonSortedLists = std::vector<std::vector<int>>(nRoutes);;
+		int temp = 0; 
+		for (int i = 0; i < wholeList.size(); i++) {
 
-			// Sort all synchronized nodes
-			std::vector<std::vector<int>> nonSortedLists = std::vector<std::vector<int>>(nRoutes);;
-			int temp = 0; 
-			for (int i = 0; i < wholeList.size(); i++) {
+			if (wholeList[i] == -1) {
 
-				if (wholeList[i] == -1) {
-
-					temp++;
-					continue;
-				}
-				nonSortedLists[temp].push_back(wholeList[i]);
+				temp++;
+				continue;
 			}
+			nonSortedLists[temp].push_back(wholeList[i]);
+		}
 
-			int* currentIndexes = new int[nRoutes];
-			std::memset(currentIndexes, 0, nRoutes);
-			int lengthOfSortedList = 0;
+		std::cout << "nonSortedLists: " << std::endl;
+		for (int i = 0; i < nRoutes; i++) {
+
+			for (int j = 0; j < nonSortedLists[i].size(); j++) {
+
+				std::cout << nonSortedLists[i][j] << " ";
+			}
+			std::cout << std::endl;
+		}
+
+		int* currentIndexes = new int[nRoutes];
+		for (int i = 0; i < nRoutes; i++) {
+
+			currentIndexes[i] = 0;
+		}
+		std::vector<int> sortedList;
+		while(1) {
+
+			int smallest = std::numeric_limits<int>::max();
+			bool finished = true;
+			int chosenRoute = 0;
 			for (int i = 0; i < nRoutes; i++) {
 
-				lengthOfSortedList += nonSortedLists[i].size();
-			}
-			std::vector<int> sortedList = std::vector<int>(lengthOfSortedList);
-			while(1) {
+				if (currentIndexes[i] >= nonSortedLists[i].size()) {
 
-				int smallest = std::numeric_limits<int>::max();
-				bool finished = true;
-				int chosenOne = 0;
-				for (int i = 0; i < nRoutes; i++) {
-
-					if (currentIndexes[i] >= nonSortedLists[i].size()) {
-
-						continue;
-					}
-					int currentNode = nonSortedLists[i][currentIndexes[i]];
-					if (correspondingList[currentNode - 1] == 0) {
-
-						currentIndexes[i]++;
-						i--;
-						continue;
-					}
-					if (arrivalTimes[currentNode][day] < smallest) {
-
-						chosenOne = i;
-						finished = false;
-					}
+					continue;
 				}
-				if (finished == true) {
+				int currentNode = nonSortedLists[i][currentIndexes[i]];
+				//std::cout << "Examine " << currentNode << std::endl;
+				if (correspondingList[currentNode] == 0) {
 
-					break;
+					currentIndexes[i]++;
+					i--;
+					continue;
 				}
-				currentIndexes[chosenOne]++;
-				sortedList.push_back(smallest);
+				//std::cout << "Start compare " << currentNode << std::endl;
+				if (arrivalTimes[currentNode][day] < smallest) {
+
+					chosenRoute = i;
+					finished = false;
+					smallest = arrivalTimes[currentNode][day];
+				}
 			}
+			if (finished == true) {
+
+				break;
+			}
+			//std::cout << "chosenRoute: " << chosenRoute << ", nonSortedLists[chosenRoute][currentIndexes[chosenRoute]]: " << nonSortedLists[chosenRoute][currentIndexes[chosenRoute]] << std::endl;
+			sortedList.push_back(nonSortedLists[chosenRoute][currentIndexes[chosenRoute]]);
+			currentIndexes[chosenRoute]++;
+		}
+		std::cout << "Sort result: " << std::endl;
+		for (int result : sortedList) {
+
+			std::cout << result << " ";
+		}
+		std::cout << std::endl;
+		std::cout << "Sort completed" << std::endl;
+
+		// If sortedList is empty, it means that there's no synchronized service on this day. 
+		if (sortedList.size() != 0) {
 
 			while (1) {
 
+				std::cout << "while loop started, length of sortedList: " << sortedList.size() << std::endl;
 				// Get the earliest. 
 				int chosenOne = sortedList[0];
 				int correspondingOne = correspondingList[chosenOne];
 
 				// If the normal and fictive node are on the same route, don't try to reduce the violation. 
-				int routeOfTheChosenOne = 0;
 				bool onTheSameRoute = false;
 				for (int i = 0; i < nRoutes; i++) {
 
@@ -347,7 +382,7 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 					if (position != nonSortedLists[j].end()) {
 
 						positionOfChosenNode = (int)(position - nonSortedLists[j].begin());
-						lengthOfAffectedNodes = nonSortedLists[j].size() - positionOfChosenNode;
+						lengthOfAffectedNodes = nonSortedLists[j].size() - positionOfChosenNode - 1;
 						affectedNodes = new int[lengthOfAffectedNodes];
 						int tempIndex = 0;
 						for (int k = positionOfChosenNode + 1; k < nonSortedLists[j].size(); k++) {
@@ -359,69 +394,86 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 						break;
 					}
 				}
+				std::cout << "Finding all the nodes that will be affected completed" << std::endl;
+				std::cout << "Affected nodes: " << std::endl;
+				for (int j = 0; j < lengthOfAffectedNodes; j++) {
+
+					std::cout << affectedNodes[j] << " ";
+				}
+				std::cout << std::endl;
 
 				// Calculate how long it would take to postpone to match its corresponding node. 
 				int maxPostponedDuration = arrivalTimes[correspondingOne][day] - arrivalTimes[chosenOne][day];
-			
-				// Calculate all the maximum distance that each node which will be affected if we move the node we picked before can move. 
-				// In order to get our maximum moving distance for the picked node. 
-				// If the duration is longer than the maxPostponedDuration, there's no reason to record it, since we can only postpone that much time. 
-				// This part has problem. Need to be fixed. 
+				
+				// For the next part, get typesAndDurations. 
 				int numberOfGoodNodes = 1; // We already got a good node which is the one we are targeting. 
 				int numberOfBadNodes = 0;
 				std::vector<TypeAndDuration> typesAndDurations;
 
-				int previousNode = chosenOne;
-				double accumulatedPostponedDuration = postponedDuration[day][previousNode][affectedNodes[0]];
-				for (int j = 0; j < lengthOfAffectedNodes; j++) {
+				// If there are affected nodes, you need to calculate how far you gonna push. 
+				if (lengthOfAffectedNodes != 0) {
+			
+					// Calculate all the maximum distance that each node which will be affected if we move the node we picked before can move. 
+					// In order to get our maximum moving distance for the picked node. 
+					// If the duration is longer than the maxPostponedDuration, there's no reason to record it, since we can only postpone that much time. 
+					// This part has problem. Need to be fixed. 
+					int previousNode = chosenOne;
+					double accumulatedPostponedDuration = postponedDuration[day][previousNode][affectedNodes[0]];
+					for (int j = 0; j < lengthOfAffectedNodes; j++) {
 
-					int theOneToCalculate = affectedNodes[j];
-					if (arrivalTimes[theOneToCalculate][day] < earliestTime[theOneToCalculate][day]) {
+						std::cout << "Start for loop!!!" << std::endl;
+						int theOneToCalculate = affectedNodes[j];
+						if (arrivalTimes[theOneToCalculate][day] < earliestTime[theOneToCalculate][day]) {
 
-						typesAndDurations.push_back(TypeAndDuration(2, accumulatedPostponedDuration));
-						double duration = (earliestTime[theOneToCalculate][day] - arrivalTimes[theOneToCalculate][day] + accumulatedPostponedDuration);
-						if (duration < maxPostponedDuration) {
+							typesAndDurations.push_back(TypeAndDuration(2, accumulatedPostponedDuration));
+							double duration = (earliestTime[theOneToCalculate][day] - arrivalTimes[theOneToCalculate][day] + accumulatedPostponedDuration);
+							if (duration < maxPostponedDuration) {
 
-							typesAndDurations.push_back(TypeAndDuration(4, duration));
+								typesAndDurations.push_back(TypeAndDuration(4, duration));
+							}
 						}
-					}
-					else if (arrivalTimes[theOneToCalculate][day] >= lastTime[theOneToCalculate][day]) {
-
-						typesAndDurations.push_back(TypeAndDuration(1, accumulatedPostponedDuration));
-					}
-					else {
-
-						double duration = (lastTime[theOneToCalculate][day] - arrivalTimes[theOneToCalculate][day] + accumulatedPostponedDuration);
-						if (duration < maxPostponedDuration) {
-
-							typesAndDurations.push_back(TypeAndDuration(1, duration));
-						}
-					}
-
-					if (correspondingList[theOneToCalculate] != 0) {
-
-						if (arrivalTimes[correspondingList[theOneToCalculate]][day] <= arrivalTimes[theOneToCalculate][day]) {
+						else if (arrivalTimes[theOneToCalculate][day] >= lastTime[theOneToCalculate][day]) {
 
 							typesAndDurations.push_back(TypeAndDuration(1, accumulatedPostponedDuration));
 						}
 						else {
 
-							typesAndDurations.push_back(TypeAndDuration(2, accumulatedPostponedDuration));
-							double duration = (arrivalTimes[correspondingList[theOneToCalculate]][day] - arrivalTimes[theOneToCalculate][day] + accumulatedPostponedDuration);
+							double duration = (lastTime[theOneToCalculate][day] - arrivalTimes[theOneToCalculate][day] + accumulatedPostponedDuration);
 							if (duration < maxPostponedDuration) {
 
-								typesAndDurations.push_back(TypeAndDuration(3, duration));
+								typesAndDurations.push_back(TypeAndDuration(1, duration));
 							}
 						}
-					}
 
-					accumulatedPostponedDuration += postponedDuration[day][previousNode][theOneToCalculate];
-					// If the accumulated postponed duration is already larger than the amount we want to push, break it. 
-					if (accumulatedPostponedDuration >= maxPostponedDuration) {
+						std::cout << "??? " << theOneToCalculate << " ??? " << day << " ??? " << std::endl;
 
-						break;
+						// Deal with the synchronized one. 
+						if (correspondingList[theOneToCalculate] != 0) {
+
+							if (arrivalTimes[correspondingList[theOneToCalculate]][day] <= arrivalTimes[theOneToCalculate][day]) {
+
+								typesAndDurations.push_back(TypeAndDuration(1, accumulatedPostponedDuration));
+							}
+							else {
+
+								typesAndDurations.push_back(TypeAndDuration(2, accumulatedPostponedDuration));
+								double duration = (arrivalTimes[correspondingList[theOneToCalculate]][day] - arrivalTimes[theOneToCalculate][day] + accumulatedPostponedDuration);
+								if (duration < maxPostponedDuration) {
+
+									typesAndDurations.push_back(TypeAndDuration(3, duration));
+								}
+							}
+						}
+						std::cout << "Initialize typesAndDurations finished" << std::endl;
+
+						accumulatedPostponedDuration += postponedDuration[day][previousNode][theOneToCalculate];
+						// If the accumulated postponed duration is already larger than the amount we want to push, break it. 
+						if (accumulatedPostponedDuration >= maxPostponedDuration) {
+
+							break;
+						}
+						previousNode = theOneToCalculate;
 					}
-					previousNode = theOneToCalculate;
 				}
 
 				// put our goal in it. 
@@ -470,12 +522,13 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 				}
 
 				// Postpone it by currentPostpondDuration. 
-				previousNode = 0; // Have been defined before. May need to come up a way to fix this problem. Or may not?
+				int previousNode = 0;
 				for (int j = 0; j < solutionListOfEachDay[day].size(); j++) {
 
 					if (solutionListOfEachDay[day][j] == chosenOne) {
 
 						arrivalTimes[chosenOne][day] += currentPostponedDuration;
+						departureTimes[chosenOne][day] += currentPostponedDuration;
 						previousNode = solutionListOfEachDay[day][j];
 						for (int k = j + 1; k < solutionListOfEachDay[day].size(); k++) {
 
@@ -528,8 +581,10 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 				}
 			}
 		}
+		std::cout << "Day " << day << " finished. " << std::endl;
 	}
 	std::cout << "Rearranging the arrival time of each synchronized service successes. " << std::endl;
+	printGraph(solutionListOfEachDay, GRAPH_LIMIT);
 }
 
 // Width: 159 characters. 
@@ -537,12 +592,32 @@ void Solution::printGraph(const std::vector<std::vector<int>>& solutionListOfEac
 
 	for (int day = 0; day < nDays; day++) {
 
-		std::cout << "Day " << day << ": ";
+		if (day != 1) continue;
+		std::cout << "\033[1;33mDay " << day << ": \033[0m";
 		for (int i = 0; i < solutionListOfEachDay[day].size(); i++) {
 
 			std::cout << solutionListOfEachDay[day][i] << " ";
 		}
-		std::cout << std::endl << std::endl;
+		std::cout << std::endl;
+		std::cout << "Arrival time: " << std::endl;
+		for (int i = 0; i < solutionListOfEachDay[day].size(); i++) {
+
+			if (solutionListOfEachDay[day][i] != -1) {
+
+				std::cout << solutionListOfEachDay[day][i] << ": " << arrivalTimes[solutionListOfEachDay[day][i]][day] << std::endl;
+			}
+		}
+		std::cout << std::endl;
+		std::cout << "Departure time: " << std::endl;
+		for (int i = 0; i < solutionListOfEachDay[day].size(); i++) {
+
+			if (solutionListOfEachDay[day][i] != -1) {
+
+				std::cout << solutionListOfEachDay[day][i] << ": " << departureTimes[solutionListOfEachDay[day][i]][day] << std::endl;
+			}
+		}
+		std::cout << std::endl;
+
 		std::vector<PointAndType> pointsAndTypes;
 
 		int route = 1;
@@ -564,37 +639,7 @@ void Solution::printGraph(const std::vector<std::vector<int>>& solutionListOfEac
 			int currentNode = solutionListOfEachDay[day][i];
 			if (currentNode == -1) {
 
-				int currentCursor = 0;
-				for (int i = 0; i < pointsAndTypes.size(); i++) {
-
-					if (pointsAndTypes[i].point > currentCursor) {
-
-						for (int j = 0; j < pointsAndTypes[i].point - currentCursor; j++) {
-
-							std::cout << "-";
-						}
-						currentCursor = pointsAndTypes[i].point;
-					}
-					else if (pointsAndTypes[i].point < currentCursor) {
-
-						continue;
-					}
-
-					if (pointsAndTypes[i].type == 1) {
-
-						std::cout << "\033[1;42m" << pointsAndTypes[i].value << "\033[0m";
-					}
-					else if (pointsAndTypes[i].type == 2) {
-
-						std::cout << "\033[1;41m" << pointsAndTypes[i].value << "\033[0m";
-					}
-
-					currentCursor++;
-				}
-				std::cout << std::endl;
-				printVerticalLines(1);
-
-				pointsAndTypes.clear();
+				printTimeLine(pointsAndTypes);
 
 				route++;
 				std::cout << "Route " << route << ":  |";
@@ -608,6 +653,8 @@ void Solution::printGraph(const std::vector<std::vector<int>>& solutionListOfEac
 				}
 				std::cout << std::endl;
 				printVerticalLines(1);
+
+				pointsAndTypes.clear();
 
 				continue;
 			}
@@ -628,6 +675,8 @@ void Solution::printGraph(const std::vector<std::vector<int>>& solutionListOfEac
 			point = std::floor(departureTimes[currentNode][day] / limit * 159);
 			pointsAndTypes.push_back(PointAndType(point, 2, currentNode));
 		}
+		printTimeLine(pointsAndTypes);
+		std::cout << std::endl;
 	}
 }
 
@@ -646,4 +695,37 @@ void Solution::printVerticalLines(int lines) {
 		}
 		std::cout << std::endl;
 	}
+}
+
+void Solution::printTimeLine(const std::vector<PointAndType>& pointsAndTypes) {
+
+	int currentCursor = 0;
+	for (int i = 0; i < pointsAndTypes.size(); i++) {
+
+		if (pointsAndTypes[i].point > currentCursor) {
+
+			for (int j = 0; j < pointsAndTypes[i].point - currentCursor; j++) {
+
+				std::cout << "-";
+			}
+			currentCursor = pointsAndTypes[i].point;
+		}
+		else if (pointsAndTypes[i].point < currentCursor) {
+
+			continue;
+		}
+
+		if (pointsAndTypes[i].type == 1) {
+
+			std::cout << "\033[1;42m" << pointsAndTypes[i].value << "\033[0m";
+		}
+		else if (pointsAndTypes[i].type == 2) {
+
+			std::cout << "\033[1;41m" << pointsAndTypes[i].value << "\033[0m";
+		}
+
+		currentCursor++;
+	}
+	std::cout << std::endl;
+	printVerticalLines(1);
 }
