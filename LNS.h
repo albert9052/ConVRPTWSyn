@@ -22,19 +22,16 @@ private:
     int R(int i, int j);
     int r(int i, int j);
     int getu();
-    //vector<int>& findMSTAndCutIntoTwo(vector<int> nodes);
+    vector<int>& findMSTAndCutIntoTwo(vector<int> nodes);
 
     void repair();
     void greedyRepair();
     void regretRepair();
 
-    void adjustDepartureTime();
-
-    void calTmp(const vector<vector<vector<int>>>& bef);
+    void calculateObjectiveTmp(const vector<vector<vector<int>>>& bef);
 public:
     LNS();
     LNS(int Iter, float T0, float Alpha, float Lambda, float Nu, float Xi);
     void solve();
-    vector<int> findMSTAndCutIntoTwo(vector<int> nodes);
 };
 

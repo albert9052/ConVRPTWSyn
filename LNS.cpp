@@ -26,7 +26,7 @@ Iter(_Iter), T0(_T0), Alpha(_Alpha), Lambda(_Lambda), Nu(_Nu), Xi(_Xi){
     // Alpha : the cooling rate, 0 < Alpha < 1
     // Lambdam, Nu, Xi : used in the related removal operator
 }
-void LNS::calTmp(const vector<vector<vector<int>>>& bef){
+void LNS::calculateObjectiveTmp(const vector<vector<vector<int>>>& bef){
     // for calculate obj
     vector<vector<int>> aft;
     for(const vector<vector<int>>& vvbef:bef){
@@ -63,8 +63,8 @@ void LNS::solve() {
         repair();
         solutionList = S;        output();
         rmdNodes.clear();
-        //calTmp(S);
-        
+        calculateObjectiveTmp(S);
+        adjustDepartureTime();
         /*calculateObjective(S);
         adjustDepartureTime();
         if (isFeasible()) ImproveTimeConsistency();
