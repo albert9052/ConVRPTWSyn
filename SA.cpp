@@ -4,10 +4,10 @@ bool SA::isFirstTime = true;
 
 SA::SA(/* args */) {
 
-	Ts = 10;
-	Te = 10;
-	numberOfIterations = 20;
-	Alpha = 0.0001;
+	Ts = 10000000000;
+	Te = 0.000000000001;
+	numberOfIterations = 100000;
+	Alpha = 0.1;
 }
 
 void SA::solve() {
@@ -29,8 +29,8 @@ void SA::solve() {
     std::vector<std::vector<int>> SAListOfEachDay; // It contains all the normal and fictive nodes, and (nRoutes - 1) -1 for boundaries of routes. 
     std::vector<std::vector<int>> bestSA;
 	std::vector<std::vector<int>> currentSA;
-    int bestScore;
-	int currentScore;
+    int bestScore = INT_MAX;
+	int currentScore = INT_MAX;
 
     // Since we are doing SA, our algorithm will be running several times because nodes on different day can't swtich with each other. 
 
@@ -68,10 +68,7 @@ void SA::solve() {
         for (int iterationNum = 0; iterationNum < numberOfIterations; iterationNum++) {
 
             // Tweak the SA
-            for (int day = 0; day < nDays; day++) {
-
-                tweakSolutionRandomly(SAListOfEachDay);
-            }
+			tweakSolutionRandomly(SAListOfEachDay);
 
 			//for (int day = 0; day < nDays; day++) {
 
@@ -83,11 +80,15 @@ void SA::solve() {
 			//	std::cout << std::endl;
 			//}
 
-			std::cout << iterationNum << " times" << std::endl;
+			//std::cout << iterationNum << " times" << std::endl;
+
+			//temporary
+			//SAListOfEachDay[0] = {1, -1, 4, -1, 3, 6, 5};
+			//SAListOfEachDay[1] = {6, 5, -1, 2, 4, -1, 7, 1};
+			//SAListOfEachDay[2] = {-1, 3, 6, -1, 1};
 
 			// Adjust the arrival time and departure time to get the minimum violation. 
-            if (iterationNum == 19) calculateObjective(SAListOfEachDay);
-			//if (iterationNum == 19) adjustDepartureTime(SAListOfEachDay);
+            calculateObjective(SAListOfEachDay);
 
 			//// Adjust the arrival time and departure time to get the minimum score. (Approximately) 
 			//adjustDepartureTime(SAListOfEachDay);
@@ -100,30 +101,48 @@ void SA::solve() {
 			// If it's feasible, do Step 5 to find the best local score using 2-opt algorithm. 
 			// This one may cost too much time. In one of the references, there's a way to reduce the time it might take. 
 
-			//int newScore;// = getScore();
-            //
-            //// Store it if it's the best one so far. 
-            //if (newScore >= bestScore) {
+			int newScore;// = getScore();
+			
+			// Temporary: 
+			newScore = getViolationScore(SAListOfEachDay, 10);
+			if (newScore == 0) {
 
-            //    bestSA.assign(SAListOfEachDay.begin(), SAListOfEachDay.end());
-			//	bestScore = newScore;
-            //}
+				//printGraph(SAListOfEachDay, GRAPH_LIMIT);
+				adjustDepartureTime(SAListOfEachDay);
+				newScore += getObjectiveScore(SAListOfEachDay);
+				//std::cout << "Score: " << newScore << std::endl;
+			}
+			//std::cout << "Score: " << newScore << ", Best Score: " << bestScore << std::endl;
+            
+            // Store it if it's the best one so far. 
+            if (newScore < bestScore) {
 
-            //// Judge if it can replace the current one. 
-            //if (newScore >= currentScore) {
+                bestSA.assign(SAListOfEachDay.begin(), SAListOfEachDay.end());
+				bestScore = newScore;
+				std::cout << "Best Score: " << newScore << std::endl;
+				//printGraph(SAListOfEachDay, GRAPH_LIMIT);
+            }
 
-			//	currentSA.assign(SAListOfEachDay.begin(), SAListOfEachDay.end());
-			//}
-			//else {
+            // Judge if it can replace the current one. 
+            if (newScore < currentScore) {
 
-			//	if (getRandomDecimal() < exp(-(newScore - currentScore) / t)) {
+				currentSA.assign(SAListOfEachDay.begin(), SAListOfEachDay.end());
+			}
+			else {
 
-			//		currentSA.assign(SAListOfEachDay.begin(), SAListOfEachDay.end());
-			//		currentScore = newScore;
-			//	}
-			//}
+				if (getRandomDecimal() < exp(-(currentScore - newScore) / t)) {
+
+					currentSA.assign(SAListOfEachDay.begin(), SAListOfEachDay.end());
+					currentScore = newScore;
+				}
+			}
         }
     }
+
+	calculateObjective(bestSA);
+	adjustDepartureTime(bestSA);
+	printGraph(bestSA, GRAPH_LIMIT);
+	std::cout << "Best score: " << bestScore << std::endl;
 }
 
 double SA::getRandomDecimal() {
@@ -139,42 +158,36 @@ int SA::getRandomInteger(int x) {
 
 void SA::tweakSolutionByInsertion(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-    for (int day = 0; day < nDays; day++) {
+	int day = getRandomInteger(3);
+	int positionToChoose = getRandomInteger(SAListOfEachDay[day].size());
+	int positionToInsert = getRandomInteger(SAListOfEachDay[day].size() - 1);
 
-        int positionToChoose = getRandomInteger(SAListOfEachDay[day].size());
-        int positionToInsert = getRandomInteger(SAListOfEachDay[day].size() - 1);
-
-        int tempValueForInsertion = SAListOfEachDay[day][positionToChoose];
-        SAListOfEachDay[day].erase(SAListOfEachDay[day].begin() + positionToChoose);
-        SAListOfEachDay[day].insert(SAListOfEachDay[day].begin() + positionToInsert, tempValueForInsertion);
-    }
+	int tempValueForInsertion = SAListOfEachDay[day][positionToChoose];
+	SAListOfEachDay[day].erase(SAListOfEachDay[day].begin() + positionToChoose);
+	SAListOfEachDay[day].insert(SAListOfEachDay[day].begin() + positionToInsert, tempValueForInsertion);
 }
 
 void SA::tweakSolutionBySwap(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-    for (int day = 0; day < nDays; day++) {
+	int day = getRandomInteger(3);
+	int position1 = getRandomInteger(SAListOfEachDay[day].size());
+	int position2 = getRandomInteger(SAListOfEachDay[day].size());
 
-        int position1 = getRandomInteger(SAListOfEachDay[day].size());
-        int position2 = getRandomInteger(SAListOfEachDay[day].size());
-
-        std::swap(SAListOfEachDay[day][position1], SAListOfEachDay[day][position2]);
-    }
+	std::swap(SAListOfEachDay[day][position1], SAListOfEachDay[day][position2]);
 }
 
 void SA::tweakSolutionByReversion(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-    for (int day = 0; day < nDays; day++) {
+	int day = getRandomInteger(3);
+	int position1 = getRandomInteger(SAListOfEachDay[day].size());
+	int position2 = getRandomInteger(SAListOfEachDay[day].size());
 
-        int position1 = getRandomInteger(SAListOfEachDay[day].size());
-        int position2 = getRandomInteger(SAListOfEachDay[day].size());
+	int middlePosition = (position1 + position2) / 2;
+	int totalOfTwoPositions = position1 + position2;
+	for (int i = std::min(position1, position2); i <= middlePosition; i++) {
 
-        int middlePosition = (position1 + position2) / 2;
-        int totalOfTwoPositions = position1 + position2;
-        for (int i = std::min(position1, position2); i <= middlePosition; i++) {
-
-            std::swap(SAListOfEachDay[day][i], SAListOfEachDay[day][totalOfTwoPositions - i]);
-        }
-    }
+		std::swap(SAListOfEachDay[day][i], SAListOfEachDay[day][totalOfTwoPositions - i]);
+	}
 }
 
 void SA::tweakSolutionRandomly(std::vector<std::vector<int>>& SAListOfEachDay) {
@@ -198,381 +211,6 @@ void SA::tweakSolutionRandomly(std::vector<std::vector<int>>& SAListOfEachDay) {
         std::cout << "Error: tweakSARandomly get value out of {0, 1, 2}" << std::endl;
         exit(1);
     }
-}
-
-int SA::calculateViolationScore(std::vector<std::vector<int>>& solutionListOfEachDay, int scaleOfViolationScore) {
-
-	// Pure calculation. 
-
-	// just for compile
-	return -1;
-}
-
-double SA::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double accumulatedPostponedDuration, bool firstLoop) {
-
-	static std::vector<int> routesHavingBeenCalculated;
-	if (firstLoop) {
-
-		routesHavingBeenCalculated.clear();
-		routesHavingBeenCalculated.push_back(day);
-	}
-	double maxPF = std::numeric_limits<double>::max();
-	while (solutionListOfEachDay[day][positionOfNode] != -1 && positionOfNode < solutionListOfEachDay[day].size()) {
-
-		int currentNode = solutionListOfEachDay[day][positionOfNode];
-		int nextNode = 0;
-		if (positionOfNode != solutionListOfEachDay[day].size() - 1) {
-
-			nextNode = solutionListOfEachDay[day][positionOfNode + 1];
-			if (nextNode == -1) {
-
-				nextNode = 0;
-			}
-		}
-
-		std::vector<int> daysOfMinArrivalTime = daysOfMinArrivalTimeOfEachCustomer[currentNode];
-		std::vector<int> daysOfMaxArrivalTime = daysOfMaxArrivalTimeOfEachCustomer[currentNode];
-
-		// Check how far it can move according to whether it will increase the objective score. 
-		if (std::find(daysOfMaxArrivalTime.begin(), daysOfMaxArrivalTime.end(), currentNode) != daysOfMaxArrivalTime.end()) {
-
-			maxPF = std::min(maxPF, accumulatedPostponedDuration);
-		}
-		else {
-
-			double duration = arrivalTimes[daysOfMaxArrivalTime[0]][day] - arrivalTimes[currentNode][day] + accumulatedPostponedDuration;
-			maxPF = std::min(maxPF, duration);
-		}
-
-		// Check how far it can move according to whether it will exceeds its own time window. 
-		double duration = lastTime[currentNode][day] - arrivalTimes[currentNode][day];
-		maxPF = std::min(maxPF, duration);
-
-		// Deal with the synchronized one. 
-		if (correspondingList[currentNode] != 0) {
-
-			int correspondingNode = correspondingList[currentNode];
-			int positionOfCorrespondingNode = 0;
-			int routeOfCorrespondingNode = 0;
-			for (int i = 0; i < solutionListOfEachDay[day].size(); i++) {
-
-				if (solutionListOfEachDay[day][i] == -1) {
-
-					routeOfCorrespondingNode++;
-					continue;
-				}
-				if (solutionListOfEachDay[day][i] == correspondingNode) {
-
-					positionOfCorrespondingNode = i;
-					break;
-				}
-			}
-			
-			// Check if this route we have taken into consideration. 
-			if (std::find(routesHavingBeenCalculated.begin(), routesHavingBeenCalculated.end(), routeOfCorrespondingNode) == routesHavingBeenCalculated.end()) {
-
-				routesHavingBeenCalculated.push_back(routeOfCorrespondingNode);
-				double accumulatedPostponedDurationForAnotherRoute = accumulatedPostponedDuration + postponedDuration[day][correspondingNode][solutionListOfEachDay[day][positionOfCorrespondingNode + 1]];
-				maxPF = std::min(maxPF, getMaxPF(solutionListOfEachDay, positionOfCorrespondingNode + 1, day, accumulatedPostponedDurationForAnotherRoute, false));
-			}
-		}
-
-		accumulatedPostponedDuration += postponedDuration[day][currentNode][nextNode];
-		positionOfNode++;
-	}
-
-	return maxPF;
-}
-
-// Assume all the synchronized service has no violation. 
-// This function needs to be adjusted to use daysOfMinArrivalTimeDifferenceOfEachCustomer and daysOfMaxArrivalTimeDifferenceOfEachCustomer. 
-CustomerAndArrivalTimeDifference SA::getTheCustomerWithLargestArrivalTimeDifference() {
-
-	int theChosenOne = 1;
-	double valueOfTheChosenOne = 0;
-	int dayOfMinArrivalTime = 0;
-	int dayOfMaxArrivalTime = 0;
-	for (int i = 1; i <= nNormals; i++) {
-
-		double difference = arrivalTimes[i][daysOfMaxArrivalTimeOfEachCustomer[i][0]] - arrivalTimes[i][daysOfMinArrivalTimeOfEachCustomer[i][0]];
-		if (difference > valueOfTheChosenOne) {
-
-			theChosenOne = i;
-			valueOfTheChosenOne = difference;
-			dayOfMinArrivalTime = daysOfMinArrivalTimeOfEachCustomer[i][0];
-			dayOfMaxArrivalTime = daysOfMaxArrivalTimeOfEachCustomer[i][0];
-		}
-	}
-	struct CustomerAndArrivalTimeDifference customerAndDifference;
-	customerAndDifference.customer = theChosenOne;
-	customerAndDifference.difference = valueOfTheChosenOne;
-	customerAndDifference.dayOfMinArrivalTime = dayOfMinArrivalTime;
-	customerAndDifference.dayOfMaxArrivalTime = dayOfMaxArrivalTime;
-	return customerAndDifference;
-}
-
-std::vector<int>* SA::applyPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double PF, bool firstLoop) {
-
-	static std::vector<int> routesHavingBeenApplied;
-	if (firstLoop) {
-
-		routesHavingBeenApplied.clear();
-		routesHavingBeenApplied.push_back(day);
-	}
-
-	std::vector<int>* nodesBeingMovedPtr = new std::vector<int>();
-	int previousNode = 0;
-	if (positionOfNode > 0) {
-
-		previousNode = solutionListOfEachDay[day][positionOfNode - 1];
-		if (previousNode == -1) {
-
-			previousNode = 0;
-		}
-	}
-	// The part about getting currentNode and nextNode can be more optimized, but it will lose its readability, so I keep it this way. 
-	for (int i = positionOfNode; i < solutionListOfEachDay[day].size(); i++) {
-
-		// Get currentNode. 
-		int currentNode = solutionListOfEachDay[day][i];
-		if (currentNode == -1) {
-
-			break;
-		}
-		// Transform it into its normal node if it is a fictive node. (Just its number)
-		if (currentNode > nNormals) {
-
-			currentNode = correspondingList[currentNode];
-		}
-
-		// Get nextNode. 
-		int nextNode = 0;
-		if (i < solutionListOfEachDay[day].size() - 1) {
-
-			nextNode = solutionListOfEachDay[day][i + 1];
-			if (nextNode == -1) {
-
-				nextNode = 0;
-			}
-		}
-
-		// Apply it. 
-		postponedDuration[day][previousNode][currentNode] += PF;
-		arrivalTimes[currentNode][day] += PF;
-		departureTimes[currentNode][day] += PF;
-
-		// Deal with the synchronized node. 
-		int correspondingNode = correspondingList[currentNode];
-		if (correspondingNode != 0) {
-
-			int positionOfCorrespondingNode = 0;
-			int routeOfCorrespondingNode = 0;
-			for (int j = 0; j < nNormals; j++) {
-
-				if (solutionListOfEachDay[day][j] == -1) {
-
-					routeOfCorrespondingNode++;
-					continue;
-				}
-				if (solutionListOfEachDay[day][j] == correspondingNode) {
-
-					positionOfCorrespondingNode = j;
-					break;
-				}
-			}
-
-			// Avoid ReApplying. 
-			if (std::find(routesHavingBeenApplied.begin(), routesHavingBeenApplied.end(), routeOfCorrespondingNode) == routesHavingBeenApplied.end()) {
-
-				routesHavingBeenApplied.push_back(routeOfCorrespondingNode);
-
-				int previousNodeForCorrespondingNode = 0;
-				if (positionOfCorrespondingNode > 0) {
-
-					previousNodeForCorrespondingNode = solutionListOfEachDay[day][positionOfCorrespondingNode -1];
-					if (previousNodeForCorrespondingNode == -1) {
-
-						previousNodeForCorrespondingNode = 0;
-					}
-				}
-				
-				int nextNodeForCorrespondingNode = 0;
-				if (i < solutionListOfEachDay[day].size() - 1) {
-
-					nextNodeForCorrespondingNode = solutionListOfEachDay[day][i + 1];
-					if (nextNodeForCorrespondingNode == -1) {
-
-						nextNodeForCorrespondingNode = 0;
-					}
-				}
-
-				// Apply it. 
-				postponedDuration[day][previousNodeForCorrespondingNode][correspondingNode] += PF;
-				arrivalTimes[correspondingNode][day] += PF;
-				departureTimes[correspondingNode][day] += PF;
-
-				// Adjust PF for corresponding node. 
-				double tempPostponedDuration = postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode];
-				double tempPF = PF;
-				if (tempPF < tempPostponedDuration) {
-
-					postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode] -= tempPF;
-				}
-				else {
-
-					postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode] = 0; // This is equal to postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode] -= tempPostponedDuration;
-					tempPF -= tempPostponedDuration;
-				}
-
-				std::vector<int>* otherNodesBeingMovedPtr = applyPF(solutionListOfEachDay, positionOfCorrespondingNode, day, tempPF, false);
-				nodesBeingMovedPtr->reserve(nodesBeingMovedPtr->size() + otherNodesBeingMovedPtr->size());
-				nodesBeingMovedPtr->insert(nodesBeingMovedPtr->end(), otherNodesBeingMovedPtr->begin(), otherNodesBeingMovedPtr->end());
-				delete otherNodesBeingMovedPtr;
-			}
-		}
-
-		// Adjust PF. 
-		double tempPostponedDuration = postponedDuration[day][currentNode][nextNode];
-		if (PF < tempPostponedDuration) {
-
-			postponedDuration[day][currentNode][nextNode] -= PF;
-			break;
-		}
-		else {
-
-			postponedDuration[day][currentNode][nextNode] = 0; // This is equal to postponedDuration[day][currentNode][nextNode] -= tempPostponedDuration;
-			PF -= tempPostponedDuration;
-		}
-
-		// Add it into nodesBeingMoved
-		nodesBeingMovedPtr->push_back(currentNode);
-		
-		// Get previousNode for next iteration. 
-		previousNode = currentNode;
-	}
-	
-	return nodesBeingMovedPtr;
-}
-
-// This version can only deal with solution with no violation. 
-void SA::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOfEachDay) {
-
-	// Calculate daysOfMinArrivalTimeOfEachCustomer, and daysOfMaxArrivalTimeOfEachCustomer
-	daysOfMinArrivalTimeOfEachCustomer.clear();
-	daysOfMaxArrivalTimeOfEachCustomer.clear();
-	for (int i = 1; i <= nNormals; i++) {
-
-		double minArrivalTime = INT_MAX;
-		double maxArrivalTime = 0;
-		std::vector<int> daysOfMinArrivalTime;
-		std::vector<int> daysOfMaxArrivalTime;
-		for (int day = 0; day < nDays; day++) {
-
-			double tempArrivalTime = arrivalTimes[i][day];
-			if (tempArrivalTime < minArrivalTime) {
-
-				daysOfMinArrivalTime.clear();
-				daysOfMinArrivalTime.push_back(day);
-				minArrivalTime = tempArrivalTime;
-			}
-			else if (tempArrivalTime == minArrivalTime) {
-
-				daysOfMinArrivalTime.push_back(day);
-			}
-			if (tempArrivalTime > maxArrivalTime) {
-
-				daysOfMaxArrivalTime.clear();
-				daysOfMaxArrivalTime.push_back(day);
-				maxArrivalTime = tempArrivalTime;
-			}
-			else if (tempArrivalTime == maxArrivalTime) {
-
-				daysOfMaxArrivalTime.push_back(day);
-			}
-		}
-		daysOfMinArrivalTimeOfEachCustomer[i] = std::vector<int>(daysOfMinArrivalTime);
-		daysOfMaxArrivalTimeOfEachCustomer[i] = std::vector<int>(daysOfMaxArrivalTime);
-	}
-	
-	// Start finding. 
-	double maxMovingDuration = INT_MAX;
-	while(1) {
-
-		// Find the customer with the largest arrival time difference. 
-		CustomerAndArrivalTimeDifference customerWithLargestArrivalTimeDifferenceAndItsDifference = getTheCustomerWithLargestArrivalTimeDifference();
-
-		// Get the maximum moving duration and the days that are the most extense. Since we are going to push forward, we only need the day of minimum arrival time. 
-		maxMovingDuration = customerWithLargestArrivalTimeDifferenceAndItsDifference.difference;
-		int dayOfMinArrivalTime = customerWithLargestArrivalTimeDifferenceAndItsDifference.dayOfMinArrivalTime;
-		int dayOfMaxArrivalTime = customerWithLargestArrivalTimeDifferenceAndItsDifference.dayOfMaxArrivalTime;
-
-		// Try to push forward. 
-		// Get the customer with largest arrival time difference
-		int customerWithLargestArrivalTimeDifference = customerWithLargestArrivalTimeDifferenceAndItsDifference.customer;
-
-		// If it is a fictive node, change to its corresponding normal node. 
-		if (correspondingList[customerWithLargestArrivalTimeDifference] > nNormals) {
-
-			customerWithLargestArrivalTimeDifference = correspondingList[customerWithLargestArrivalTimeDifference];
-		}
-
-		// Get the position of customer with largest arrival time difference. 
-		int positionOfCustomerWithLargestArrivalTimeDifference = 0;
-		for (int i = 0; i < solutionListOfEachDay[dayOfMinArrivalTime].size(); i++) {
-
-			if (solutionListOfEachDay[dayOfMinArrivalTime][i] == customerWithLargestArrivalTimeDifference) {
-
-				positionOfCustomerWithLargestArrivalTimeDifference = i;
-				break;
-			}
-		}
-
-		// Get those blocking customer. Calculate their maxPF. 
-		maxMovingDuration = std::min(maxMovingDuration, getMaxPF(solutionListOfEachDay, positionOfCustomerWithLargestArrivalTimeDifference, dayOfMinArrivalTime, 0, true));
-		std::vector<int>* nodesBeingMovedPtr;
-		if (maxMovingDuration > 0) {
-
-			nodesBeingMovedPtr = applyPF(solutionListOfEachDay, positionOfCustomerWithLargestArrivalTimeDifference, dayOfMinArrivalTime, maxMovingDuration, true);
-		}
-		else {
-
-			break;
-		}
-
-		// We have to know which node have been pushed and recalculate their minimum arrival time difference, and maximum arrival time difference. 
-		// The nodes in nodesBeingMoved are all normal nodes, not fictive nodes. 
-		std::vector<bool> nodesHavingBeenRecalculated(nNodes, false);
-		for (int i = 0; i < nodesBeingMovedPtr->size(); i++) {
-
-			int nodeAreGoingToRecalculate = nodesBeingMovedPtr->at(i);
-			if (nodesHavingBeenRecalculated[nodeAreGoingToRecalculate]) {
-
-				continue;
-			}
-			nodesHavingBeenRecalculated[nodeAreGoingToRecalculate] = true;
-
-			double minArrivalTime = INT_MAX;
-			std::vector<int> daysOfMinArrivalTime;
-			for (int day = 0; day < nDays; day++) {
-
-				double tempArrivalTime = arrivalTimes[nodeAreGoingToRecalculate][day];
-				if (tempArrivalTime < minArrivalTime) {
-
-					daysOfMinArrivalTime.clear();
-					daysOfMinArrivalTime.push_back(day);
-					minArrivalTime = tempArrivalTime;
-				}
-				else if (tempArrivalTime == minArrivalTime) {
-
-					daysOfMinArrivalTime.push_back(day);
-				}
-			}
-			daysOfMinArrivalTimeOfEachCustomer[nodeAreGoingToRecalculate] = std::vector<int>(daysOfMinArrivalTime);
-		}
-
-		// Delete nodesBeingMovedPtr. 
-		delete nodesBeingMovedPtr;
-	}
 }
 
 void SA::improveTimeConsistency(std::vector<std::vector<int>>& solutionListOfEachDay) {

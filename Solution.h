@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <cmath>
 #include <cstring>
 //<<<<<<< Updated upstream
 #include <climits>
@@ -16,6 +17,8 @@
 #include <limits>
 //>>>>>>> Stashed changes
 #include <iomanip>
+
+#define GRAPH_LIMIT 200
 
 class PointAndType {
 
@@ -86,6 +89,14 @@ public:
 	}
 };
 
+struct CustomerAndArrivalTimeDifference {
+
+	int customer;
+	double difference;
+	int dayOfMinArrivalTime;
+	int dayOfMaxArrivalTime;
+};
+
 class Solution {
 public:
 
@@ -124,6 +135,8 @@ public:
 				correspondingList[fictiveLink[i - 1]] = i;
 			}
 		}
+		daysOfMinArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
+		daysOfMaxArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
     }
     void input();
     void output();
@@ -137,9 +150,28 @@ protected:
 	std::vector<std::vector<std::vector<double>>> postponedDuration;
 	std::vector<int> correspondingList; // 0 means no corresponding nodes
 	
+	// Assume all the synchronized service has no violation. 
+	CustomerAndArrivalTimeDifference getTheCustomerWithLargestArrivalTimeDifference();
+	// This version can only deal with solutions with no violation. 
+	double getMaxPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double accumulatedPostponedDuration, bool firstLoop);
+	// This version can only deal with solutions with no violation. 
+	std::vector<int>* applyPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double PF, bool firstLoop);
+	// This version can only deal with solutions with no violation. 
+	// Haven't consider about 0's lastTime. 
+    void adjustDepartureTime(std::vector<std::vector<int>>& solutionListOfEachDay);
+	// Variables for adjustDepartureTime
+	std::vector<std::vector<int>> nodesHavinglastArrivalTime;
+	std::vector<std::vector<int>> nodesHavingEarliestArrivalTime;
+	std::vector<std::vector<int>> daysOfMinArrivalTimeOfEachCustomer;
+	std::vector<std::vector<int>> daysOfMaxArrivalTimeOfEachCustomer;
+	// -------------------------------------
+	
 	void printGraph(const std::vector<std::vector<int>>& solutionListOfEachDay, double limit);
 	void printTimeLine(const std::vector<PointAndType>& pointsAndTypes);
 	void printVerticalLines(int lines);
+
+	int getViolationScore(const std::vector<std::vector<int>>& solutionListOfEachDay, int scaleOfViolationScore);
+	int getObjectiveScore(const std::vector<std::vector<int>>& solutionListOfEachDay);
 };
 
 #endif

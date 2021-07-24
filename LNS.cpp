@@ -64,7 +64,7 @@ void LNS::solve() {
         solutionList = S;        output();
         rmdNodes.clear();
         calculateObjectiveTmp(S);
-        adjustDepartureTime();
+        //adjustDepartureTime();
         /*calculateObjective(S);
         adjustDepartureTime();
         if (isFeasible()) ImproveTimeConsistency();
@@ -215,7 +215,7 @@ void LNS::relatedRemoval(){
     }
 }
 
-vector<int> LNS::findMSTAndCutIntoTwo(vector<int> nodes){
+vector<int>& LNS::findMSTAndCutIntoTwo(vector<int> nodes){
     // return edge
     vector<vector<int>> groups, edges, mst;
     vector<double> times;
@@ -439,9 +439,6 @@ void LNS::regretRepair(){
             tmpRmd.erase(tmpRmd.begin()+bestIdxInRmd);
         }
     }
-}
-void LNS::adjustDepartureTime(){
-    
 }
 
     

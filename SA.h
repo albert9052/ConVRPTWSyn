@@ -29,14 +29,6 @@ public:
 	void resetAll(int _value);
 };
 
-struct CustomerAndArrivalTimeDifference {
-
-	int customer;
-	double difference;
-	int dayOfMinArrivalTime;
-	int dayOfMaxArrivalTime;
-};
-
 class SA : public Solution{
 
 private:
@@ -51,29 +43,12 @@ private:
 
     std::vector<std::vector<bool>> modifiedRequiredMatrix;
 
-	int calculateViolationScore(std::vector<std::vector<int>>& solutionListOfEachDay, int scaleOfViolationScore);
-
     double getRandomDecimal(); // Which is [0, 1]
     int getRandomInteger(int x); // Which is [0, x - 1]
     void tweakSolutionByInsertion(std::vector<std::vector<int>>& solutionListOfEachDay);
     void tweakSolutionBySwap(std::vector<std::vector<int>>& solutionListOfEachDay);
     void tweakSolutionByReversion(std::vector<std::vector<int>>& solutionListOfEachDay);
     void tweakSolutionRandomly(std::vector<std::vector<int>>& solutionListOfEachDay);
-	// Assume all the synchronized service has no violation. 
-	CustomerAndArrivalTimeDifference getTheCustomerWithLargestArrivalTimeDifference();
-	// This version can only deal with solutions with no violation. 
-	double getMaxPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double accumulatedPostponedDuration, bool firstLoop);
-	// This version can only deal with solutions with no violation. 
-	std::vector<int>* applyPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double PF, bool firstLoop);
-	// This version can only deal with solutions with no violation. 
-	// Haven't consider about 0's lastTime. 
-    void adjustDepartureTime(std::vector<std::vector<int>>& solutionListOfEachDay);
-	// Variables for adjustDepartureTime
-	std::vector<std::vector<int>> nodesHavinglastArrivalTime;
-	std::vector<std::vector<int>> nodesHavingEarliestArrivalTime;
-	std::vector<std::vector<int>> daysOfMinArrivalTimeOfEachCustomer;
-	std::vector<std::vector<int>> daysOfMaxArrivalTimeOfEachCustomer;
-	// -------------------------------------
 
 	void improveTimeConsistency(std::vector<std::vector<int>>& solutionListOfEachDay);
 	bool isFeasible(std::vector<std::vector<int>>& solutionListOfEachDay);
