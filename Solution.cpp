@@ -30,7 +30,10 @@ void Solution::input() {
 				requiredList[d].push_back(n);
 }
 
-void Solution::output(){ for(int i = 0; i < nDays; i++){ std::cout << "Day " << i + 1 << std::endl; for(int j = 0; j < nRoutes; j++){
+void Solution::output(){ 
+	for(int i = 0; i < nDays; i++){ 
+		std::cout << "Day " << i + 1 << std::endl; 
+		for(int j = 0; j < nRoutes; j++){
             std::cout << "   Route " << j + 1 << ":";
             for(int& k : solutionList[i][j]){
                 std::cout << " => " << k;

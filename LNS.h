@@ -22,7 +22,7 @@ private:
     int R(int i, int j);
     int r(int i, int j);
     int getu();
-    vector<int>& findMSTAndCutIntoTwo(vector<int> nodes);
+    vector<int> findMSTAndCutIntoTwo(vector<int> nodes);
 
     void repair();
     void greedyRepair();
