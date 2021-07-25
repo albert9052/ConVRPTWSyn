@@ -655,15 +655,27 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 		std::vector<int> daysOfMaxArrivalTime = daysOfMaxArrivalTimeOfEachCustomer[normalNode];
 
 		// Check how far it can move according to whether it will increase the objective score. 
-		if (std::find(daysOfMaxArrivalTime.begin(), daysOfMaxArrivalTime.end(), normalNode) != daysOfMaxArrivalTime.end()) {
+		//if (std::find(daysOfMaxArrivalTime.begin(), daysOfMaxArrivalTime.end(), day) != daysOfMaxArrivalTime.end()) {
 
-			maxPF = std::min(maxPF, accumulatedPostponedDuration);
-		}
-		else {
+		//	if (std::find(daysOfMinArrivalTime.begin(), daysOfMinArrivalTime.end(), day) != daysOfMinArrivalTime.end()) {
 
-			double duration = arrivalTimes[daysOfMaxArrivalTime[0]][day] - arrivalTimes[normalNode][day] + accumulatedPostponedDuration;
-			maxPF = std::min(maxPF, duration);
-		}
+		//		
+		//	}
+		//	if (accumulatedPostponedDuration < maxPF) {
+
+		//		std::cout << "currentNode: " << currentNode << ", accumulatedPostponedDuration: " << accumulatedPostponedDuration << std::endl;
+		//	}
+		//	maxPF = std::min(maxPF, accumulatedPostponedDuration);
+		//}
+		//else {
+
+		//	double duration = arrivalTimes[normalNode][daysOfMaxArrivalTime[0]] - arrivalTimes[normalNode][day] + accumulatedPostponedDuration;
+		//	if (duration < maxPF) {
+
+		//		std::cout << "currentNode: " << currentNode << ", duration: " << duration << std::endl;
+		//	}
+		//	maxPF = std::min(maxPF, duration);
+		//}
 
 		// Check how far it can move according to whether it will exceeds its own time window. 
 		double duration = lastTime[currentNode][day] - arrivalTimes[currentNode][day];
@@ -694,6 +706,7 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 			if (std::find(routesHavingBeenCalculated.begin(), routesHavingBeenCalculated.end(), routeOfCorrespondingNode) == routesHavingBeenCalculated.end()) {
 
 				routesHavingBeenCalculated.push_back(routeOfCorrespondingNode);
+				//double oldMaxPF = maxPF; // For testing
 
 				// Check if there are other node ahead of corresponding node. 
 				if (positionOfCorrespondingNode + 1 < solutionListOfEachDay[day].size() && solutionListOfEachDay[day][positionOfCorrespondingNode] != -1) {
@@ -702,6 +715,10 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 					accumulatedPostponedDurationForAnotherRoute = accumulatedPostponedDuration + postponedDuration[day][correspondingNode][solutionListOfEachDay[day][positionOfCorrespondingNode + 1]];
 					maxPF = std::min(maxPF, getMaxPF(solutionListOfEachDay, positionOfCorrespondingNode + 1, day, accumulatedPostponedDurationForAnotherRoute, false));
 				}
+				//if (oldMaxPF != maxPF) {
+
+				//	std::cout << "currentNode: " << currentNode << ", because of correspondingNode, change to : " << maxPF << std::endl;
+				//}
 			}
 		}
 		//std::cout << "seciont 3" << std::endl;
@@ -747,7 +764,15 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 	if (firstLoop) {
 
 		routesHavingBeenApplied.clear();
-		routesHavingBeenApplied.push_back(day);
+		int routeOfCurrentNode = 0;
+		for (int i = 0; i < positionOfNode; i++) {
+
+			if (solutionListOfEachDay[day][i] == -1) {
+
+				routeOfCurrentNode++;
+			}
+		}
+		routesHavingBeenApplied.push_back(routeOfCurrentNode);
 	}
 
 	std::vector<int>* nodesBeingMovedPtr = new std::vector<int>();
@@ -814,6 +839,8 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 			// Avoid ReApplying. 
 			if (std::find(routesHavingBeenApplied.begin(), routesHavingBeenApplied.end(), routeOfCorrespondingNode) == routesHavingBeenApplied.end()) {
 
+				//std::cout << "deal with synchronized customer in applyPF" << std::endl;
+				//std::cout << "currentNode: " << currentNode << ", correspondingNode: " << correspondingNode << std::endl;
 				routesHavingBeenApplied.push_back(routeOfCorrespondingNode);
 
 				int previousNodeForCorrespondingNode = 0;
@@ -854,7 +881,7 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 					tempPF -= tempPostponedDuration;
 				}
 
-				std::vector<int>* otherNodesBeingMovedPtr = applyPF(solutionListOfEachDay, positionOfCorrespondingNode, day, tempPF, false);
+				std::vector<int>* otherNodesBeingMovedPtr = applyPF(solutionListOfEachDay, positionOfCorrespondingNode + 1, day, tempPF, false);
 				nodesBeingMovedPtr->reserve(nodesBeingMovedPtr->size() + otherNodesBeingMovedPtr->size());
 				nodesBeingMovedPtr->insert(nodesBeingMovedPtr->end(), otherNodesBeingMovedPtr->begin(), otherNodesBeingMovedPtr->end());
 				delete otherNodesBeingMovedPtr;
@@ -1002,6 +1029,10 @@ void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOf
 			}
 		}
 
+		//std::cout << "/////////" << std::endl;
+		//std::cout << arrivalTimes[solutionListOfEachDay[dayOfMinArrivalTime][positionOfCustomerWithLargestArrivalTimeDifference]][dayOfMinArrivalTime] << std::endl;
+		//std::cout << "/////////" << std::endl;
+
 		// Get those blocking customer. Calculate their maxPF. 
 		maxMovingDuration = std::min(maxMovingDuration, getMaxPF(solutionListOfEachDay, positionOfCustomerWithLargestArrivalTimeDifference, dayOfMinArrivalTime, 0, true));
 		//std::cout << "Getting maxMovingDuration finished. " << std::endl;
@@ -1080,9 +1111,9 @@ void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOf
 	}
 }
 
-int Solution::getViolationScore(const std::vector<std::vector<int>>& solutionListOfEachDay, int scaleOfViolationScore) {
+double Solution::getViolationScore(const std::vector<std::vector<int>>& solutionListOfEachDay, double scaleOfViolationScore) {
 
-	int violation = 0;
+	double violation = 0;
 	for (int day = 0; day < nDays; day++) {
 
 		for (int currentNode = 1; currentNode <= nNormals; currentNode++) {
@@ -1112,13 +1143,13 @@ int Solution::getViolationScore(const std::vector<std::vector<int>>& solutionLis
 	return violation * scaleOfViolationScore;
 }
 
-int Solution::getObjectiveScore(const std::vector<std::vector<int>>& solutionListOfEachDay) {
+double Solution::getObjectiveScore(const std::vector<std::vector<int>>& solutionListOfEachDay) {
 
-	int score = 0;
+	double score = 0;
 	for (int i = 1; i <= nNormals; i++) {
 
-		int minArrivalTime = INT_MAX;
-		int maxArrivalTime = -1;
+		double minArrivalTime = std::numeric_limits<double>::max();
+		double maxArrivalTime = -1;
 		for (int day = 0; day < nDays; day++) {
 
 			if (required[i][day] == false) {
@@ -1128,25 +1159,54 @@ int Solution::getObjectiveScore(const std::vector<std::vector<int>>& solutionLis
 			if (arrivalTimes[i][day] < minArrivalTime) {
 
 				minArrivalTime = arrivalTimes[i][day];
+				//std::cout << "minArrivalTime: " << minArrivalTime << std::endl;
 			}
 			if (arrivalTimes[i][day] > maxArrivalTime) {
 
 				maxArrivalTime = arrivalTimes[i][day];
+				//std::cout << "maxArrivalTime: " << maxArrivalTime << std::endl;
 			}
 			if (correspondingList[i] != 0) {
 
 				if (arrivalTimes[correspondingList[i]][day] < minArrivalTime) {
 
 					minArrivalTime = arrivalTimes[correspondingList[i]][day];
+					//std::cout << "Corresponding: " << "minArrivalTime: " << minArrivalTime << std::endl;
 				}
 				if (arrivalTimes[correspondingList[i]][day] > maxArrivalTime) {
 
 					maxArrivalTime = arrivalTimes[correspondingList[i]][day];
+					//std::cout << "Corresponding: " << "maxArrivalTime: " << maxArrivalTime << std::endl;
 				}
 			}
 		}
 		score += maxArrivalTime - minArrivalTime;
 	}
+
+	for (int day = 0; day < nDays; day++) {
+
+		int currentNode = 0;
+		int previousNode = 0;
+		for (int i = 0; i < solutionListOfEachDay[day].size(); i++) {
+
+			if (solutionListOfEachDay[day][i] == -1) {
+
+				previousNode = 0;
+				continue;
+			}
+			currentNode = solutionListOfEachDay[day][i];
+			if (currentNode == previousNode && currentNode == 0) {
+
+				continue;
+			}
+			score += timeMat[previousNode][currentNode];
+			//std::cout << "(" << previousNode << ", " << currentNode << ", " << timeMat[previousNode][currentNode] << ")" << std::endl;
+			previousNode = currentNode;
+		}
+		score += timeMat[currentNode][0];
+		//std::cout << "(" << currentNode << ", 0, " << timeMat[currentNode][0] << ")" << std::endl;
+	}
+	//std::cout << "getObjectiveScore: " << score << std::endl;
 	return score;
 }
 

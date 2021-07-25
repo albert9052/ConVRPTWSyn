@@ -29,8 +29,8 @@ void SA::solve() {
     std::vector<std::vector<int>> SAListOfEachDay; // It contains all the normal and fictive nodes, and (nRoutes - 1) -1 for boundaries of routes. 
     std::vector<std::vector<int>> bestSA;
 	std::vector<std::vector<int>> currentSA;
-    int bestScore = INT_MAX;
-	int currentScore = INT_MAX;
+    double bestScore = INT_MAX;
+	double currentScore = INT_MAX;
 
     // Since we are doing SA, our algorithm will be running several times because nodes on different day can't swtich with each other. 
 
@@ -83,9 +83,9 @@ void SA::solve() {
 			//std::cout << iterationNum << " times" << std::endl;
 
 			//temporary
-			//SAListOfEachDay[0] = {1, -1, 4, -1, 3, 6, 5};
-			//SAListOfEachDay[1] = {6, 5, -1, 2, 4, -1, 7, 1};
-			//SAListOfEachDay[2] = {-1, 3, 6, -1, 1};
+			//SAListOfEachDay[0] = {1, 5, -1, 4, -1, 6, 3};
+			//SAListOfEachDay[1] = {2, 1, 5, -1, 4, -1, 7, 6};
+			//SAListOfEachDay[2] = {1, -1, -1, 6, 3};
 
 			// Adjust the arrival time and departure time to get the minimum violation. 
             calculateObjective(SAListOfEachDay);
@@ -101,10 +101,10 @@ void SA::solve() {
 			// If it's feasible, do Step 5 to find the best local score using 2-opt algorithm. 
 			// This one may cost too much time. In one of the references, there's a way to reduce the time it might take. 
 
-			int newScore;// = getScore();
+			double newScore;// = getScore();
 			
 			// Temporary: 
-			newScore = getViolationScore(SAListOfEachDay, 10);
+			newScore = getViolationScore(SAListOfEachDay, 100000);
 			if (newScore == 0) {
 
 				//printGraph(SAListOfEachDay, GRAPH_LIMIT);
@@ -136,6 +136,9 @@ void SA::solve() {
 					currentScore = newScore;
 				}
 			}
+
+			//std::cout << bestScore << std::endl;
+			//exit(1);
         }
     }
 

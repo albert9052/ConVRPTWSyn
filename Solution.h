@@ -170,8 +170,8 @@ protected:
 	void printTimeLine(const std::vector<PointAndType>& pointsAndTypes);
 	void printVerticalLines(int lines);
 
-	int getViolationScore(const std::vector<std::vector<int>>& solutionListOfEachDay, int scaleOfViolationScore);
-	int getObjectiveScore(const std::vector<std::vector<int>>& solutionListOfEachDay);
+	double getViolationScore(const std::vector<std::vector<int>>& solutionListOfEachDay, double scaleOfViolationScore);
+	double getObjectiveScore(const std::vector<std::vector<int>>& solutionListOfEachDay);
 };
 
 #endif
