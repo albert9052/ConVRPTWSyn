@@ -12,8 +12,8 @@ int main(){
     //lns.solve();
     //lns.output();
 	
-	cout << "bold red text" << std::endl;
-	cout << "\033[1;31mbold red text\033[0m\n";
+	//cout << "bold red text" << std::endl;
+	//cout << "\033[1;31mbold red text\033[0m\n";
 	SA sa;
 	sa.input();
 	sa.solve();

@@ -83,12 +83,26 @@ void SA::solve() {
 			//std::cout << iterationNum << " times" << std::endl;
 
 			//temporary
-			//SAListOfEachDay[0] = {1, 5, -1, 4, -1, 6, 3};
-			//SAListOfEachDay[1] = {2, 1, 5, -1, 4, -1, 7, 6};
-			//SAListOfEachDay[2] = {1, -1, -1, 6, 3};
+			//SAListOfEachDay[0] = {1, -1, 4, -1, 6, 3, 5};
+			//SAListOfEachDay[1] = {7, 6, -1, 4, -1, 2, 1, 5};
+			//SAListOfEachDay[2] = {6, 3, -1, 1, -1};
 
 			// Adjust the arrival time and departure time to get the minimum violation. 
             calculateObjective(SAListOfEachDay);
+			//std::cout << "calculateObjective done. " << std::endl;
+			//CheckConstraintsResult checkConstraintsResult = checkConstraints(SAListOfEachDay);
+			//std::cout << "checkConstraints done. " << std::endl;
+			//if (checkConstraintsResult.result == false) {
+
+			//	printGraph(SAListOfEachDay, GRAPH_LIMIT);
+			//	std::cout << "Violation detected ----------------------------------" << std::endl;
+			//	for (std::string message : checkConstraintsResult.messages) {
+
+			//		std::cout << message << std::endl;
+			//	}
+			//	std::cout << "-----------------------------------------------------" << std::endl;
+			//	exit(1);
+			//}
 
 			//// Adjust the arrival time and departure time to get the minimum score. (Approximately) 
 			//adjustDepartureTime(SAListOfEachDay);
@@ -110,6 +124,19 @@ void SA::solve() {
 				//printGraph(SAListOfEachDay, GRAPH_LIMIT);
 				adjustDepartureTime(SAListOfEachDay);
 				newScore += getObjectiveScore(SAListOfEachDay);
+				CheckConstraintsResult checkConstraintsResult = checkConstraints(SAListOfEachDay);
+				//std::cout << "checkConstraints done. " << std::endl;
+				if (checkConstraintsResult.result == false) {
+
+					printGraph(SAListOfEachDay, GRAPH_LIMIT);
+					std::cout << "Violation detected ----------------------------------" << std::endl;
+					for (std::string message : checkConstraintsResult.messages) {
+
+						std::cout << message << std::endl;
+					}
+					std::cout << "-----------------------------------------------------" << std::endl;
+					exit(1);
+				}
 				//std::cout << "Score: " << newScore << std::endl;
 			}
 			//std::cout << "Score: " << newScore << ", Best Score: " << bestScore << std::endl;
@@ -144,8 +171,18 @@ void SA::solve() {
 
 	calculateObjective(bestSA);
 	adjustDepartureTime(bestSA);
+	CheckConstraintsResult checkConstraintsResult = checkConstraints(bestSA);
 	printGraph(bestSA, GRAPH_LIMIT);
 	std::cout << "Best score: " << bestScore << std::endl;
+	if (checkConstraintsResult.result == false) {
+
+		std::cout << "Violation detected ----------------------------------" << std::endl;
+		for (std::string message : checkConstraintsResult.messages) {
+
+			std::cout << message << std::endl;
+		}
+		std::cout << "-----------------------------------------------------" << std::endl;
+	}
 }
 
 double SA::getRandomDecimal() {

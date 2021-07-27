@@ -90,6 +90,16 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 			previousNode = currentNode;
 		}
 	}
+	for (int day = 0; day < nDays; day++) {
+
+		for (int i = 0; i < nNodes; i++) {
+
+			for (int j = 0; j < nNodes; j++) {
+
+				postponedDuration[day][i][j] = 0;
+			}
+		}
+	}
 	//std::cout << "Diretly arraning the arrival time successes. " << std::endl;
 	//printGraph(solutionListOfEachDay, GRAPH_LIMIT);
 
@@ -195,12 +205,12 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 
 						break;
 					}
-					movingDuration -= postponedDuration[day][previousNodeForPushing][currentNodeForPushing];
-					if (movingDuration <= 0) {
+					if (movingDuration <= postponedDuration[day][previousNodeForPushing][currentNodeForPushing]) {
 
 						postponedDuration[day][previousNodeForPushing][currentNodeForPushing] -= movingDuration;
 						break;
 					}
+					movingDuration -= postponedDuration[day][previousNodeForPushing][currentNodeForPushing];
 					postponedDuration[day][previousNodeForPushing][currentNodeForPushing] = 0;
 					arrivalTimes[currentNodeForPushing][day] += movingDuration;
 					departureTimes[currentNodeForPushing][day] += movingDuration;
@@ -216,7 +226,7 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 			//	typesAndDurations[j].duration += postponedDuration[day][previousNode][currentNode];
 			//}
 
-			// Add new timestamp, whose data type is TypeAndDuration. 
+			// Add new timestamps, whose data type is TypeAndDuration. 
 			double tempDuration = earliestTime[currentNode][day] - arrivalTimes[currentNode][day];
 			if (tempDuration > 0) {
 
@@ -232,6 +242,20 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 			else {
 
 				typesAndDurations.push_back(TypeAndDuration(1, postponedDuration[day][previousNode][currentNode]));
+			}
+
+			// If nextNode == 0, add a new timestamp, because of the vehicle needs to arrive at 0 before 0's latest time. (lastTime)
+			if (nextNode == 0) {
+
+				tempDuration = lastTime[0][day] - departureTimes[currentNode][day] - timeMat[currentNode][0];
+				if (tempDuration > 0) {
+
+					typesAndDurations.push_back(TypeAndDuration(1, tempDuration + postponedDuration[day][previousNode][currentNode]));
+				}
+				else {
+
+					typesAndDurations.push_back(TypeAndDuration(1, postponedDuration[day][previousNode][currentNode]));
+				}
 			}
 
 			// No need for this section, because we have done this above. If the while loop is broken by the else in it, then numberOfGoodNodes--. On the other hand, it won't subtract 1 from numberOfGoodNodes. 
@@ -377,7 +401,7 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 
 				// Find all the nodes that will be affected
 				int chosenRoute = 0;
-				int positionOfChosenNode = 0;
+				int positionOfChosenOne = 0;
 				int* affectedNodes = NULL;
 				int lengthOfAffectedNodes = 0;
 				for (int j = 0; j < nRoutes; j++) {
@@ -385,11 +409,11 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 					auto position = std::find(nonSortedLists[j].begin(), nonSortedLists[j].end(), chosenOne);
 					if (position != nonSortedLists[j].end()) {
 
-						positionOfChosenNode = (int)(position - nonSortedLists[j].begin());
-						lengthOfAffectedNodes = nonSortedLists[j].size() - positionOfChosenNode - 1;
+						positionOfChosenOne = (int)(position - nonSortedLists[j].begin());
+						lengthOfAffectedNodes = nonSortedLists[j].size() - positionOfChosenOne - 1;
 						affectedNodes = new int[lengthOfAffectedNodes];
 						int tempIndex = 0;
-						for (int k = positionOfChosenNode + 1; k < nonSortedLists[j].size(); k++) {
+						for (int k = positionOfChosenOne + 1; k < nonSortedLists[j].size(); k++) {
 
 							affectedNodes[tempIndex] = nonSortedLists[j][k];
 							tempIndex++;
@@ -439,6 +463,32 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 					numberOfBadNodes++;
 				}
 
+				// Get nextNode. 
+				int nextNode = 0;
+				if (positionOfChosenOne + 1 < solutionListOfEachDay[day].size()) {
+
+					nextNode = solutionListOfEachDay[day][positionOfChosenOne + 1];
+					if (nextNode == -1) {
+
+						nextNode = 0;
+					}
+				}
+
+				// If nextNode == 0, we need to take 0's latest time into consideration. 
+				if (nextNode == 0) {
+
+					double arrivalTimeOf0 = departureTimes[chosenOne][day] + timeMat[chosenOne][0];
+					if (lastTime[0][day] > arrivalTimeOf0) {
+
+						double duration = lastTime[0][day] - arrivalTimeOf0;
+						typesAndDurations.push_back(TypeAndDuration(1, duration));
+					}
+					else {
+
+						numberOfBadNodes++;
+					}
+				}
+
 				// If there are affected nodes, you need to calculate how far you gonna push. 
 				if (lengthOfAffectedNodes != 0) {
 			
@@ -447,11 +497,19 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 					// If the duration is longer than the maxPostponedDuration, there's no reason to record it, since we can only postpone that much time. 
 					// This part has problem. Need to be fixed. 
 					int previousNode = chosenOne;
-					double accumulatedPostponedDuration = postponedDuration[day][previousNode][affectedNodes[0]];
+					double accumulatedPostponedDuration = 0;
 					for (int j = 0; j < lengthOfAffectedNodes; j++) {
 
 						//std::cout << "Start for loop!!!" << std::endl;
 						int theOneToCalculate = affectedNodes[j];
+						accumulatedPostponedDuration += postponedDuration[day][previousNode][theOneToCalculate];
+
+						// If the accumulated postponed duration is already larger than the amount we want to push, break it. 
+						if (accumulatedPostponedDuration >= maxPostponedDuration) {
+
+							break;
+						}
+
 						if (arrivalTimes[theOneToCalculate][day] < earliestTime[theOneToCalculate][day]) {
 
 							typesAndDurations.push_back(TypeAndDuration(2, accumulatedPostponedDuration));
@@ -473,34 +531,45 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 								typesAndDurations.push_back(TypeAndDuration(1, duration));
 							}
 						}
+						
+						// If this is the last one, which means the vehicle needs to go back to 0 after this service, we need to take 0's latest time into consideration. 
+						// It is not efficient to write this in this for loop. This is for reducing the length of code. 
+						if (j == lengthOfAffectedNodes - 1) {
 
-						//std::cout << "theOneToCalculate:  " << theOneToCalculate << ", day:  " << day << std::endl;
+							double arrivalTimeOf0 = departureTimes[theOneToCalculate][day] + timeMat[theOneToCalculate][0];
+							if (lastTime[0][day] > arrivalTimeOf0) {
 
-						// Deal with the synchronized one. 
-						if (correspondingList[theOneToCalculate] != 0) {
-
-							if (arrivalTimes[correspondingList[theOneToCalculate]][day] <= arrivalTimes[theOneToCalculate][day]) {
-
-								typesAndDurations.push_back(TypeAndDuration(1, accumulatedPostponedDuration));
+								typesAndDurations.push_back(TypeAndDuration(1, arrivalTimeOf0 + accumulatedPostponedDuration));
 							}
 							else {
 
-								typesAndDurations.push_back(TypeAndDuration(2, accumulatedPostponedDuration));
-								double duration = (arrivalTimes[correspondingList[theOneToCalculate]][day] - arrivalTimes[theOneToCalculate][day] + accumulatedPostponedDuration);
-								if (duration < maxPostponedDuration) {
-
-									typesAndDurations.push_back(TypeAndDuration(3, duration));
-								}
+								typesAndDurations.push_back(TypeAndDuration(1, accumulatedPostponedDuration));
 							}
 						}
+
+						//std::cout << "theOneToCalculate:  " << theOneToCalculate << ", day:  " << day << std::endl;
+
+						// Might not need this section, because those affected synchronized services, can be adjusted later. 
+						// If we take this into consideration, it will make the node that we want to push forward stuck (numberOfGoodNodes <= numberOfBadNodes), and we won't be able to get the minimal violation score. 
+						// The reason why this can work is because after we push this node forward, other nodes can't affected it at all. 
+						// Deal with the synchronized one. 
+						//if (correspondingList[theOneToCalculate] != 0) {
+
+						//	if (arrivalTimes[correspondingList[theOneToCalculate]][day] <= arrivalTimes[theOneToCalculate][day]) {
+
+						//		typesAndDurations.push_back(TypeAndDuration(1, accumulatedPostponedDuration));
+						//	}
+						//	else {
+
+						//		typesAndDurations.push_back(TypeAndDuration(2, accumulatedPostponedDuration));
+						//		double duration = (arrivalTimes[correspondingList[theOneToCalculate]][day] - arrivalTimes[theOneToCalculate][day] + accumulatedPostponedDuration);
+						//		if (duration < maxPostponedDuration) {
+
+						//			typesAndDurations.push_back(TypeAndDuration(3, duration));
+						//		}
+						//	}
+						//}
 						//std::cout << "Initialize typesAndDurations finished" << std::endl;
-
-						accumulatedPostponedDuration += postponedDuration[day][previousNode][theOneToCalculate];
-						// If the accumulated postponed duration is already larger than the amount we want to push, break it. 
-						if (accumulatedPostponedDuration >= maxPostponedDuration) {
-
-							break;
-						}
 						previousNode = theOneToCalculate;
 					}
 				}
@@ -624,7 +693,15 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 	if (firstLoop) {
 
 		routesHavingBeenCalculated.clear();
-		routesHavingBeenCalculated.push_back(day);
+		int route = 0;
+		for (int i = 0; i < positionOfNode; i++) {
+
+			if (solutionListOfEachDay[day][i] == -1) {
+
+				route++;
+			}
+		}
+		routesHavingBeenCalculated.push_back(route);
 	}
 	double maxPF = std::numeric_limits<double>::max();
 	while (solutionListOfEachDay[day][positionOfNode] != -1 && positionOfNode < solutionListOfEachDay[day].size()) {
@@ -644,18 +721,18 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 		//std::cout << "currentNode: " << currentNode << std::endl;
 
 		// If currentNode is a fictive node, then we need to translate it into its original number. 
-		int normalNode = 1;
-		if (currentNode <= nNormals) {
+		//int normalNode = 1;
+		//if (currentNode <= nNormals) {
 
-			normalNode = currentNode;
-		}
-		else {
+		//	normalNode = currentNode;
+		//}
+		//else {
 
-			normalNode = correspondingList[currentNode];
-		}
+		//	normalNode = correspondingList[currentNode];
+		//}
 
-		std::vector<int> daysOfMinArrivalTime = daysOfMinArrivalTimeOfEachCustomer[normalNode];
-		std::vector<int> daysOfMaxArrivalTime = daysOfMaxArrivalTimeOfEachCustomer[normalNode];
+		//std::vector<int> daysOfMinArrivalTime = daysOfMinArrivalTimeOfEachCustomer[normalNode];
+		//std::vector<int> daysOfMaxArrivalTime = daysOfMaxArrivalTimeOfEachCustomer[normalNode];
 
 		// Check how far it can move according to whether it will increase the objective score. 
 		//if (std::find(daysOfMaxArrivalTime.begin(), daysOfMaxArrivalTime.end(), day) != daysOfMaxArrivalTime.end()) {
@@ -682,7 +759,24 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 
 		// Check how far it can move according to whether it will exceeds its own time window. 
 		double duration = lastTime[currentNode][day] - arrivalTimes[currentNode][day];
-		maxPF = std::min(maxPF, duration);
+		maxPF = std::min(maxPF, duration + accumulatedPostponedDuration);
+
+		// If nextNode == 0, we need to take 0's latest time into consideration. 
+		if (nextNode == 0) {
+
+			double arrivalTimeOf0 = departureTimes[currentNode][day] + timeMat[currentNode][0];
+			//std::cout << "currentNode: " << currentNode << std::endl;
+			//std::cout << "departureTimes[currentNode][day]: " << departureTimes[currentNode][day] << std::endl;
+			//std::cout << "accumulatedPostponedDuration: " << accumulatedPostponedDuration << std::endl;
+			//std::cout << "lastTime[0][day] - arrivalTimeOf0 + accumulatedPostponedDuration: " << lastTime[0][day] - arrivalTimeOf0 + accumulatedPostponedDuration << std::endl;
+			maxPF = std::min(maxPF, lastTime[0][day] - arrivalTimeOf0 + accumulatedPostponedDuration);
+		}
+
+		// If maxPF is already smaller than 0, then the node we want to move is already not movable. 
+		if (maxPF <= 0) {
+
+			return maxPF;
+		}
 
 		//std::cout << "seciont 2" << std::endl;
 		// Deal with the synchronized one. 
@@ -712,7 +806,7 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 				//double oldMaxPF = maxPF; // For testing
 
 				// Check if there are other node ahead of corresponding node. 
-				if (positionOfCorrespondingNode + 1 < solutionListOfEachDay[day].size() && solutionListOfEachDay[day][positionOfCorrespondingNode] != -1) {
+				if (positionOfCorrespondingNode + 1 < solutionListOfEachDay[day].size() && solutionListOfEachDay[day][positionOfCorrespondingNode + 1] != -1) {
 
 					double accumulatedPostponedDurationForAnotherRoute;
 					accumulatedPostponedDurationForAnotherRoute = accumulatedPostponedDuration + postponedDuration[day][correspondingNode][solutionListOfEachDay[day][positionOfCorrespondingNode + 1]];
@@ -764,6 +858,18 @@ CustomerAndArrivalTimeDifference Solution::getTheCustomerWithLargestArrivalTimeD
 std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double PF, bool firstLoop) {
 
 	static std::vector<int> routesHavingBeenApplied;
+
+	std::vector<int>* nodesBeingMovedPtr = new std::vector<int>();
+	int previousNode = 0;
+	if (positionOfNode > 0) {
+
+		previousNode = solutionListOfEachDay[day][positionOfNode - 1];
+		if (previousNode == -1) {
+
+			previousNode = 0;
+		}
+	}
+
 	if (firstLoop) {
 
 		routesHavingBeenApplied.clear();
@@ -776,18 +882,11 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 			}
 		}
 		routesHavingBeenApplied.push_back(routeOfCurrentNode);
+
+		int currentNode = solutionListOfEachDay[day][positionOfNode];
+		postponedDuration[day][previousNode][currentNode] += PF;
 	}
 
-	std::vector<int>* nodesBeingMovedPtr = new std::vector<int>();
-	int previousNode = 0;
-	if (positionOfNode > 0) {
-
-		previousNode = solutionListOfEachDay[day][positionOfNode - 1];
-		if (previousNode == -1) {
-
-			previousNode = 0;
-		}
-	}
 	// The part about getting currentNode and nextNode can be more optimized, but it will lose its readability, so I keep it this way. 
 	for (int i = positionOfNode; i < solutionListOfEachDay[day].size(); i++) {
 
@@ -814,8 +913,11 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 			}
 		}
 
+		//std::cout << "i: " << i << std::endl;
+		//std::cout << "currentNode: " << currentNode << std::endl;
+		//std::cout << "nextNode: " << nextNode << std::endl;
+
 		// Apply it. 
-		postponedDuration[day][previousNode][currentNode] += PF;
 		arrivalTimes[currentNode][day] += PF;
 		departureTimes[currentNode][day] += PF;
 
@@ -825,7 +927,7 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 
 			int positionOfCorrespondingNode = 0;
 			int routeOfCorrespondingNode = 0;
-			for (int j = 0; j < nNormals; j++) {
+			for (int j = 0; j < solutionListOfEachDay[day].size(); j++) {
 
 				if (solutionListOfEachDay[day][j] == -1) {
 
@@ -849,7 +951,7 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 				int previousNodeForCorrespondingNode = 0;
 				if (positionOfCorrespondingNode > 0) {
 
-					previousNodeForCorrespondingNode = solutionListOfEachDay[day][positionOfCorrespondingNode -1];
+					previousNodeForCorrespondingNode = solutionListOfEachDay[day][positionOfCorrespondingNode - 1];
 					if (previousNodeForCorrespondingNode == -1) {
 
 						previousNodeForCorrespondingNode = 0;
@@ -857,9 +959,9 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 				}
 				
 				int nextNodeForCorrespondingNode = 0;
-				if (i < solutionListOfEachDay[day].size() - 1) {
+				if (positionOfCorrespondingNode < solutionListOfEachDay[day].size() - 1) {
 
-					nextNodeForCorrespondingNode = solutionListOfEachDay[day][i + 1];
+					nextNodeForCorrespondingNode = solutionListOfEachDay[day][positionOfCorrespondingNode + 1];
 					if (nextNodeForCorrespondingNode == -1) {
 
 						nextNodeForCorrespondingNode = 0;
@@ -874,26 +976,29 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 				// Adjust PF for corresponding node. 
 				double tempPostponedDuration = postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode];
 				double tempPF = PF;
-				if (tempPF < tempPostponedDuration) {
+				if (tempPF <= tempPostponedDuration) {
 
 					postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode] -= tempPF;
 				}
 				else {
 
+					//std::cout << "tempPF: " << tempPF << std::endl;
+					//std::cout << "tempPostponedDuration: " << tempPostponedDuration << std::endl;
 					postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode] = 0; // This is equal to postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode] -= tempPostponedDuration;
 					tempPF -= tempPostponedDuration;
+					//std::cout << "Next applyPF!!!!!!!" << std::endl;
+					//std::cout << "positionOfCorrespondingNode" << positionOfCorrespondingNode << std::endl;
+					std::vector<int>* otherNodesBeingMovedPtr = applyPF(solutionListOfEachDay, positionOfCorrespondingNode + 1, day, tempPF, false);
+					nodesBeingMovedPtr->reserve(nodesBeingMovedPtr->size() + otherNodesBeingMovedPtr->size());
+					nodesBeingMovedPtr->insert(nodesBeingMovedPtr->end(), otherNodesBeingMovedPtr->begin(), otherNodesBeingMovedPtr->end());
+					delete otherNodesBeingMovedPtr;
 				}
-
-				std::vector<int>* otherNodesBeingMovedPtr = applyPF(solutionListOfEachDay, positionOfCorrespondingNode + 1, day, tempPF, false);
-				nodesBeingMovedPtr->reserve(nodesBeingMovedPtr->size() + otherNodesBeingMovedPtr->size());
-				nodesBeingMovedPtr->insert(nodesBeingMovedPtr->end(), otherNodesBeingMovedPtr->begin(), otherNodesBeingMovedPtr->end());
-				delete otherNodesBeingMovedPtr;
 			}
 		}
 
 		// Adjust PF. 
 		double tempPostponedDuration = postponedDuration[day][currentNode][nextNode];
-		if (PF < tempPostponedDuration) {
+		if (PF <= tempPostponedDuration) {
 
 			postponedDuration[day][currentNode][nextNode] -= PF;
 			break;
@@ -911,6 +1016,7 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 		previousNode = currentNode;
 	}
 	
+	//std::cout << "End of applyPF!!!!!!!" << std::endl;
 	return nodesBeingMovedPtr;
 }
 
@@ -975,6 +1081,19 @@ void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOf
 	double maxMovingDuration = INT_MAX;
 	while(1) {
 		
+		//CheckConstraintsResult checkConstraintsResult = checkConstraints(solutionListOfEachDay);
+		//if (checkConstraintsResult.result == false) {
+
+		//	printGraph(solutionListOfEachDay, GRAPH_LIMIT);
+		//	std::cout << "Violation detected ----------------------------------" << std::endl;
+		//	for (std::string message : checkConstraintsResult.messages) {
+
+		//		std::cout << message << std::endl;
+		//	}
+		//	std::cout << "-----------------------------------------------------" << std::endl;
+		//	exit(1);
+		//}
+
 		//std::cout << "///////////////////////////////////////////////////////////////////////////////////////" << std::endl;
 		//printGraph(solutionListOfEachDay, GRAPH_LIMIT);
 		//std::cout << "///////////////////////////////////////////////////////////////////////////////////////" << std::endl;
@@ -1142,6 +1261,32 @@ double Solution::getViolationScore(const std::vector<std::vector<int>>& solution
 				}
 			}
 		}
+
+		int previousNode = 0;
+		for (int i = 0; i < solutionListOfEachDay[day].size(); i++) {
+
+			int currentNode = solutionListOfEachDay[day][i];
+			if (currentNode == -1) {
+
+				if (previousNode != 0) {
+
+					if (departureTimes[previousNode][day] + timeMat[previousNode][0] > lastTime[0][day]) {
+
+						violation += departureTimes[previousNode][day] + timeMat[previousNode][0] - lastTime[0][day];
+					}
+				}
+				previousNode = 0;
+				continue;
+			}
+			previousNode = currentNode;
+		}
+		if (previousNode != 0) {
+
+			if (departureTimes[previousNode][day] + timeMat[previousNode][0] > lastTime[0][day]) {
+
+				violation += departureTimes[previousNode][day] + timeMat[previousNode][0] - lastTime[0][day];
+			}
+		}
 	}
 	return violation * scaleOfViolationScore;
 }
@@ -1211,6 +1356,128 @@ double Solution::getObjectiveScore(const std::vector<std::vector<int>>& solution
 	}
 	//std::cout << "getObjectiveScore: " << score << std::endl;
 	return score;
+}
+
+CheckConstraintsResult Solution::checkConstraints(const std::vector<std::vector<int>>& solutionListOfEachDay) {
+
+	CheckConstraintsResult checkConstraintsResult;
+	checkConstraintsResult.result = true;
+	// Check service time
+	for (int i = 1; i < nNodes; i++) {
+
+		for (int day = 0; day < nDays; day++) {
+
+			if (required[i][day] == false) {
+
+				continue;
+			}
+			if (departureTimes[i][day] - arrivalTimes[i][day] != serviceTime[i][day]) {
+
+				checkConstraintsResult.result = false;
+				checkConstraintsResult.messages.push_back("Customer " + std::to_string(i) + " on Day " + std::to_string(day) + " service time didn't much. Correct value: " + std::to_string(serviceTime[i][day]) + ", wrong value: " + std::to_string(departureTimes[i][day] - arrivalTimes[i][day]));
+			}
+		}
+	}
+
+	// Check time window
+	for (int i = 0; i < nNodes; i++) {
+
+		for (int day = 0; day < nDays; day++) {
+
+			if (required[i][day] == false) {
+
+				continue;
+			}
+			if (arrivalTimes[i][day] < earliestTime[i][day]) {
+
+				checkConstraintsResult.result = false;
+				checkConstraintsResult.messages.push_back("Customer " + std::to_string(i) + " on Day " + std::to_string(day) + " serves too early. Earliest time: " + std::to_string(earliestTime[i][day]) + ". Arrival time: " + std::to_string(arrivalTimes[i][day]));
+			}
+			if (arrivalTimes[i][day] > lastTime[i][day]) {
+
+				checkConstraintsResult.result = false;
+				checkConstraintsResult.messages.push_back("Customer " + std::to_string(i) + " on Day " + std::to_string(day) + " serves too late. Latest time: " + std::to_string(lastTime[i][day]) + ". Arrival time: " + std::to_string(arrivalTimes[i][day]));
+			}
+		}
+	}
+
+	// Check synchronized service
+	for (int i = 1; i <= nNormals; i++) {
+
+		for (int day = 0; day < nDays; day++) {
+
+			if (required[i][day] == false) {
+
+				continue;
+			}
+			if (correspondingList[i] != 0) {
+
+				if (arrivalTimes[i][day] != arrivalTimes[correspondingList[i]][day]) {
+
+					checkConstraintsResult.result = false;
+					checkConstraintsResult.messages.push_back("Customer " + std::to_string(i) + " on Day " + std::to_string(day) + " didn't synchronize. Node " + std::to_string(i) + ": " + std::to_string(arrivalTimes[i][day]) + ". Node " + std::to_string(correspondingList[i]) + ": " + std::to_string(arrivalTimes[correspondingList[i]][day]));
+				}
+			}
+		}
+	}
+
+	// Check commuting time and postponedDuration
+	for (int day = 0; day < nDays; day++) {
+
+		int previousNode = 0;
+		for (int i = 1; i < solutionListOfEachDay[day].size(); i++) {
+
+			int currentNode = solutionListOfEachDay[day][i];
+			if (currentNode == -1 && previousNode == 0) {
+
+				continue;
+			}
+			if (currentNode == -1) {
+
+				currentNode = 0;
+				if (lastTime[currentNode][day] - departureTimes[previousNode][day] < timeMat[previousNode][currentNode]) {
+
+					checkConstraintsResult.result = false;
+					checkConstraintsResult.messages.push_back("Node " + std::to_string(previousNode) + " and node " + std::to_string(currentNode) + "\'s commmuting time is too short on day " + std::to_string(day) + ". Minimal commuting time: " + std::to_string(timeMat[previousNode][currentNode]) + ". Commuting time: " + std::to_string(lastTime[currentNode][day] - departureTimes[previousNode][day]));
+				}
+				previousNode = 0;
+				continue;
+			}
+			if (previousNode == 0) {
+
+				if (arrivalTimes[currentNode][day] - earliestTime[previousNode][day] < timeMat[previousNode][currentNode]) {
+
+					checkConstraintsResult.result = false;
+					checkConstraintsResult.messages.push_back("Node " + std::to_string(previousNode) + " and node " + std::to_string(currentNode) + "\'s commmuting time is too short on day " + std::to_string(day) + ". Minimal commuting time: " + std::to_string(timeMat[previousNode][currentNode]) + ". Commuting time: " + std::to_string(arrivalTimes[currentNode][day] - earliestTime[previousNode][day]));
+				}
+				previousNode = currentNode;
+				continue;
+			}
+			if (arrivalTimes[currentNode][day] - departureTimes[previousNode][day] < timeMat[previousNode][currentNode]) {
+
+				checkConstraintsResult.result = false;
+				checkConstraintsResult.messages.push_back("Node " + std::to_string(previousNode) + " and node " + std::to_string(currentNode) + "\'s commmuting time is too short on day " + std::to_string(day) + ". Minimal commuting time: " + std::to_string(timeMat[previousNode][currentNode]) + ". Commuting time: " + std::to_string(arrivalTimes[currentNode][day] - departureTimes[previousNode][day]));
+			}
+			if (postponedDuration[day][previousNode][currentNode] != arrivalTimes[currentNode][day] - departureTimes[previousNode][day] - timeMat[previousNode][currentNode]) {
+
+				checkConstraintsResult.result = false;
+				checkConstraintsResult.messages.push_back("Node " + std::to_string(previousNode) + " and node " + std::to_string(currentNode) + "\'s postponed duration has problem. Correct: " + std::to_string(arrivalTimes[currentNode][day] - departureTimes[previousNode][day] - timeMat[previousNode][currentNode]) + ". Wrong: " + std::to_string(postponedDuration[day][previousNode][currentNode]));
+			}
+			
+			previousNode = currentNode;
+		}
+		int currentNode = 0;
+		if (previousNode != 0) {
+
+			if (lastTime[currentNode][day] - departureTimes[previousNode][day] < timeMat[previousNode][currentNode]) {
+
+				checkConstraintsResult.result = false;
+				checkConstraintsResult.messages.push_back("Node " + std::to_string(previousNode) + " and node " + std::to_string(currentNode) + "\'s commmuting time is too short on day " + std::to_string(day) + ". Minimal commuting time: " + std::to_string(timeMat[previousNode][currentNode]) + ". Commuting time: " + std::to_string(lastTime[currentNode][day] - departureTimes[previousNode][day]));
+			}
+		}
+	}
+
+	return checkConstraintsResult;
 }
 
 // Width: 159 characters. 

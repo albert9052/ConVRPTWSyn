@@ -10,6 +10,7 @@
 #include <math.h>
 #include <cmath>
 #include <cstring>
+#include <string>
 //<<<<<<< Updated upstream
 #include <climits>
 #include <set>
@@ -89,6 +90,12 @@ public:
 	}
 };
 
+struct CheckConstraintsResult {
+
+	bool result;
+	std::vector<std::string> messages;
+};
+
 struct CustomerAndArrivalTimeDifference {
 
 	int customer;
@@ -144,6 +151,10 @@ public:
 
 protected: 
 
+	// You can get the minimal violation score after executing this function. 
+	// If there's no violation, this function can promise that every node can't be pushed backward. 
+	// If there's a node be pushed backward, the violation will increase. 
+	// However, if there's violation, it can't promise it. 
     void calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay);
 	std::vector<std::vector<double>> arrivalTimes;
 	std::vector<std::vector<double>> departureTimes;
@@ -172,6 +183,7 @@ protected:
 
 	double getViolationScore(const std::vector<std::vector<int>>& solutionListOfEachDay, double scaleOfViolationScore);
 	double getObjectiveScore(const std::vector<std::vector<int>>& solutionListOfEachDay);
+	CheckConstraintsResult checkConstraints(const std::vector<std::vector<int>>& solutionListOfEachDay);
 };
 
 #endif

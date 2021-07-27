@@ -215,7 +215,7 @@ void LNS::relatedRemoval(){
     }
 }
 
-vector<int>& LNS::findMSTAndCutIntoTwo(vector<int> nodes){
+vector<int> LNS::findMSTAndCutIntoTwo(vector<int> nodes){
     // return edge
     vector<vector<int>> groups, edges, mst;
     vector<double> times;
