@@ -704,7 +704,7 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 		routesHavingBeenCalculated.push_back(route);
 	}
 	double maxPF = std::numeric_limits<double>::max();
-	while (solutionListOfEachDay[day][positionOfNode] != -1 && positionOfNode < solutionListOfEachDay[day].size()) {
+	while (positionOfNode < solutionListOfEachDay[day].size() && solutionListOfEachDay[day][positionOfNode] != -1) {
 
 		int currentNode = solutionListOfEachDay[day][positionOfNode];
 		int nextNode = 0;

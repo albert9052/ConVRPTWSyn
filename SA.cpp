@@ -51,15 +51,15 @@ void SA::solve() {
         SAListOfEachDay[day].insert(SAListOfEachDay[day].end(), tempVectorForBoundary.begin(), tempVectorForBoundary.end());
     }
 
-	for (int day = 0; day < nDays; day++) {
+	//for (int day = 0; day < nDays; day++) {
 
-		std::cout << "Day " << day << ": ";
-		for (int i = 0; i < SAListOfEachDay[day].size(); i++) {
+	//	std::cout << "Day " << day << ": ";
+	//	for (int i = 0; i < SAListOfEachDay[day].size(); i++) {
 
-			std::cout << SAListOfEachDay[day][i] << " ";
-		}
-		std::cout << std::endl;
-	}
+	//		std::cout << SAListOfEachDay[day][i] << " ";
+	//	}
+	//	std::cout << std::endl;
+	//}
 
     // 
     

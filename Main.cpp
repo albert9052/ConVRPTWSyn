@@ -14,6 +14,10 @@ int main(){
 	
 	//cout << "bold red text" << std::endl;
 	//cout << "\033[1;31mbold red text\033[0m\n";
+	int test[10];
+	test[0] = 12;
+	std::cout << test[-10] << std::endl;
+	//std::cout << test[1] << std::endl;
 	SA sa;
 	sa.input();
 	sa.solve();
