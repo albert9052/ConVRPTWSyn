@@ -7,7 +7,9 @@ private:
     int Iter;
     float T0, Alpha, Lambda, Nu, Xi;
 
-    vector<vector<vector<int>>> S;
+    double bestScore = (double)INT_MAX, curScore = (double)INT_MAX;
+
+    vector<vector<vector<int>>> bestS, curS;
     vector<vector<int>> rmdNodes; //day * tmp rmd nodes, 1~nNodes
 
     void genInitSolution();
@@ -28,7 +30,7 @@ private:
     void greedyRepair();
     void regretRepair();
 
-    void calculateObjectiveTmp(const vector<vector<vector<int>>>& bef);
+    //void calculateObjectiveAndadjustDepartureTime(const vector<vector<vector<int>>>& bef);
 public:
     LNS();
     LNS(int Iter, float T0, float Alpha, float Lambda, float Nu, float Xi);

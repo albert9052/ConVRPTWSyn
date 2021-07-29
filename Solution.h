@@ -149,13 +149,16 @@ public:
     void output();
     virtual void solve() = 0;
 
+	// tmp at here, line 158
+	void calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay); 
+
 protected: 
 
 	// You can get the minimal violation score after executing this function. 
 	// If there's no violation, this function can promise that every node can't be pushed backward. 
 	// If there's a node be pushed backward, the violation will increase. 
 	// However, if there's violation, it can't promise it. 
-    void calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay);
+    //void calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay);
 	std::vector<std::vector<double>> arrivalTimes;
 	std::vector<std::vector<double>> departureTimes;
 	std::vector<std::vector<std::vector<double>>> postponedDuration;
