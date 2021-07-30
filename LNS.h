@@ -9,7 +9,7 @@ private:
 
     double bestScore = (double)INT_MAX, curScore = (double)INT_MAX;
 
-    vector<vector<vector<int>>> bestS, curS;
+    vector<vector<vector<int>>> bestS, curS, newS;
     vector<vector<int>> rmdNodes; //day * tmp rmd nodes, 1~nNodes
 
     void genInitSolution();
