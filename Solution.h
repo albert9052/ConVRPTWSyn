@@ -20,6 +20,7 @@
 #include <iomanip>
 
 #define GRAPH_LIMIT 200
+#define FACTOR_OF_VIOLATION 100000
 
 class PointAndType {
 
@@ -100,8 +101,8 @@ struct CustomerAndArrivalTimeDifference {
 
 	int customer;
 	double difference;
-	int dayOfMinArrivalTime;
-	int dayOfMaxArrivalTime;
+	int dayOfEarliestArrivalTime;
+	int dayOfLatestArrivalTime;
 };
 
 class Solution {
@@ -142,8 +143,8 @@ public:
 				correspondingList[fictiveLink[i - 1]] = i;
 			}
 		}
-		daysOfMinArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
-		daysOfMaxArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
+		daysOfEarliestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
+		daysOfLatestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
     }
     void input();
     void output();
@@ -176,9 +177,14 @@ protected:
 	// Variables for adjustDepartureTime
 	std::vector<std::vector<int>> nodesHavinglastArrivalTime;
 	std::vector<std::vector<int>> nodesHavingEarliestArrivalTime;
-	std::vector<std::vector<int>> daysOfMinArrivalTimeOfEachCustomer;
-	std::vector<std::vector<int>> daysOfMaxArrivalTimeOfEachCustomer;
+	std::vector<std::vector<int>> daysOfEarliestArrivalTimeOfEachCustomer;
+	std::vector<std::vector<int>> daysOfLatestArrivalTimeOfEachCustomer;
 	// -------------------------------------
+	
+	void improveTimeConsistency(std::vector<std::vector<int>>& solutionListOfEachDay);
+	void tweakADayOfSolutionWithTwoOptAlgorithm(std::vector<std::vector<int>>& solutionListOfEachDay, int day, int k, int l);
+    double getRandomDecimal(); // Which is [0, 1]
+    int getRandomInteger(int x); // Which is [0, x - 1]
 	
 	void printGraph(const std::vector<std::vector<int>>& solutionListOfEachDay, double limit);
 	void printTimeLine(const std::vector<PointAndType>& pointsAndTypes);

@@ -731,13 +731,13 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 		//	normalNode = correspondingList[currentNode];
 		//}
 
-		//std::vector<int> daysOfMinArrivalTime = daysOfMinArrivalTimeOfEachCustomer[normalNode];
-		//std::vector<int> daysOfMaxArrivalTime = daysOfMaxArrivalTimeOfEachCustomer[normalNode];
+		//std::vector<int> daysOfEarliestArrivalTime = daysOfEarliestArrivalTimeOfEachCustomer[normalNode];
+		//std::vector<int> daysOfLatestArrivalTime = daysOfLatestArrivalTimeOfEachCustomer[normalNode];
 
 		// Check how far it can move according to whether it will increase the objective score. 
-		//if (std::find(daysOfMaxArrivalTime.begin(), daysOfMaxArrivalTime.end(), day) != daysOfMaxArrivalTime.end()) {
+		//if (std::find(daysOfLatestArrivalTime.begin(), daysOfLatestArrivalTime.end(), day) != daysOfLatestArrivalTime.end()) {
 
-		//	if (std::find(daysOfMinArrivalTime.begin(), daysOfMinArrivalTime.end(), day) != daysOfMinArrivalTime.end()) {
+		//	if (std::find(daysOfEarliestArrivalTime.begin(), daysOfEarliestArrivalTime.end(), day) != daysOfEarliestArrivalTime.end()) {
 
 		//		
 		//	}
@@ -749,7 +749,7 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 		//}
 		//else {
 
-		//	double duration = arrivalTimes[normalNode][daysOfMaxArrivalTime[0]] - arrivalTimes[normalNode][day] + accumulatedPostponedDuration;
+		//	double duration = arrivalTimes[normalNode][daysOfLatestArrivalTime[0]] - arrivalTimes[normalNode][day] + accumulatedPostponedDuration;
 		//	if (duration < maxPF) {
 
 		//		std::cout << "currentNode: " << currentNode << ", duration: " << duration << std::endl;
@@ -828,30 +828,30 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 }
 
 // Assume all the synchronized service has no violation. 
-// This function needs to be adjusted to use daysOfMinArrivalTimeDifferenceOfEachCustomer and daysOfMaxArrivalTimeDifferenceOfEachCustomer. 
+// This function needs to be adjusted to use daysOfMinArrivalTimeOfEachCustomer and daysOfLatestArrivalTimeOfEachCustomer. 
 CustomerAndArrivalTimeDifference Solution::getTheCustomerWithLargestArrivalTimeDifference() {
 
 	int theChosenOne = 1;
 	double valueOfTheChosenOne = 0;
-	int dayOfMinArrivalTime = 0;
-	int dayOfMaxArrivalTime = 0;
+	int dayOfEarliestArrivalTime = 0;
+	int dayOfLatestArrivalTime = 0;
 	for (int i = 1; i <= nNormals; i++) {
 
-		//std::cout << i << ", " << daysOfMaxArrivalTimeOfEachCustomer[i].size() << ", " << daysOfMinArrivalTimeOfEachCustomer[i].size() << std::endl;
-		double difference = arrivalTimes[i][daysOfMaxArrivalTimeOfEachCustomer[i][0]] - arrivalTimes[i][daysOfMinArrivalTimeOfEachCustomer[i][0]];
+		//std::cout << i << ", " << daysOfLatestArrivalTimeOfEachCustomer[i].size() << ", " << daysOfEarliestArrivalTimeOfEachCustomer[i].size() << std::endl;
+		double difference = arrivalTimes[i][daysOfLatestArrivalTimeOfEachCustomer[i][0]] - arrivalTimes[i][daysOfEarliestArrivalTimeOfEachCustomer[i][0]];
 		if (difference > valueOfTheChosenOne) {
 
 			theChosenOne = i;
 			valueOfTheChosenOne = difference;
-			dayOfMinArrivalTime = daysOfMinArrivalTimeOfEachCustomer[i][0];
-			dayOfMaxArrivalTime = daysOfMaxArrivalTimeOfEachCustomer[i][0];
+			dayOfEarliestArrivalTime = daysOfEarliestArrivalTimeOfEachCustomer[i][0];
+			dayOfLatestArrivalTime = daysOfLatestArrivalTimeOfEachCustomer[i][0];
 		}
 	}
 	struct CustomerAndArrivalTimeDifference customerAndDifference;
 	customerAndDifference.customer = theChosenOne;
 	customerAndDifference.difference = valueOfTheChosenOne;
-	customerAndDifference.dayOfMinArrivalTime = dayOfMinArrivalTime;
-	customerAndDifference.dayOfMaxArrivalTime = dayOfMaxArrivalTime;
+	customerAndDifference.dayOfEarliestArrivalTime = dayOfEarliestArrivalTime;
+	customerAndDifference.dayOfLatestArrivalTime = dayOfLatestArrivalTime;
 	return customerAndDifference;
 }
 
@@ -1023,12 +1023,12 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 // This version can only deal with solution with no violation. 
 void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOfEachDay) {
 
-	// Calculate daysOfMinArrivalTimeOfEachCustomer, and daysOfMaxArrivalTimeOfEachCustomer
+	// Calculate daysOfEarliestArrivalTimeOfEachCustomer, and daysOfLatestArrivalTimeOfEachCustomer
 	// To fill 0's position. 
 	for (int i = 1; i <= nNormals; i++) {
 
-		daysOfMinArrivalTimeOfEachCustomer[i].clear();
-		daysOfMaxArrivalTimeOfEachCustomer[i].clear();
+		daysOfEarliestArrivalTimeOfEachCustomer[i].clear();
+		daysOfLatestArrivalTimeOfEachCustomer[i].clear();
 		double minArrivalTime = INT_MAX;
 		double maxArrivalTime = -1;
 		for (int day = 0; day < nDays; day++) {
@@ -1040,39 +1040,39 @@ void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOf
 			double tempArrivalTime = arrivalTimes[i][day];
 			if (tempArrivalTime < minArrivalTime) {
 
-				daysOfMinArrivalTimeOfEachCustomer[i].clear();
-				daysOfMinArrivalTimeOfEachCustomer[i].push_back(day);
+				daysOfEarliestArrivalTimeOfEachCustomer[i].clear();
+				daysOfEarliestArrivalTimeOfEachCustomer[i].push_back(day);
 				minArrivalTime = tempArrivalTime;
 			}
 			else if (tempArrivalTime == minArrivalTime) {
 
-				daysOfMinArrivalTimeOfEachCustomer[i].push_back(day);
+				daysOfEarliestArrivalTimeOfEachCustomer[i].push_back(day);
 			}
 			if (tempArrivalTime > maxArrivalTime) {
 
-				daysOfMaxArrivalTimeOfEachCustomer[i].clear();
-				daysOfMaxArrivalTimeOfEachCustomer[i].push_back(day);
+				daysOfLatestArrivalTimeOfEachCustomer[i].clear();
+				daysOfLatestArrivalTimeOfEachCustomer[i].push_back(day);
 				maxArrivalTime = tempArrivalTime;
 			}
 			else if (tempArrivalTime == maxArrivalTime) {
 
-				daysOfMaxArrivalTimeOfEachCustomer[i].push_back(day);
+				daysOfLatestArrivalTimeOfEachCustomer[i].push_back(day);
 			}
 		}
 	}
-	//std::cout << "Initializing daysOfMinArrivalTimeOfEachCustomer and daysOfMaxArrivalTimeOfEachCustomer finished. " << std::endl;
+	//std::cout << "Initializing daysOfEarliestArrivalTimeOfEachCustomer and daysOfLatestArrivalTimeOfEachCustomer finished. " << std::endl;
 	//for (int i = 1; i <= nNormals; i++) {
 
 	//	std::cout << "Node " << i << ": (";
-	//	std::cout << daysOfMinArrivalTimeOfEachCustomer[i][0];
-	//	for (int j = 1; j < daysOfMinArrivalTimeOfEachCustomer[i].size(); j++) {
+	//	std::cout << daysOfEarliestArrivalTimeOfEachCustomer[i][0];
+	//	for (int j = 1; j < daysOfEarliestArrivalTimeOfEachCustomer[i].size(); j++) {
 
-	//		std::cout << ", " << daysOfMinArrivalTimeOfEachCustomer[i][j];
+	//		std::cout << ", " << daysOfEarliestArrivalTimeOfEachCustomer[i][j];
 	//	}
-	//	std::cout << " / " << daysOfMaxArrivalTimeOfEachCustomer[i][0];
-	//	for (int j = 1; j < daysOfMaxArrivalTimeOfEachCustomer[i].size(); j++) {
+	//	std::cout << " / " << daysOfLatestArrivalTimeOfEachCustomer[i][0];
+	//	for (int j = 1; j < daysOfLatestArrivalTimeOfEachCustomer[i].size(); j++) {
 
-	//		std::cout << ", " << daysOfMaxArrivalTimeOfEachCustomer[i][j];
+	//		std::cout << ", " << daysOfLatestArrivalTimeOfEachCustomer[i][j];
 	//	}
 	//	std::cout << ")" << std::endl;
 	//}
@@ -1100,20 +1100,20 @@ void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOf
 		//for (int i = 1; i <= nNormals; i++) {
 
 		//	std::cout << "Node " << i << ": (";
-		//	std::cout << arrivalTimes[i][daysOfMinArrivalTimeOfEachCustomer[i][0]] << ", " << arrivalTimes[i][daysOfMaxArrivalTimeOfEachCustomer[i][0]] << ") " << std::endl;
+		//	std::cout << arrivalTimes[i][daysOfEarliestArrivalTimeOfEachCustomer[i][0]] << ", " << arrivalTimes[i][daysOfLatestArrivalTimeOfEachCustomer[i][0]] << ") " << std::endl;
 		//}
 		//for (int i = 1; i <= nNormals; i++) {
 
 		//	std::cout << "Node " << i << ": (";
-		//	std::cout << daysOfMinArrivalTimeOfEachCustomer[i][0];
-		//	for (int j = 1; j < daysOfMinArrivalTimeOfEachCustomer[i].size(); j++) {
+		//	std::cout << daysOfEarliestArrivalTimeOfEachCustomer[i][0];
+		//	for (int j = 1; j < daysOfEarliestArrivalTimeOfEachCustomer[i].size(); j++) {
 
-		//		std::cout << ", " << daysOfMinArrivalTimeOfEachCustomer[i][j];
+		//		std::cout << ", " << daysOfEarliestArrivalTimeOfEachCustomer[i][j];
 		//	}
-		//	std::cout << " / " << daysOfMaxArrivalTimeOfEachCustomer[i][0];
-		//	for (int j = 1; j < daysOfMaxArrivalTimeOfEachCustomer[i].size(); j++) {
+		//	std::cout << " / " << daysOfLatestArrivalTimeOfEachCustomer[i][0];
+		//	for (int j = 1; j < daysOfLatestArrivalTimeOfEachCustomer[i].size(); j++) {
 
-		//		std::cout << ", " << daysOfMaxArrivalTimeOfEachCustomer[i][j];
+		//		std::cout << ", " << daysOfLatestArrivalTimeOfEachCustomer[i][j];
 		//	}
 		//	std::cout << ")" << std::endl;
 		//}
@@ -1126,8 +1126,8 @@ void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOf
 
 		// Get the maximum moving duration and the days that are the most extense. Since we are going to push forward, we only need the day of minimum arrival time. 
 		maxMovingDuration = customerWithLargestArrivalTimeDifferenceAndItsDifference.difference;
-		int dayOfMinArrivalTime = customerWithLargestArrivalTimeDifferenceAndItsDifference.dayOfMinArrivalTime;
-		int dayOfMaxArrivalTime = customerWithLargestArrivalTimeDifferenceAndItsDifference.dayOfMaxArrivalTime;
+		int dayOfEarliestArrivalTime = customerWithLargestArrivalTimeDifferenceAndItsDifference.dayOfEarliestArrivalTime;
+		int dayOfLatestArrivalTime = customerWithLargestArrivalTimeDifferenceAndItsDifference.dayOfLatestArrivalTime;
 
 		// Try to push forward. 
 		// Get the customer with largest arrival time difference
@@ -1142,9 +1142,9 @@ void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOf
 
 		// Get the position of customer with largest arrival time difference. 
 		int positionOfCustomerWithLargestArrivalTimeDifference = 0;
-		for (int i = 0; i < solutionListOfEachDay[dayOfMinArrivalTime].size(); i++) {
+		for (int i = 0; i < solutionListOfEachDay[dayOfEarliestArrivalTime].size(); i++) {
 
-			if (solutionListOfEachDay[dayOfMinArrivalTime][i] == customerWithLargestArrivalTimeDifference) {
+			if (solutionListOfEachDay[dayOfEarliestArrivalTime][i] == customerWithLargestArrivalTimeDifference) {
 
 				positionOfCustomerWithLargestArrivalTimeDifference = i;
 				break;
@@ -1152,11 +1152,11 @@ void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOf
 		}
 
 		//std::cout << "/////////" << std::endl;
-		//std::cout << arrivalTimes[solutionListOfEachDay[dayOfMinArrivalTime][positionOfCustomerWithLargestArrivalTimeDifference]][dayOfMinArrivalTime] << std::endl;
+		//std::cout << arrivalTimes[solutionListOfEachDay[dayOfEarliestArrivalTime][positionOfCustomerWithLargestArrivalTimeDifference]][dayOfEarliestArrivalTime] << std::endl;
 		//std::cout << "/////////" << std::endl;
 
 		// Get those blocking customer. Calculate their maxPF. 
-		maxMovingDuration = std::min(maxMovingDuration, getMaxPF(solutionListOfEachDay, positionOfCustomerWithLargestArrivalTimeDifference, dayOfMinArrivalTime, 0, true));
+		maxMovingDuration = std::min(maxMovingDuration, getMaxPF(solutionListOfEachDay, positionOfCustomerWithLargestArrivalTimeDifference, dayOfEarliestArrivalTime, 0, true));
 		//std::cout << "Getting maxMovingDuration finished. " << std::endl;
 		//std::cout << "maxMovingDuration: " << maxMovingDuration << std::endl;
 
@@ -1164,7 +1164,7 @@ void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOf
 		std::vector<int>* nodesBeingMovedPtr;
 		if (maxMovingDuration > 0) {
 
-			nodesBeingMovedPtr = applyPF(solutionListOfEachDay, positionOfCustomerWithLargestArrivalTimeDifference, dayOfMinArrivalTime, maxMovingDuration, true);
+			nodesBeingMovedPtr = applyPF(solutionListOfEachDay, positionOfCustomerWithLargestArrivalTimeDifference, dayOfEarliestArrivalTime, maxMovingDuration, true);
 			//std::cout << "nodesBeingMoved: ";
 			//for (int t = 0; t < nodesBeingMovedPtr->size(); t++) {
 
@@ -1191,8 +1191,8 @@ void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOf
 			}
 			nodesHavingBeenRecalculated[nodeBeingGoingToRecalculate] = true;
 
-			daysOfMinArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].clear();
-			daysOfMaxArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].clear();
+			daysOfEarliestArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].clear();
+			daysOfLatestArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].clear();
 			double minArrivalTime = INT_MAX;
 			double maxArrivalTime = -1;
 			for (int day = 0; day < nDays; day++) {
@@ -1204,23 +1204,23 @@ void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOf
 				double tempArrivalTime = arrivalTimes[nodeBeingGoingToRecalculate][day];
 				if (tempArrivalTime < minArrivalTime) {
 
-					daysOfMinArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].clear();
-					daysOfMinArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].push_back(day);
+					daysOfEarliestArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].clear();
+					daysOfEarliestArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].push_back(day);
 					minArrivalTime = tempArrivalTime;
 				}
 				else if (tempArrivalTime == minArrivalTime) {
 
-					daysOfMinArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].push_back(day);
+					daysOfEarliestArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].push_back(day);
 				}
 				if (tempArrivalTime > maxArrivalTime) {
 
-					daysOfMaxArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].clear();
-					daysOfMaxArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].push_back(day);
+					daysOfLatestArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].clear();
+					daysOfLatestArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].push_back(day);
 					maxArrivalTime = tempArrivalTime;
 				}
 				else if (tempArrivalTime == maxArrivalTime) {
 
-					daysOfMaxArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].push_back(day);
+					daysOfLatestArrivalTimeOfEachCustomer[nodeBeingGoingToRecalculate].push_back(day);
 				}
 			}
 		}
@@ -1356,6 +1356,172 @@ double Solution::getObjectiveScore(const std::vector<std::vector<int>>& solution
 	}
 	//std::cout << "getObjectiveScore: " << score << std::endl;
 	return score;
+}
+
+void Solution::improveTimeConsistency(std::vector<std::vector<int>>& solutionListOfEachDay) {
+
+	//std::cout << "improveTimeConsistency started" << std::endl;
+	// Record the original score. 
+	double originalScore = getObjectiveScore(solutionListOfEachDay);
+	double newScore = originalScore;
+	std::vector<std::vector<int>> alternativeSolution = std::vector<std::vector<int>>();
+	alternativeSolution.reserve(nDays);
+	for (int day = 0; day < nDays; day++) {
+
+		alternativeSolution.push_back(solutionListOfEachDay[day]);
+	}
+
+	while (1) {
+
+		bool betterOne = false;
+
+		// Initialize
+		for (int day = 0; day < nDays; day++) {
+
+			alternativeSolution[day] = std::vector<int>(solutionListOfEachDay[day]);
+		}
+
+		//std::cout << "section 1" << std::endl;
+
+		// Get the customer with the largest arrival time difference. 
+		int customerWithLargestArrivalTimeDifference = 0;
+		double largestDifference = -1;
+		for (int i = 1; i <= nNormals; i++) {
+
+			double difference = arrivalTimes[i][daysOfLatestArrivalTimeOfEachCustomer[i][0]] - arrivalTimes[i][daysOfEarliestArrivalTimeOfEachCustomer[i][0]];
+			if (difference > largestDifference) {
+
+				largestDifference = difference;
+				customerWithLargestArrivalTimeDifference = i;
+			}
+		}
+		//std::cout << "section 2" << std::endl;
+
+		// Get its average arrival time, earliest arrival time, and latest arrival time. 
+		int dayOfEarliestArrivalTime = daysOfEarliestArrivalTimeOfEachCustomer[customerWithLargestArrivalTimeDifference][0];
+		int dayOfLatestArrivalTime = daysOfLatestArrivalTimeOfEachCustomer[customerWithLargestArrivalTimeDifference][0];
+		double averageArrivalTime = 0;
+		double earliestArrivalTime = arrivalTimes[customerWithLargestArrivalTimeDifference][dayOfEarliestArrivalTime];
+		double latestArrivalTime = arrivalTimes[customerWithLargestArrivalTimeDifference][dayOfLatestArrivalTime];
+		for (int day = 0; day < nDays; day++) {
+
+			double arrivalTime = arrivalTimes[customerWithLargestArrivalTimeDifference][day];
+			averageArrivalTime += (arrivalTime / nDays);
+		}
+		//std::cout << "section 3" << std::endl;
+
+		// Decide which day to reverse
+		// Also need to check if it is the special case. 
+		// When there are more than two days being the earliest days or the latest days, we break this function. 
+		// This is according to the original paper, not the one written by Jeff. 
+		int dayToReverse = 0;
+		if (averageArrivalTime - earliestArrivalTime < latestArrivalTime - averageArrivalTime) {
+
+			dayToReverse = dayOfEarliestArrivalTime;
+			if (daysOfEarliestArrivalTimeOfEachCustomer[customerWithLargestArrivalTimeDifference].size() > 1) {
+
+				break;
+			}
+		}
+		else {
+
+			dayToReverse = dayOfLatestArrivalTime;
+			if (daysOfLatestArrivalTimeOfEachCustomer[customerWithLargestArrivalTimeDifference].size() > 1) {
+
+				break;
+			}
+		}
+		//std::cout << "section 4" << std::endl;
+		
+		std::vector<std::vector<int>> bestSolutionSoFar;
+		bestSolutionSoFar.resize(nDays);
+		
+		// Apply 2-opt to that day. 
+		for (int k = 0; k < solutionListOfEachDay[dayToReverse].size(); k++) {
+
+			for (int l = k + 1; l < solutionListOfEachDay[dayToReverse].size(); l++) {
+
+				tweakADayOfSolutionWithTwoOptAlgorithm(alternativeSolution, dayToReverse, k, l);
+
+				// Recalculate everything and get the score
+				calculateObjective(alternativeSolution);
+				
+				newScore = getViolationScore(alternativeSolution, FACTOR_OF_VIOLATION);
+				if (newScore == 0) {
+
+					//printGraph(SAListOfEachDay, GRAPH_LIMIT);
+					adjustDepartureTime(alternativeSolution);
+					newScore += getObjectiveScore(alternativeSolution);
+					CheckConstraintsResult checkConstraintsResult = checkConstraints(alternativeSolution);
+					//std::cout << "checkConstraints done. " << std::endl;
+					if (checkConstraintsResult.result == false) {
+
+						printGraph(alternativeSolution, GRAPH_LIMIT);
+						std::cout << "Violation detected ----------------------------------" << std::endl;
+						for (std::string message : checkConstraintsResult.messages) {
+
+							std::cout << message << std::endl;
+						}
+						std::cout << "-----------------------------------------------------" << std::endl;
+						exit(1);
+					}
+					//std::cout << "Score: " << newScore << std::endl;
+				}
+				
+				if (newScore < originalScore) {
+				
+					betterOne = true;
+					originalScore = newScore;
+					for (int day = 0; day < nDays; day++) {
+
+						solutionListOfEachDay[day] = std::vector<int>(alternativeSolution[day]);
+					}
+					for (int day = 0; day < nDays; day++) {
+
+						bestSolutionSoFar[day] = std::vector<int>(alternativeSolution[day]);
+					}
+				}
+			}
+		}
+
+		if (betterOne) {
+
+			for (int day = 0; day < nDays; day++) {
+
+				solutionListOfEachDay[day] = std::vector<int>(bestSolutionSoFar[day]);
+			}
+			calculateObjective(solutionListOfEachDay);
+			adjustDepartureTime(solutionListOfEachDay);
+		}
+		else {
+
+			break;
+		}
+	}
+
+	return;
+}
+
+void Solution::tweakADayOfSolutionWithTwoOptAlgorithm(std::vector<std::vector<int>>& solutionListOfEachDay, int day, int k, int l) {
+
+	if (k > l) {
+
+		std::swap(k, l);
+	}
+
+	std::reverse(solutionListOfEachDay[day].begin() + k, solutionListOfEachDay[day].begin() + l);
+	return;
+}
+
+double Solution::getRandomDecimal() {
+
+    return ((double)rand() / RAND_MAX);
+}
+
+int Solution::getRandomInteger(int x) {
+
+	int randomInteger = floor((double)rand() / (RAND_MAX) * x);
+    return randomInteger == x ? x - 1 : randomInteger; // The reason why RAND_MAX has to add one is to eliminate the possibility the function return x. 
 }
 
 CheckConstraintsResult Solution::checkConstraints(const std::vector<std::vector<int>>& solutionListOfEachDay) {

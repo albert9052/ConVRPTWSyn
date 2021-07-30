@@ -43,15 +43,10 @@ private:
 
     std::vector<std::vector<bool>> modifiedRequiredMatrix;
 
-    double getRandomDecimal(); // Which is [0, 1]
-    int getRandomInteger(int x); // Which is [0, x - 1]
     void tweakSolutionByInsertion(std::vector<std::vector<int>>& solutionListOfEachDay);
     void tweakSolutionBySwap(std::vector<std::vector<int>>& solutionListOfEachDay);
     void tweakSolutionByReversion(std::vector<std::vector<int>>& solutionListOfEachDay);
     void tweakSolutionRandomly(std::vector<std::vector<int>>& solutionListOfEachDay);
-
-	void improveTimeConsistency(std::vector<std::vector<int>>& solutionListOfEachDay);
-	bool isFeasible(std::vector<std::vector<int>>& solutionListOfEachDay);
 
 public:
 

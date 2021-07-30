@@ -4,10 +4,10 @@ bool SA::isFirstTime = true;
 
 SA::SA(/* args */) {
 
-	Ts = 10000000000;
-	Te = 0.000000000001;
+	Ts = 100000000000000;
+	Te = 0.00000001;
 	numberOfIterations = 100000;
-	Alpha = 0.1;
+	Alpha = 0.2;
 }
 
 void SA::solve() {
@@ -80,7 +80,10 @@ void SA::solve() {
 			//	std::cout << std::endl;
 			//}
 
-			//std::cout << iterationNum << " times" << std::endl;
+			//if (iterationNum % 1000 == 0) {
+
+			//	std::cout << iterationNum << " times" << std::endl;
+			//}
 
 			//temporary
 			//SAListOfEachDay[0] = {1, -1, 4, -1, 6, 3, 5};
@@ -118,7 +121,7 @@ void SA::solve() {
 			double newScore;// = getScore();
 			
 			// Temporary: 
-			newScore = getViolationScore(SAListOfEachDay, 100000);
+			newScore = getViolationScore(SAListOfEachDay, FACTOR_OF_VIOLATION);
 			if (newScore == 0) {
 
 				//printGraph(SAListOfEachDay, GRAPH_LIMIT);
@@ -137,6 +140,33 @@ void SA::solve() {
 					std::cout << "-----------------------------------------------------" << std::endl;
 					exit(1);
 				}
+
+				improveTimeConsistency(SAListOfEachDay);
+				//bool improved = improveTimeConsistency(SAListOfEachDay);
+				//if (improved) {
+
+				//	calculateObjective(SAListOfEachDay);
+				//	adjustDepartureTime(SAListOfEachDay);
+				//	newScore = getObjectiveScore(SAListOfEachDay);
+				//	CheckConstraintsResult checkConstraintsResult = checkConstraints(SAListOfEachDay);
+				//	//std::cout << "checkConstraints done. " << std::endl;
+				//	if (checkConstraintsResult.result == false) {
+
+				//		printGraph(SAListOfEachDay, GRAPH_LIMIT);
+				//		std::cout << "Violation detected ----------------------------------" << std::endl;
+				//		for (std::string message : checkConstraintsResult.messages) {
+
+				//			std::cout << message << std::endl;
+				//		}
+				//		std::cout << "-----------------------------------------------------" << std::endl;
+				//		exit(1);
+				//	}
+				//}
+				//else {
+
+				//	calculateObjective(SAListOfEachDay);
+				//	adjustDepartureTime(SAListOfEachDay);
+				//}
 				//std::cout << "Score: " << newScore << std::endl;
 			}
 			//std::cout << "Score: " << newScore << ", Best Score: " << bestScore << std::endl;
@@ -183,17 +213,6 @@ void SA::solve() {
 		}
 		std::cout << "-----------------------------------------------------" << std::endl;
 	}
-}
-
-double SA::getRandomDecimal() {
-
-    return ((double)rand() / RAND_MAX);
-}
-
-int SA::getRandomInteger(int x) {
-
-	int randomInteger = floor((double)rand() / (RAND_MAX) * x);
-    return randomInteger == x ? x - 1 : randomInteger; // The reason why RAND_MAX has to add one is to eliminate the possibility the function return x. 
 }
 
 void SA::tweakSolutionByInsertion(std::vector<std::vector<int>>& SAListOfEachDay) {
@@ -251,16 +270,6 @@ void SA::tweakSolutionRandomly(std::vector<std::vector<int>>& SAListOfEachDay) {
         std::cout << "Error: tweakSARandomly get value out of {0, 1, 2}" << std::endl;
         exit(1);
     }
-}
-
-void SA::improveTimeConsistency(std::vector<std::vector<int>>& solutionListOfEachDay) {
-	
-	return;
-}
-
-bool SA::isFeasible(std::vector<std::vector<int>>& solutionListOfEachDay) {
-
-	return true;
 }
 
 int Smallest::getTheSmallest() {
