@@ -4,10 +4,10 @@ bool SA::isFirstTime = true;
 
 SA::SA(/* args */) {
 
-	Ts = 100000000000000;
-	Te = 0.00000001;
+	Ts = 100000000000;
+	Te = 0.0000000000001;
 	numberOfIterations = 100000;
-	Alpha = 0.2;
+	Alpha = 0.1;
 }
 
 void SA::solve() {
@@ -86,9 +86,9 @@ void SA::solve() {
 			//}
 
 			//temporary
-			//SAListOfEachDay[0] = {1, -1, 4, -1, 6, 3, 5};
-			//SAListOfEachDay[1] = {7, 6, -1, 4, -1, 2, 1, 5};
-			//SAListOfEachDay[2] = {6, 3, -1, 1, -1};
+			//SAListOfEachDay[0] = {6, 7, 1, 20, 8, -1, 14, 19, 3, 9, -1, 11, 16, 13, 15, 10, -1, 18};
+			//SAListOfEachDay[1] = {6, 1, 8, -1, 19, -1, 11, 13, 10, -1, 12, 17, 2, 18};
+			//SAListOfEachDay[2] = {6, 7, 20, 8, -1, 14, 3, 9, -1, 16, 13, 15, 10, -1, 12, 17, 4, 5};
 
 			// Adjust the arrival time and departure time to get the minimum violation. 
             calculateObjective(SAListOfEachDay);
@@ -122,6 +122,20 @@ void SA::solve() {
 			
 			// Temporary: 
 			newScore = getViolationScore(SAListOfEachDay, FACTOR_OF_VIOLATION);
+			//CheckConstraintsResult checkConstraintsResult = checkConstraints(SAListOfEachDay);
+			////std::cout << "checkConstraints done. " << std::endl;
+			//if (checkConstraintsResult.result == false) {
+
+			//	printGraph(SAListOfEachDay, GRAPH_LIMIT);
+			//	std::cout << "After calculateObjective" << std::endl;
+			//	std::cout << "Violation detected ----------------------------------" << std::endl;
+			//	for (std::string message : checkConstraintsResult.messages) {
+
+			//		std::cout << message << std::endl;
+			//	}
+			//	std::cout << "-----------------------------------------------------" << std::endl;
+			//	exit(1);
+			//}
 			if (newScore == 0) {
 
 				//printGraph(SAListOfEachDay, GRAPH_LIMIT);
@@ -132,6 +146,7 @@ void SA::solve() {
 				if (checkConstraintsResult.result == false) {
 
 					printGraph(SAListOfEachDay, GRAPH_LIMIT);
+					std::cout << "After adjustDepartureTime" << std::endl;
 					std::cout << "Violation detected ----------------------------------" << std::endl;
 					for (std::string message : checkConstraintsResult.messages) {
 
@@ -194,6 +209,7 @@ void SA::solve() {
 				}
 			}
 
+			//printGraph(bestSA, GRAPH_LIMIT);
 			//std::cout << bestScore << std::endl;
 			//exit(1);
         }
@@ -217,35 +233,44 @@ void SA::solve() {
 
 void SA::tweakSolutionByInsertion(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-	int day = getRandomInteger(3);
-	int positionToChoose = getRandomInteger(SAListOfEachDay[day].size());
-	int positionToInsert = getRandomInteger(SAListOfEachDay[day].size() - 1);
+	//int day = getRandomInteger(3);
+	for (int day = 0; day < nDays; day++) {
 
-	int tempValueForInsertion = SAListOfEachDay[day][positionToChoose];
-	SAListOfEachDay[day].erase(SAListOfEachDay[day].begin() + positionToChoose);
-	SAListOfEachDay[day].insert(SAListOfEachDay[day].begin() + positionToInsert, tempValueForInsertion);
+		int positionToChoose = getRandomInteger(SAListOfEachDay[day].size());
+		int positionToInsert = getRandomInteger(SAListOfEachDay[day].size() - 1);
+
+		int tempValueForInsertion = SAListOfEachDay[day][positionToChoose];
+		SAListOfEachDay[day].erase(SAListOfEachDay[day].begin() + positionToChoose);
+		SAListOfEachDay[day].insert(SAListOfEachDay[day].begin() + positionToInsert, tempValueForInsertion);
+	}
 }
 
 void SA::tweakSolutionBySwap(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-	int day = getRandomInteger(3);
-	int position1 = getRandomInteger(SAListOfEachDay[day].size());
-	int position2 = getRandomInteger(SAListOfEachDay[day].size());
+	//int day = getRandomInteger(3);
+	for (int day = 0; day < nDays; day++) {
 
-	std::swap(SAListOfEachDay[day][position1], SAListOfEachDay[day][position2]);
+		int position1 = getRandomInteger(SAListOfEachDay[day].size());
+		int position2 = getRandomInteger(SAListOfEachDay[day].size());
+
+		std::swap(SAListOfEachDay[day][position1], SAListOfEachDay[day][position2]);
+	}
 }
 
 void SA::tweakSolutionByReversion(std::vector<std::vector<int>>& SAListOfEachDay) {
 
-	int day = getRandomInteger(3);
-	int position1 = getRandomInteger(SAListOfEachDay[day].size());
-	int position2 = getRandomInteger(SAListOfEachDay[day].size());
+	//int day = getRandomInteger(3);
+	for (int day = 0; day < nDays; day++) {
 
-	int middlePosition = (position1 + position2) / 2;
-	int totalOfTwoPositions = position1 + position2;
-	for (int i = std::min(position1, position2); i <= middlePosition; i++) {
+		int position1 = getRandomInteger(SAListOfEachDay[day].size());
+		int position2 = getRandomInteger(SAListOfEachDay[day].size());
 
-		std::swap(SAListOfEachDay[day][i], SAListOfEachDay[day][totalOfTwoPositions - i]);
+		int middlePosition = (position1 + position2) / 2;
+		int totalOfTwoPositions = position1 + position2;
+		for (int i = std::min(position1, position2); i <= middlePosition; i++) {
+
+			std::swap(SAListOfEachDay[day][i], SAListOfEachDay[day][totalOfTwoPositions - i]);
+		}
 	}
 }
 

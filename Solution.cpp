@@ -2,25 +2,149 @@
 
 void Solution::input() {
     
-	nCustomer = 7;
-    nNodes = 8;
-    nNormals = 5;
-    nFictives = 2;
-    nRoutes = 3;
-    nDays = 3;
-    fictiveLink = {0, 0, 0, 0, 0, 1, 2};
-    serviceTime = { {0, 0, 0}, {15, 15, 15}, {18, 18, 18}, {23, 23, 23}, {45, 45, 45}, {30, 30, 30}, {15, 15, 15}, {18, 18, 18} };
-    required = { {0, 0, 0}, {1, 1, 1}, {0, 1, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 0}, {1, 1, 1}, {0, 1, 0} };
-    earliestTime = { {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {15, 15, 15}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0} };
-    lastTime = { {100, 100, 100}, {50, 50, 50}, {30, 30, 30}, {95, 95, 95}, {25, 25, 25}, {80, 80, 80}, {50, 50, 50}, {30, 30, 30} };
-    timeMat = { {100000, 12.751, 3.302, 4.6204, 2.6174, 9.0958, 12.751, 3.302},
-                {12.751, 100000, 9.8491, 8.2998, 10.341, 5.2756, 100000, 9.8491},
-                {3.302, 9.8491, 100000, 2.82, 0.717, 5.809, 9.8491, 100000},
-                {4.6204, 8.2998, 2.82, 100000, 2.8158, 5.7838, 8.2998, 2.82},
-                {2.6174, 10.341, 0.717, 2.8158, 100000, 6.4784, 10.341, 0.717},
-                {9.0958, 5.2756, 5.809, 5.7838, 6.4784, 100000, 5.2756, 5.809},
-                {12.751, 100000, 9.8491, 8.2998, 10.341, 5.2756, 100000, 9.8491},
-                {3.302, 9.8491, 100000, 2.82, 0.717, 5.809, 9.8491, 100000} };
+	//nCustomer = 7;
+    //nNodes = 8;
+    //nNormals = 5;
+    //nFictives = 2;
+    //nRoutes = 3;
+    //nDays = 3;
+    //fictiveLink = {0, 0, 0, 0, 0, 1, 2};
+    //serviceTime = { {0, 0, 0}, {15, 15, 15}, {18, 18, 18}, {23, 23, 23}, {45, 45, 45}, {30, 30, 30}, {15, 15, 15}, {18, 18, 18} };
+    //required = { {0, 0, 0}, {1, 1, 1}, {0, 1, 0}, {1, 0, 1}, {1, 1, 0}, {1, 1, 0}, {1, 1, 1}, {0, 1, 0} };
+    //earliestTime = { {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0}, {15, 15, 15}, {0, 0, 0}, {0, 0, 0}, {0, 0, 0} };
+    //lastTime = { {100, 100, 100}, {50, 50, 50}, {30, 30, 30}, {95, 95, 95}, {25, 25, 25}, {80, 80, 80}, {50, 50, 50}, {30, 30, 30} };
+    //timeMat = { {100000, 12.751, 3.302, 4.6204, 2.6174, 9.0958, 12.751, 3.302},
+    //            {12.751, 100000, 9.8491, 8.2998, 10.341, 5.2756, 100000, 9.8491},
+    //            {3.302, 9.8491, 100000, 2.82, 0.717, 5.809, 9.8491, 100000},
+    //            {4.6204, 8.2998, 2.82, 100000, 2.8158, 5.7838, 8.2998, 2.82},
+    //            {2.6174, 10.341, 0.717, 2.8158, 100000, 6.4784, 10.341, 0.717},
+    //            {9.0958, 5.2756, 5.809, 5.7838, 6.4784, 100000, 5.2756, 5.809},
+    //            {12.751, 100000, 9.8491, 8.2998, 10.341, 5.2756, 100000, 9.8491},
+    //            {3.302, 9.8491, 100000, 2.82, 0.717, 5.809, 9.8491, 100000} };
+	
+	// case_1_20_4_2_2
+	nCustomer = 20;
+	nNodes = 21;
+	nNormals = 18;
+	nFictives = 2;
+	nRoutes = 4;
+	nDays = 3;
+	fictiveLink = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3};
+	serviceTime = {
+		{0, 0, 0}, 
+		{139, 139, 139}, 
+		{37, 37, 37}, 
+		{32, 32, 32}, 
+		{102, 102, 102}, 
+		{72, 72, 72}, 
+		{75, 75, 75}, 
+		{49, 49, 49}, 
+		{98, 98, 98}, 
+		{107, 107, 107}, 
+		{37, 37, 37}, 
+		{25, 25, 25}, 
+		{88, 88, 88}, 
+		{47, 47, 47}, 
+		{118, 118, 118}, 
+		{131, 131, 131}, 
+		{63, 63, 63}, 
+		{52, 52, 52}, 
+		{69, 69, 69}, 
+		{139, 139, 139}, 
+		{32, 32, 32}, 
+	};
+	required = {
+		{0, 0, 0}, 
+		{1, 1, 0}, 
+		{0, 1, 0}, 
+		{1, 0, 1}, 
+		{0, 0, 1}, 
+		{0, 0, 1}, 
+		{1, 1, 1}, 
+		{1, 0, 1}, 
+		{1, 1, 1}, 
+		{1, 0, 1}, 
+		{1, 1, 1}, 
+		{1, 1, 0}, 
+		{0, 1, 1}, 
+		{1, 1, 1}, 
+		{1, 0, 1}, 
+		{1, 0, 1}, 
+		{1, 0, 1}, 
+		{0, 1, 1}, 
+		{1, 1, 0}, 
+		{1, 1, 0}, 
+		{1, 0, 1}, 
+	};
+	earliestTime = {
+		{0, 0, 0}, 
+		{170, 170, 170}, 
+		{284, 284, 284}, 
+		{339, 339, 339}, 
+		{447, 447, 447}, 
+		{536, 536, 536}, 
+		{0, 0, 0}, 
+		{38, 38, 38}, 
+		{413, 413, 413}, 
+		{358, 358, 358}, 
+		{566, 566, 566}, 
+		{0, 0, 0}, 
+		{0, 0, 0}, 
+		{97, 97, 97}, 
+		{165, 165, 165}, 
+		{355, 355, 355}, 
+		{0, 0, 0}, 
+		{4, 4, 4}, 
+		{270, 270, 270}, 
+		{170, 170, 170}, 
+		{339, 339, 339}, 
+	};
+	lastTime = {
+		{695, 695, 695}, 
+		{288, 288, 288}, 
+		{378, 378, 378}, 
+		{497, 497, 497}, 
+		{560, 560, 560}, 
+		{684, 684, 684}, 
+		{29, 29, 29}, 
+		{136, 136, 136}, 
+		{492, 492, 492}, 
+		{549, 549, 549}, 
+		{667, 667, 667}, 
+		{88, 88, 88}, 
+		{107, 107, 107}, 
+		{206, 206, 206}, 
+		{333, 333, 333}, 
+		{419, 419, 419}, 
+		{72, 72, 72}, 
+		{172, 172, 172}, 
+		{400, 400, 400}, 
+		{288, 288, 288}, 
+		{497, 497, 497}, 
+	};
+	timeMat = {
+		{0, 21, 18, 20, 22, 23, 7, 18, 13, 18, 13, 9, 11, 19, 19, 19, 17, 26, 13, 21, 20}, 
+		{21, 10000, 23, 3, 42, 43, 23, 25, 14, 4, 33, 29, 29, 38, 3, 39, 37, 40, 24, 10000, 3}, 
+		{18, 23, 10000, 23, 35, 36, 25, 35, 25, 20, 23, 22, 17, 35, 23, 31, 24, 19, 7, 23, 23}, 
+		{20, 3, 23, 10000, 40, 41, 22, 23, 12, 4, 32, 28, 28, 36, 2, 38, 36, 40, 24, 3, 10000}, 
+		{22, 42, 35, 40, 10000, 2, 20, 27, 31, 39, 13, 14, 18, 7, 39, 4, 14, 29, 28, 42, 40}, 
+		{23, 43, 36, 41, 2, 10000, 20, 27, 32, 40, 14, 15, 19, 7, 40, 6, 15, 30, 29, 43, 41}, 
+		{7, 23, 25, 22, 20, 20, 10000, 12, 12, 21, 15, 10, 15, 15, 21, 18, 20, 31, 20, 23, 22}, 
+		{18, 25, 35, 23, 27, 27, 12, 10000, 13, 24, 26, 22, 27, 21, 23, 27, 31, 43, 31, 25, 23}, 
+		{13, 14, 25, 12, 31, 32, 12, 13, 10000, 12, 25, 20, 23, 26, 11, 29, 30, 37, 23, 14, 12}, 
+		{18, 4, 20, 4, 39, 40, 21, 24, 12, 10000, 30, 26, 26, 35, 3, 36, 34, 36, 21, 4, 4}, 
+		{13, 33, 23, 32, 13, 14, 15, 26, 25, 30, 10000, 5, 6, 14, 31, 9, 6, 19, 16, 33, 32}, 
+		{9, 29, 22, 28, 14, 15, 10, 22, 20, 26, 5, 10000, 7, 13, 27, 11, 10, 22, 15, 29, 28}, 
+		{11, 29, 17, 28, 18, 19, 15, 27, 23, 26, 6, 7, 10000, 19, 27, 14, 8, 16, 10, 29, 28}, 
+		{19, 38, 35, 36, 7, 7, 15, 21, 26, 35, 14, 13, 19, 10000, 35, 8, 17, 32, 28, 38, 36}, 
+		{19, 3, 23, 2, 39, 40, 21, 23, 11, 3, 31, 27, 27, 35, 10000, 37, 35, 39, 23, 3, 2}, 
+		{19, 39, 31, 38, 4, 6, 18, 27, 29, 36, 9, 11, 14, 8, 37, 10000, 10, 25, 24, 39, 38}, 
+		{17, 37, 24, 36, 14, 15, 20, 31, 30, 34, 6, 10, 8, 17, 35, 10, 10000, 16, 17, 37, 36}, 
+		{26, 40, 19, 40, 29, 30, 31, 43, 37, 36, 19, 22, 16, 32, 39, 25, 16, 10000, 16, 40, 40}, 
+		{13, 24, 7, 24, 28, 29, 20, 31, 23, 21, 16, 15, 10, 28, 23, 24, 17, 16, 10000, 24, 24}, 
+		{21, 10000, 23, 3, 42, 43, 23, 25, 14, 4, 33, 29, 29, 38, 3, 39, 37, 40, 24, 10000, 3}, 
+		{20, 3, 23, 10000, 40, 41, 22, 23, 12, 4, 32, 28, 28, 36, 2, 38, 36, 40, 24, 3, 10000}, 
+	};
 
     // below are data processing
 	requiredList.resize(nDays);
@@ -100,8 +224,22 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 			}
 		}
 	}
-	//std::cout << "Diretly arraning the arrival time successes. " << std::endl;
+	//std::cout << "Diretly arranging the arrival time successes. " << std::endl;
 	//printGraph(solutionListOfEachDay, GRAPH_LIMIT);
+	
+	//CheckConstraintsResult checkConstraintsResult = checkConstraints(solutionListOfEachDay);
+	////std::cout << "checkConstraints done. " << std::endl;
+	//if (checkConstraintsResult.result == false) {
+
+	//	printGraph(solutionListOfEachDay, GRAPH_LIMIT);
+	//	std::cout << "After directly arranging the arrival time" << std::endl;
+	//	std::cout << "Violation detected ----------------------------------" << std::endl;
+	//	for (std::string message : checkConstraintsResult.messages) {
+
+	//		std::cout << message << std::endl;
+	//	}
+	//	std::cout << "-----------------------------------------------------" << std::endl;
+	//}
 
 	// Rearrange the arrival time to minimize the violation of time windows. 
 	// Needs to consider 0's last time. (IMPORTANT)
@@ -275,6 +413,20 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 	}
 	//std::cout << "Rearranging the arrival time to minimize the violation of time window successes. " << std::endl;
 	//printGraph(solutionListOfEachDay, GRAPH_LIMIT);
+	
+	//checkConstraintsResult = checkConstraints(solutionListOfEachDay);
+	////std::cout << "checkConstraints done. " << std::endl;
+	//if (checkConstraintsResult.result == false) {
+
+	//	printGraph(solutionListOfEachDay, GRAPH_LIMIT);
+	//	std::cout << "After rearranging the arrival time to minimize the violation of time window" << std::endl;
+	//	std::cout << "Violation detected ----------------------------------" << std::endl;
+	//	for (std::string message : checkConstraintsResult.messages) {
+
+	//		std::cout << message << std::endl;
+	//	}
+	//	std::cout << "-----------------------------------------------------" << std::endl;
+	//}
 	
 	// Rearrange the arrival time of each synchronized service. 
 	// Haven't consider about 0's last time (latest time). This needs to be implemented. 
@@ -620,7 +772,6 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 				}
 
 				// Postpone it by currentPostpondDuration. 
-				int previousNode = 0;
 				for (int j = 0; j < solutionListOfEachDay[day].size(); j++) {
 
 					if (solutionListOfEachDay[day][j] == chosenOne) {
@@ -628,7 +779,18 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 						//std::cout << "Current postponed duration: " << currentPostponedDuration << std::endl;
 						arrivalTimes[chosenOne][day] += currentPostponedDuration;
 						departureTimes[chosenOne][day] += currentPostponedDuration;
-						previousNode = solutionListOfEachDay[day][j];
+						int previousOne = 0;
+						if (j != 0) {
+
+							previousOne = solutionListOfEachDay[day][j - 1];
+							if (previousOne == -1) {
+
+								previousOne = 0;
+							}
+						}
+						postponedDuration[day][previousOne][chosenOne] += currentPostponedDuration;
+
+						int previousNode = solutionListOfEachDay[day][j];
 						for (int k = j + 1; k < solutionListOfEachDay[day].size(); k++) {
 
 							if (solutionListOfEachDay[day][k] == -1) {
@@ -638,7 +800,12 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 							currentPostponedDuration -= postponedDuration[day][previousNode][solutionListOfEachDay[day][k]];
 							if (currentPostponedDuration <= 0) {
 
+								postponedDuration[day][previousNode][solutionListOfEachDay[day][k]] -= (currentPostponedDuration + postponedDuration[day][previousNode][solutionListOfEachDay[day][k]]);
 								break;
+							}
+							else {
+
+								postponedDuration[day][previousNode][solutionListOfEachDay[day][k]] = 0;
 							}
 							arrivalTimes[solutionListOfEachDay[day][k]][day] += currentPostponedDuration;
 							departureTimes[solutionListOfEachDay[day][k]][day] += currentPostponedDuration;
@@ -646,7 +813,6 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 						}
 						break;
 					}
-					previousNode = solutionListOfEachDay[day][j];
 				}
 				
 				// Remove the picked one and its corresponding node. 
@@ -684,6 +850,20 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 	}
 	//std::cout << "Rearranging the arrival time of each synchronized service successes. " << std::endl;
 	//printGraph(solutionListOfEachDay, GRAPH_LIMIT);
+	
+	//checkConstraintsResult = checkConstraints(solutionListOfEachDay);
+	////std::cout << "checkConstraints done. " << std::endl;
+	//if (checkConstraintsResult.result == false) {
+
+	//	printGraph(solutionListOfEachDay, GRAPH_LIMIT);
+	//	std::cout << "After rearranging the arrival time of each synchronized service" << std::endl;
+	//	std::cout << "Violation detected ----------------------------------" << std::endl;
+	//	for (std::string message : checkConstraintsResult.messages) {
+
+	//		std::cout << message << std::endl;
+	//	}
+	//	std::cout << "-----------------------------------------------------" << std::endl;
+	//}
 }
 
 double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double accumulatedPostponedDuration, bool firstLoop) {
@@ -1339,10 +1519,12 @@ double Solution::getObjectiveScore(const std::vector<std::vector<int>>& solution
 
 			if (solutionListOfEachDay[day][i] == -1) {
 
-				previousNode = 0;
-				continue;
+				currentNode = 0;
 			}
-			currentNode = solutionListOfEachDay[day][i];
+			else {
+
+				currentNode = solutionListOfEachDay[day][i];
+			}
 			if (currentNode == previousNode && currentNode == 0) {
 
 				continue;
@@ -1449,7 +1631,7 @@ void Solution::improveTimeConsistency(std::vector<std::vector<int>>& solutionLis
 				newScore = getViolationScore(alternativeSolution, FACTOR_OF_VIOLATION);
 				if (newScore == 0) {
 
-					//printGraph(SAListOfEachDay, GRAPH_LIMIT);
+					//printGraph(solutionListOfEachDay, GRAPH_LIMIT);
 					adjustDepartureTime(alternativeSolution);
 					newScore += getObjectiveScore(alternativeSolution);
 					CheckConstraintsResult checkConstraintsResult = checkConstraints(alternativeSolution);

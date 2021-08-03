@@ -19,7 +19,7 @@
 //>>>>>>> Stashed changes
 #include <iomanip>
 
-#define GRAPH_LIMIT 200
+#define GRAPH_LIMIT 650
 #define FACTOR_OF_VIOLATION 100000
 
 class PointAndType {
@@ -150,10 +150,11 @@ public:
     void output();
     virtual void solve() = 0;
 
+protected: 
+
 	// tmp at here, line 158
 	void calculateObjective(std::vector<std::vector<int>>& solutionListOfEachDay); 
-
-protected: 
+	//void calculateObjectiveInSimpleWay(std::vector<std::vector<int>>& solutionListOfEachDay);
 
 	// You can get the minimal violation score after executing this function. 
 	// If there's no violation, this function can promise that every node can't be pushed backward. 
