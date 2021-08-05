@@ -79,7 +79,7 @@ void LNS::solve() {
         if (newScore < bestScore) {
             bestS = newS;
             bestScore = newScore;
-            std::cout << "Best Score: " << newScore << std::endl;
+            //std::cout << "Best Score: " << newScore << std::endl;
         }
         T *= Alpha;
     }
@@ -97,9 +97,9 @@ void LNS::solve() {
     calculateObjective(Saft);
     adjustDepartureTime(Saft);
     CheckConstraintsResult checkConstraintsResult = checkConstraints(Saft);
-    printGraph(Saft, GRAPH_LIMIT);
+    //printGraph(Saft, GRAPH_LIMIT);
     std::cout << "Best score: " << bestScore << std::endl;
-    if (checkConstraintsResult.result == false) {
+    /*if (checkConstraintsResult.result == false) {
 
         std::cout << "Violation detected ----------------------------------" << std::endl;
         for (std::string message : checkConstraintsResult.messages) {
@@ -107,7 +107,7 @@ void LNS::solve() {
             std::cout << message << std::endl;
         }
         std::cout << "-----------------------------------------------------" << std::endl;
-    }
+    }*/
 }
 void LNS::genInitSolution(){
     curS.resize(nDays);
@@ -305,6 +305,8 @@ vector<int> LNS::findMSTAndCutIntoTwo(vector<int> nodes){
         while(idxMst < mst.size()){
             bool rmd = false;
             for (int rmdNode : curRmdNodes) {
+                if (idxMst >= mst.size())
+                    break;
                 for (int i : {0, 1}) {
                     if (mst[idxMst][i] == rmdNode) {
                         newCurRmdNodes.push_back(mst[idxMst][1 - i]);
@@ -333,7 +335,7 @@ void LNS::clusterRemoval(){
         while(u > 0 && routesLessThan3Node.size() < nRoutes){
             int route = rand() % nRoutes;
             while (newS[day][route].size() < 5)
-                route = rand() % nDays;
+                route = rand() % nRoutes;
                 
             vector<int> tmpNodes(newS[day][route].begin() + 1, newS[day][route].end() - 1);
             vector<int> newNodes = findMSTAndCutIntoTwo(tmpNodes);
