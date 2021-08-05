@@ -363,7 +363,7 @@ void LNS::worstRemoval_timeConsistency(){
 
         set<int> diffRoutes;
         int arrivalTimeMin = INT_MAX, arrivalTimeMax = 0;
-        for (int d = 0; d < nDays; d++) {
+        for (int d = 1; d < nDays; d++) {
             for (int r = 0; r < nRoutes; r++) {
                 for (int n : newS[d][r]) {
                     if (n == node) {
@@ -371,8 +371,10 @@ void LNS::worstRemoval_timeConsistency(){
                     }
                 }
             }
-            arrivalTimeMin = fmin(arrivalTimeMin, arrivalTimes[node][d]);
-            arrivalTimeMax = fmax(arrivalTimeMax, arrivalTimes[node][d]);
+            if (required[node][d]) {
+                arrivalTimeMin = fmin(arrivalTimeMin, arrivalTimes[node][d]);
+                arrivalTimeMax = fmax(arrivalTimeMax, arrivalTimes[node][d]);
+            }            
         }
         numOfDrivers.push_back(diffRoutes.size());
         arrivalTimeDiff.push_back(arrivalTimeMax - arrivalTimeMin);
