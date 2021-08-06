@@ -173,7 +173,6 @@ protected:
 	// This version can only deal with solutions with no violation. 
 	std::vector<int>* applyPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double PF, bool firstLoop);
 	// This version can only deal with solutions with no violation. 
-	// Haven't consider about 0's lastTime. 
     void adjustDepartureTime(std::vector<std::vector<int>>& solutionListOfEachDay);
 	// Variables for adjustDepartureTime
 	std::vector<std::vector<int>> nodesHavinglastArrivalTime;

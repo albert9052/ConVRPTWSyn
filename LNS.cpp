@@ -17,8 +17,8 @@ T avr(vector<T> arr){
 }
 
 LNS::LNS(){
-    
 }
+
 LNS::LNS(int _Iter, float _T0, float _Alpha, float _Lambda, float _Nu, float _Xi): 
 Iter(_Iter), T0(_T0), Alpha(_Alpha), Lambda(_Lambda), Nu(_Nu), Xi(_Xi){
     // I : number of iterations proceeds from the beginning of the algorithm
@@ -37,6 +37,7 @@ void LNS::solve() {
     float T = T0;
     genInitSolution();
     solutionList = curS;    //output();
+    std::cout << Iter << std::endl;
     for (int i = 0; i < Iter; i++) {
         newS = curS;
         rmdNodes.resize(nDays, {});
@@ -67,10 +68,13 @@ void LNS::solve() {
             Saft.push_back(v);
         }
         calculateObjective(Saft);
-        adjustDepartureTime(Saft);
-        //if (isFeasible()) improveTimeConsistency(Saft);
-
         double newScore = getViolationScore(Saft, 100000);
+		if (newScore == 0) {
+			adjustDepartureTime(Saft);
+			improveTimeConsistency(Saft);
+			newScore += getObjectiveScore(Saft);
+		}
+
         int r3 = rand()/RAND_MAX;
         if (r3 <= exp((newScore - curScore) / T)) {
             curS = newS;
@@ -94,8 +98,12 @@ void LNS::solve() {
         v.pop_back();
         Saft.push_back(v);
     }
-    calculateObjective(Saft);
-    adjustDepartureTime(Saft);
+    double newScore = getViolationScore(Saft, 100000);
+    if (newScore == 0) {
+        adjustDepartureTime(Saft);
+        improveTimeConsistency(Saft);
+        newScore += getObjectiveScore(Saft);
+    }
     CheckConstraintsResult checkConstraintsResult = checkConstraints(Saft);
     //printGraph(Saft, GRAPH_LIMIT);
     std::cout << "Best score: " << bestScore << std::endl;

@@ -140,7 +140,7 @@ void SA::solve() {
 
 				//printGraph(SAListOfEachDay, GRAPH_LIMIT);
 				adjustDepartureTime(SAListOfEachDay);
-				newScore += getObjectiveScore(SAListOfEachDay);
+				//newScore += getObjectiveScore(SAListOfEachDay);
 				CheckConstraintsResult checkConstraintsResult = checkConstraints(SAListOfEachDay);
 				//std::cout << "checkConstraints done. " << std::endl;
 				if (checkConstraintsResult.result == false) {
@@ -157,6 +157,28 @@ void SA::solve() {
 				}
 
 				improveTimeConsistency(SAListOfEachDay);
+				newScore += getObjectiveScore(SAListOfEachDay);
+				checkConstraintsResult = checkConstraints(SAListOfEachDay);
+				//std::cout << "checkConstraints done. " << std::endl;
+				if (checkConstraintsResult.result == false) {
+
+					printGraph(SAListOfEachDay, GRAPH_LIMIT);
+					std::cout << "After adjustDepartureTime" << std::endl;
+					std::cout << "Violation detected ----------------------------------" << std::endl;
+					for (std::string message : checkConstraintsResult.messages) {
+
+						std::cout << message << std::endl;
+					}
+					std::cout << "-----------------------------------------------------" << std::endl;
+					exit(1);
+				}
+				if (getViolationScore(SAListOfEachDay, FACTOR_OF_VIOLATION)) {
+
+					printGraph(SAListOfEachDay, GRAPH_LIMIT);
+					std::cout << "After ImproveTimeConssitenct" << std::endl;
+					std::cout << "Violation score is not zero" << std::endl;
+					exit(1);
+				}
 				//bool improved = improveTimeConsistency(SAListOfEachDay);
 				//if (improved) {
 
