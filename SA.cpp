@@ -12,6 +12,11 @@ SA::SA(/* args */) {
 
 void SA::solve() {
 
+	//for (int i = 0; i < correspondingList.size(); i++) {
+
+	//	std::cout << i << ": " << correspondingList[i] << std::endl;
+	//}
+
     if (isFirstTime == true) {
 
         isFirstTime = false;

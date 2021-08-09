@@ -152,6 +152,393 @@ void Solution::input() {
 		for (int d = 0; d < nDays; d++)
 			if (required[n][d])
 				requiredList[d].push_back(n);
+
+	correspondingList.resize(nNodes);
+	correspondingList[0] = 0;
+	for (int i = 1; i <= fictiveLink.size(); i++) {
+
+		correspondingList[i] = fictiveLink[i - 1];
+		if (fictiveLink[i - 1] != 0) {
+
+			correspondingList[fictiveLink[i - 1]] = i;
+		}
+	}
+
+	arrivalTimes = std::vector<std::vector<double>>(nNodes, (std::vector<double>(nDays, -1)));
+
+	departureTimes = std::vector<std::vector<double>>(nNodes, (std::vector<double>(nDays, -1)));
+	
+	postponedDuration = std::vector<std::vector<std::vector<double>>>(nDays, std::vector<std::vector<double>>(nNodes, std::vector<double>(nNodes, 0)));
+
+	daysOfEarliestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
+	daysOfLatestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
+}
+
+void Solution::readData(std::string input) {
+
+	int RC = 80;
+	int VN = 500;
+	FILE* infile;
+	char dispose[1000];
+	// open input file
+	infile = fopen(input.c_str(), "r");
+	if (infile == NULL)
+	{
+		std::cout << "Can't find this file" << std::endl;
+		exit(0);
+	}
+	int counts1 = 0, counts2 = 0, counts3 = 0;
+	for (int i = 0; i < 8; i++)  // dispose first three rows
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	int Single_service[1000];
+	for (int i = 0; i < VN; i++)  // Read Single service nodes
+	{
+		fscanf(infile, "%d", &Single_service[i]);
+		if (Single_service[i] == 0)
+		{
+			Single_service[i] = -1;
+			break;
+		}
+		counts1++;
+	}
+	//std::cout << "Single service : ";
+	//for (int i = 0; i < counts1; i++)
+	//{
+	//	std::cout << Single_service[i] << "\t";
+	//}
+	//std::cout << std::endl;
+	for (int i = 0; i < 4; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	int* Synchronized_services = (int*)malloc(sizeof(int) * VN);
+	for (int i = 0; i < VN; i++)  // Read Synchronized services nodes
+	{
+		fscanf(infile, "%d", &Synchronized_services[i]);
+		if (Synchronized_services[i] == 0)
+		{
+			Synchronized_services[i] = -1;
+			break;
+		}
+		counts2++;
+	}
+	nNormals = counts1 + counts2 / 2;
+	//std::cout << "nNormals: " << nNormals << std::endl;
+	nFictives = counts2 / 2;
+	//td::cout << "nFictives: " << nFictives << std::endl;
+	nCustomer = nNormals + nFictives;
+	//std::cout << "nCustomer: " << nCustomer << std::endl;
+	nNodes = nCustomer + 1;
+	//std::cout << "nNodes: " << nNodes << std::endl;
+	//std::cout << "Synchronized services : ";
+	//for (int i = 0; i < counts2; i++)
+	//{
+	//	std::cout << Synchronized_services[i] << "\t";
+	//}
+	//std::cout << std::endl;
+	for (int i = 0; i < 3; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	char Real_node[1000];
+	for (int i = 0; i < VN; i++)  // Read Shared1
+	{
+		fscanf(infile, "%d", &Real_node[i]);
+		if (Real_node[i] == 0)
+		{
+			Real_node[i] = -1;
+			break;
+		}
+		counts3++;
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	for (int i = 0; i < nCustomer; i++) {
+		fictiveLink.push_back(0);
+	}
+	for (int i = 0; i < counts3; i++)  // Read Shared2
+	{
+		int disposeInt;
+		fscanf(infile, "%d", &disposeInt);
+		fictiveLink[disposeInt - 1] = Real_node[i];
+	}
+	int node_number = nCustomer;  // Get Node numbers
+	//std::cout << "Synchronized Node : ";
+	//for (int i = 0; i < counts3; i++)
+	//	std::cout << Real_node[i] << "__" << Fictive_node[i] << "\t";
+	//std::cout << "hi" << std::endl;
+	//std::cout << std::endl;
+	for (int i = 0; i < 6; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	int vehicle_number;
+	fscanf(infile, "%d", &vehicle_number);  // Read Vehicle numbers
+	nRoutes = vehicle_number;
+	for (int i = 0; i < 3; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	fscanf(infile, "%d", &nDays);
+	//cout << "Vehicle : " << vehicle_number << endl;
+	for (int i = 0; i < 3; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	int T;
+	fscanf(infile, "%d", &T);  // Read Total time
+	//std::cout << "T: " << T << std::endl;
+	//cout << "Total time : " << T << endl;
+	for (int i = 0; i < 4 + nDays; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	for (int i = 0; i < node_number + 1; i++)  // Read Service time
+	{
+		//std::cout << serviceTime.size() << ": ";
+		fscanf(infile, "%s", dispose);
+		serviceTime.push_back(std::vector<float>());
+		for (int j = 0; j < nDays; j++)
+		{
+			serviceTime[i].push_back(0);
+			fscanf(infile, "%f", &serviceTime[i][j]);
+			if (i == 0 && serviceTime[i][j] != 0) {
+
+				exit(1);
+			}
+			//std::cout << serviceTime[i].size() << ", ";
+		}
+		//std::cout << std::endl;
+	}
+	/*cout << "Service Time ~~~~~~~~~~~~~~~~" << endl;
+	for (int i = 0; i < node_number + 1; i++)
+	{
+		cout << i << "\t";
+		for (int j = 0; j < nDays; j++)
+		{
+			cout << service_time[i][j] << "\t";
+		}
+		cout << endl;
+	}*/
+	for (int i = 0; i < 4 + node_number + 1; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	//cout << dispose;
+	for (int i = 0; i < node_number + 1; i++)  // Read Travelling time
+	{
+		fscanf(infile, "%s", dispose);
+		timeMat.push_back(std::vector<float>());
+		for (int j = 0; j < node_number + 1; j++)
+		{
+			timeMat[i].push_back(0);
+			fscanf(infile, "%f", &timeMat[i][j]);
+		}
+	}
+	/*cout << "Distance Matrix ~~~~~~~~~~~~~~~~" << endl;
+	cout << "\t";
+	for (int i = 0; i < node_number + 1; i++)
+		cout << i << "\t";
+	cout << endl;
+	for (int i = 0; i < node_number + 1; i++)
+	{
+		cout << i << "\t";
+		for (int j = 0; j < node_number + 1; j++)
+		{
+			cout << DistanceMatrix_Time[i][j] << "\t";
+		}
+		cout << endl;
+	}*/
+	for (int i = 0; i < 4 + nDays; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	int w[1000][100];
+	required.push_back(std::vector<bool>());
+	for (int i = 0; i < nDays; i++) {
+		required[0].push_back(false);
+	}
+	for (int i = 1; i < node_number + 1; i++)  // Read w
+	{
+		fscanf(infile, "%s", dispose);
+		required.push_back(std::vector<bool>());
+		for (int j = 0; j < nDays; j++)
+		{
+			fscanf(infile, "%d", &w[i][j]);
+			if (w[i][j] == 0) 
+			{
+				required[i].push_back(false);
+			}
+			else 
+			{
+				required[i].push_back(true);
+			}
+		}
+	}
+	/*cout << endl;
+	cout << "w ~~~~~~~~~~~~~~~~" << endl;
+	for (int i = 1; i < node_number + 1; i++)
+	{
+		cout << i << "\t";
+		for (int j = 0; j < nDays; j++)
+		{
+			if (w[i][j] == 0)
+				service_time[i][j] = 0;
+			cout << w[i][j] << "\t";
+		}
+		cout << endl;
+	}*/
+	for (int i = 0; i < 4 + nDays; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	for (int i = 0; i < node_number + 1; i++)  // Read Earliest time
+	{
+		//std::cout << earliestTime.size() << ": " << std::endl;
+		fscanf(infile, "%s", dispose);
+		earliestTime.push_back(std::vector<float>());
+		for (int j = 0; j < nDays; j++)
+		{
+			earliestTime[i].push_back(0);
+			//std::cout << earliestTime[i].size() << std::endl;
+			fscanf(infile, "%f", &earliestTime[i][j]);
+		}
+	}
+	/*cout << "Earliest Time ~~~~~~~~~~~~~~~~" << endl;
+	for (int i = 0; i < node_number + 1; i++)
+	{
+		cout << i << "\t";
+		for (int j = 0; j < nDays; j++)
+		{
+			cout << ready_time[i][j] << "\t";
+		}
+		cout << endl;
+	}*/
+	for (int i = 0; i < 4 + nDays; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	for (int i = 0; i < node_number + 1; i++)  // Read Latest time
+	{
+		fscanf(infile, "%s", dispose);
+		lastTime.push_back(std::vector<float>());
+		for (int j = 0; j < nDays; j++)
+		{
+			lastTime[i].push_back(0);
+			fscanf(infile, "%f", &lastTime[i][j]);
+		}
+	}
+	/*cout << "Latest Time ~~~~~~~~~~~~~~~~" << endl;
+	for (int i = 0; i < node_number + 1; i++)
+	{
+		cout << i << "\t";
+		for (int j = 0; j < nDays; j++)
+		{
+			cout << due_time[i][j] << "\t";
+		}
+		cout << endl;
+	}*/
+
+	std::cout << "Finish Read Data--------------------------------------------------------------------" << std::endl;
+
+	fclose(infile);
+
+    // below are data processing
+	requiredList.resize(nDays);
+	for (int n = 0; n < nCustomer; n++)
+		for (int d = 0; d < nDays; d++)
+			if (required[n][d])
+				requiredList[d].push_back(n);
+
+	correspondingList.resize(nNodes);
+	correspondingList[0] = 0;
+	for (int i = 1; i <= fictiveLink.size(); i++) {
+
+		correspondingList[i] = fictiveLink[i - 1];
+		if (fictiveLink[i - 1] != 0) {
+
+			correspondingList[fictiveLink[i - 1]] = i;
+		}
+	}
+
+	arrivalTimes = std::vector<std::vector<double>>(nNodes, (std::vector<double>(nDays, -1)));
+
+	departureTimes = std::vector<std::vector<double>>(nNodes, (std::vector<double>(nDays, -1)));
+	
+	postponedDuration = std::vector<std::vector<std::vector<double>>>(nDays, std::vector<std::vector<double>>(nNodes, std::vector<double>(nNodes, 0)));
+
+	daysOfEarliestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
+	daysOfLatestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
+}
+
+void Solution::printInput() {
+
+	std::cout << "nCustomer: " << nCustomer << std::endl;
+	std::cout << "nNodes: " << nNodes << std::endl;
+	std::cout << "nNormals: " << nNormals << std::endl;
+	std::cout << "nFictives: " << nFictives << std::endl;
+	std::cout << "nRoutes: " << nRoutes << std::endl;
+	std::cout << "nDays: " << nDays << std::endl;
+	std::cout << "fictiveLink: {" << fictiveLink[0];
+	for (int i = 1; i < fictiveLink.size(); i++) {
+
+		std::cout << ", " << fictiveLink[i];
+	}
+	std::cout << "}" << std::endl;
+	std::cout << "serviceTime: {" << std::endl;
+	for (int i = 0; i < serviceTime.size(); i++) {
+
+		std::cout << "\t{" << serviceTime[i][0];
+		for (int j = 1; j < serviceTime[i].size(); j++) {
+
+			std::cout << ", " << serviceTime[i][j];
+		}
+		std::cout << "}" << std::endl;
+	}
+	std::cout << "required: {" << std::endl;
+	for (int i = 0; i < required.size(); i++) {
+
+		std::cout << "\t{" << required[i][0];
+		for (int j = 1; j < required[i].size(); j++) {
+
+			std::cout << ", " << required[i][j];
+		}
+		std::cout << "}" << std::endl;
+	}
+	std::cout << "earliestTime: {" << std::endl;
+	for (int i = 0; i < earliestTime.size(); i++) {
+
+		std::cout << "\t{" << earliestTime[i][0];
+		for (int j = 1; j < earliestTime[i].size(); j++) {
+
+			std::cout << ", " << earliestTime[i][j];
+		}
+		std::cout << "}" << std::endl;
+	}
+	std::cout << "lastTime: {" << std::endl;
+	for (int i = 0; i < lastTime.size(); i++) {
+
+		std::cout << "\t{" << lastTime[i][0];
+		for (int j = 1; j < lastTime[i].size(); j++) {
+
+			std::cout << ", " << lastTime[i][j];
+		}
+		std::cout << "}" << std::endl;
+	}
+	std::cout << "timeMat: {" << std::endl;
+	for (int i = 0; i < timeMat.size(); i++) {
+
+		std::cout << "\t{" << timeMat[i][0];
+		for (int j = 1; j < timeMat[i].size(); j++) {
+
+			std::cout << ", " << timeMat[i][j];
+		}
+		std::cout << "}" << std::endl;
+	}
 }
 
 void Solution::output(){ 

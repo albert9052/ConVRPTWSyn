@@ -18,6 +18,7 @@
 #include <limits>
 //>>>>>>> Stashed changes
 #include <iomanip>
+#include <fstream>
 
 #define GRAPH_LIMIT 650
 #define FACTOR_OF_VIOLATION 100000
@@ -125,28 +126,10 @@ public:
 
     Solution() {
 
-        input();
-
-		arrivalTimes = std::vector<std::vector<double>>(nNodes, (std::vector<double>(nDays, -1)));
-
-		departureTimes = std::vector<std::vector<double>>(nNodes, (std::vector<double>(nDays, -1)));
-		
-		postponedDuration = std::vector<std::vector<std::vector<double>>>(nDays, std::vector<std::vector<double>>(nNodes, std::vector<double>(nNodes, 0)));
-
-		correspondingList.resize(nNodes);
-		correspondingList[0] = 0;
-		for (int i = 1; i <= fictiveLink.size(); i++) {
-
-			correspondingList[i] = fictiveLink[i - 1];
-			if (fictiveLink[i - 1] != 0) {
-
-				correspondingList[fictiveLink[i - 1]] = i;
-			}
-		}
-		daysOfEarliestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
-		daysOfLatestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
     }
     void input();
+	void readData(std::string input);
+	void printInput();
     void output();
     virtual void solve() = 0;
 
