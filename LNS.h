@@ -28,8 +28,9 @@ private:
 
     void repair();
     void greedyRepair();
-    void regretRepair();
+    void regretRepair(int);
 
+    vector<vector<int>> transFormat(const vector<vector<vector<int>>>& v);
     //void calculateObjectiveAndadjustDepartureTime(const vector<vector<vector<int>>>& bef);
 public:
     LNS();

@@ -17,8 +17,8 @@ T avr(vector<T> arr){
 }
 
 LNS::LNS(){
+    
 }
-
 LNS::LNS(int _Iter, float _T0, float _Alpha, float _Lambda, float _Nu, float _Xi): 
 Iter(_Iter), T0(_T0), Alpha(_Alpha), Lambda(_Lambda), Nu(_Nu), Xi(_Xi){
     // I : number of iterations proceeds from the beginning of the algorithm
@@ -31,19 +31,30 @@ Iter(_Iter), T0(_T0), Alpha(_Alpha), Lambda(_Lambda), Nu(_Nu), Xi(_Xi){
 //    // for calculate obj
 //    
 //}
-
+vector<vector<int>> LNS::transFormat(const vector<vector<vector<int>>>& v) {
+    vector<vector<int>> ans;
+    for (const vector<vector<int>>& vvbef : newS) {
+        vector<int> v;
+        for (const vector<int>& vbef : vvbef) {
+            v.insert(v.end(), vbef.begin() + 1, vbef.end() - 1);
+            v.push_back(-1);
+        }
+        v.pop_back();
+        ans.push_back(v);
+    }
+    return ans;
+}
 void LNS::solve() {
 
     float T = T0;
     genInitSolution();
-    solutionList = curS;    //output();
-    std::cout << Iter << std::endl;
+    //solutionList = curS;    output();
     for (int i = 0; i < Iter; i++) {
         newS = curS;
         rmdNodes.resize(nDays, {});
         //cout << endl << endl << "   ====  " << i << "  ====" << endl;
         removal();
-        solutionList = newS;        //output();
+        //solutionList = newS;        output();
 
         /*cout << endl << " Removed Nodes " <<endl;
         for (int d = 0; d < nDays; d++) {
@@ -54,28 +65,18 @@ void LNS::solve() {
             
 
         repair();
-        solutionList = newS;        //output();
+        //solutionList = newS;        output();
         rmdNodes.clear();
         
-        vector<vector<int>> Saft;
-        for (const vector<vector<int>>& vvbef : newS) {
-            vector<int> v;
-            for (const vector<int>& vbef : vvbef) {
-                v.insert(v.end(), vbef.begin() + 1, vbef.end() - 1);
-                v.push_back(-1);
-            }
-            v.pop_back();
-            Saft.push_back(v);
-        }
-        calculateObjective(Saft);
-        double newScore = getViolationScore(Saft, 100000);
-		if (newScore == 0) {
-			adjustDepartureTime(Saft);
-			improveTimeConsistency(Saft);
-			newScore += getObjectiveScore(Saft);
-		}
+        vector<vector<int>> Saft = transFormat(newS);
 
-        int r3 = rand()/RAND_MAX;
+        calculateObjective(Saft);
+        adjustDepartureTime(Saft);
+        improveTimeConsistency(Saft);
+
+        double newScore = getViolationScore(Saft, FACTOR_OF_VIOLATION);
+        //cout << newScore << std::endl;
+        int r3 = rand() / RAND_MAX;
         if (r3 <= exp((newScore - curScore) / T)) {
             curS = newS;
             curScore = newScore;
@@ -83,31 +84,19 @@ void LNS::solve() {
         if (newScore < bestScore) {
             bestS = newS;
             bestScore = newScore;
-            //std::cout << "Best Score: " << newScore << std::endl;
+            std::cout << "Best Score: " << newScore << std::endl;
         }
         T *= Alpha;
     }
 
-    vector<vector<int>> Saft;
-    for (const vector<vector<int>>& vvbef : bestS) {
-        vector<int> v;
-        for (const vector<int>& vbef : vvbef) {
-            v.insert(v.end(), vbef.begin() + 1, vbef.end() - 1);
-            v.push_back(-1);
-        }
-        v.pop_back();
-        Saft.push_back(v);
-    }
-    double newScore = getViolationScore(Saft, 100000);
-    if (newScore == 0) {
-        adjustDepartureTime(Saft);
-        improveTimeConsistency(Saft);
-        newScore += getObjectiveScore(Saft);
-    }
+    vector<vector<int>> Saft = transFormat(newS);
+
+    calculateObjective(Saft);
+    adjustDepartureTime(Saft);
     CheckConstraintsResult checkConstraintsResult = checkConstraints(Saft);
-    //printGraph(Saft, GRAPH_LIMIT);
+    printGraph(Saft, GRAPH_LIMIT);
     std::cout << "Best score: " << bestScore << std::endl;
-    /*if (checkConstraintsResult.result == false) {
+    if (checkConstraintsResult.result == false) {
 
         std::cout << "Violation detected ----------------------------------" << std::endl;
         for (std::string message : checkConstraintsResult.messages) {
@@ -115,7 +104,7 @@ void LNS::solve() {
             std::cout << message << std::endl;
         }
         std::cout << "-----------------------------------------------------" << std::endl;
-    }*/
+    }
 }
 void LNS::genInitSolution(){
     curS.resize(nDays);
@@ -196,13 +185,14 @@ void LNS::removal(){
 }
 int LNS::rmFromEachday(int node){    
     int ans = 0;
-    for(int d = 0; d < nDays; d++){
-        rmdNodes[d].push_back(node);
+    for(int d = 0; d < nDays; d++){        
         for(int r = 0; r < nRoutes; r++){
             for(int n = 0; n < newS[d][r].size(); n++){
                 if(newS[d][r][n] == node){
                     newS[d][r].erase(newS[d][r].begin() + n);
                     ans++;
+                    rmdNodes[d].push_back(node);
+                    break;
                 }
             }
         }
@@ -243,7 +233,10 @@ void LNS::relatedRemoval(){
     int rmNode = rand() % nCustomer + 1, u = getu();
     u -= rmFromEachday(rmNode);
     while(u > 0){
-        int refNode = rmdNodes[0][rand() % rmdNodes[0].size()], minSimilarity = INT_MAX;
+        int randIdx = rand() % (rmdNodes[0].size() + rmdNodes[1].size() + rmdNodes[2].size()), refNode, minSimilarity = INT_MAX;
+        if (randIdx < rmdNodes[0].size())refNode = rmdNodes[0][randIdx];
+        else if (randIdx < rmdNodes[0].size() + rmdNodes[1].size())refNode = rmdNodes[1][randIdx - rmdNodes[0].size()];
+        else refNode = rmdNodes[2][randIdx - rmdNodes[0].size() - rmdNodes[1].size()];
         for(int n = 1; n <= nCustomer; n++){
             if(!in(n, rmdNodes[0])){
                 int similarity = R(refNode, n);
@@ -406,16 +399,33 @@ void LNS::synchronized_servicesCustomerRemoval(){
         rmFromEachday(i);
 }
 void LNS::repair(){
-    switch (rand() % 2) {
+    switch (rand() % 6) {
     case 0:
         //cout << endl << " greedyRepair" << endl;
         greedyRepair();
         break;
     case 1:
+        //cout << endl << " greedyRepair" << endl;
+        greedyRepair();
+        break;
+    case 2:
         //cout << endl << " regretRepair" << endl;
-        regretRepair();
+        regretRepair(2);
+        break;
+    case 3:
+        //cout << endl << " regretRepair" << endl;
+        regretRepair(3);
+        break;
+    case 4:
+        //cout << endl << " regretRepair" << endl;
+        regretRepair(4);
+        break;
+    case 5:
+        //cout << endl << " regretRepair" << endl;
+        regretRepair(5);
         break;
     }
+
 }
 void LNS::greedyRepair(){
     for(int d = 0; d < nDays; d++){        
@@ -446,19 +456,15 @@ void LNS::greedyRepair(){
         }
     }
 }
-void LNS::regretRepair(){
-    for(int d = 0; d < nDays; d++){
-        vector<int> tmpRmd;
-        for(int node : rmdNodes[d])
-            if(required[node][d])
-                tmpRmd.push_back(node);                     
-        while(tmpRmd.size() > 0){
+void LNS::regretRepair(int q){
+    for(int d = 0; d < nDays; d++){                    
+        while(rmdNodes[d].size() > 0){
             double maxDiff = 0;
             int bestIdxInRmd = -1, bestRoute, bestIdxInRut;
-            for(int nodeIdx = 0; nodeIdx < tmpRmd.size(); nodeIdx++){
+            for(int nodeIdx = 0; nodeIdx < rmdNodes[d].size(); nodeIdx++){
                 double minCost1 = 100000.0, minCost2 = 100000.0;
                 int bestIdxInRmd1 = -1, bestRoute1, bestIdxInRut1;
-                int node = tmpRmd[nodeIdx];                      
+                int node = rmdNodes[d][nodeIdx];
                 for(int j = 0; j < nRoutes; j++){
                     for(int k = 1; k < newS[d][j].size(); k++){
                         double cost = timeMat[node][newS[d][j][k]] + timeMat[node][newS[d][j][k - 1]];
@@ -481,8 +487,8 @@ void LNS::regretRepair(){
                     bestIdxInRut = bestIdxInRut1;
                 }
             }
-            newS[d][bestRoute].insert(newS[d][bestRoute].begin() + bestIdxInRut, tmpRmd[bestIdxInRmd]);
-            tmpRmd.erase(tmpRmd.begin()+bestIdxInRmd);
+            newS[d][bestRoute].insert(newS[d][bestRoute].begin() + bestIdxInRut, rmdNodes[d][bestIdxInRmd]);
+            rmdNodes[d].erase(rmdNodes[d].begin()+bestIdxInRmd);
         }
     }
 }
