@@ -27,8 +27,11 @@ private:
     vector<int> findMSTAndCutIntoTwo(vector<int> nodes);
 
     void repair();
-    void greedyRepair();
-    void regretRepair(int);
+    void greedyInsertion();
+    void regretInsertion(int);
+    void earliestInsertion();
+    void latestInsertion();
+
 
     vector<vector<int>> transFormat(const vector<vector<vector<int>>>& v);
     //void calculateObjectiveAndadjustDepartureTime(const vector<vector<vector<int>>>& bef);

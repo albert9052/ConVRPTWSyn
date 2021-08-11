@@ -402,32 +402,32 @@ void LNS::repair(){
     switch (rand() % 6) {
     case 0:
         //cout << endl << " greedyRepair" << endl;
-        greedyRepair();
+        greedyInsertion();
         break;
     case 1:
         //cout << endl << " greedyRepair" << endl;
-        greedyRepair();
+        greedyInsertion();
         break;
     case 2:
         //cout << endl << " regretRepair" << endl;
-        regretRepair(2);
+        regretInsertion(2);
         break;
     case 3:
         //cout << endl << " regretRepair" << endl;
-        regretRepair(3);
+        regretInsertion(3);
         break;
     case 4:
         //cout << endl << " regretRepair" << endl;
-        regretRepair(4);
+        regretInsertion(4);
         break;
     case 5:
         //cout << endl << " regretRepair" << endl;
-        regretRepair(5);
+        regretInsertion(5);
         break;
     }
 
 }
-void LNS::greedyRepair(){
+void LNS::greedyInsertion(){
     for(int d = 0; d < nDays; d++){        
         vector<int> tmpRmd = rmdNodes[d];
         while(tmpRmd.size() > 0){
@@ -456,7 +456,7 @@ void LNS::greedyRepair(){
         }
     }
 }
-void LNS::regretRepair(int q){
+void LNS::regretInsertion(int q){
     for(int d = 0; d < nDays; d++){                    
         while(rmdNodes[d].size() > 0){
             double maxDiff = 0;
@@ -493,4 +493,10 @@ void LNS::regretRepair(int q){
     }
 }
 
-    
+void LNS::earliestInsertion() {
+
+}
+
+void LNS::latestInsertion() {
+
+}
