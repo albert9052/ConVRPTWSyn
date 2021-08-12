@@ -67,20 +67,12 @@ void LNS::solve() {
 
         calculateObjective(Saft);
         adjustDepartureTime(Saft);
-<<<<<<< HEAD
         newS.score = getViolationScore(Saft, FACTOR_OF_VIOLATION);
         newS.arrivalTimes = arrivalTimes;
 
         if (newS.score == 0)  improveTimeConsistency(Saft); 
 
         newS.score += getObjectiveScore(Saft);
-=======
-        newScore = getViolationScore(Saft, FACTOR_OF_VIOLATION);
-
-        if (newScore == 0)  improveTimeConsistency(Saft); 
-
-        newScore += getObjectiveScore(Saft);
->>>>>>> d12f3e67031cb75a112f644cb69137cbca7e5fff
 
         int r3 = rand() / RAND_MAX;
         if (r3 <= exp((newS.score - curS.score) / T)) {
@@ -88,22 +80,13 @@ void LNS::solve() {
         }
         if (newS.score < bestS.score) {
             bestS = newS;
-<<<<<<< HEAD
             std::cout << "Best Score: " << bestS.score << std::endl;
             int a = 1;
-=======
-            bestScore = newScore;
-            std::cout << "Best Score: " << bestScore << std::endl;
->>>>>>> d12f3e67031cb75a112f644cb69137cbca7e5fff
         }
         T *= Alpha;
     }
 
-<<<<<<< HEAD
     vector<vector<int>> Saft = transFormat(bestS.list);
-=======
-    vector<vector<int>> Saft = transFormat(bestS);
->>>>>>> d12f3e67031cb75a112f644cb69137cbca7e5fff
     calculateObjective(Saft);
     adjustDepartureTime(Saft);
     cout << getViolationScore(Saft, FACTOR_OF_VIOLATION) << endl;
@@ -452,13 +435,8 @@ void LNS::randomInsertion() {
     for (int d = 0; d < nDays; d++) {
         vector<int> tmpRmd = rmdNodes[d];
         for (int& node : tmpRmd) {
-<<<<<<< HEAD
             int route = rand() % nRoutes, pos = rand() % (newS.list[d][route].size() - 1) + 1;
             newS.list[d][route].insert(newS.list[d][route].begin() + pos, node);
-=======
-            int route = rand() % nRoutes, pos = rand() % (newS[d][route].size() - 1) + 1;
-            newS[d][route].insert(newS[d][route].begin() + pos, node);
->>>>>>> d12f3e67031cb75a112f644cb69137cbca7e5fff
         }
     }
 }
@@ -531,11 +509,7 @@ void LNS::regretInsertion(int q){
 void LNS::earliestInsertion() {
     for (int d = 0; d < nDays; d++) {
         int route = rand() % nRoutes;
-<<<<<<< HEAD
         for (int idx = 0; idx < newS.list[d][route].size(); idx++) {
-=======
-        for (int idx = 0; idx < newS[d][route].size(); idx++) {
->>>>>>> d12f3e67031cb75a112f644cb69137cbca7e5fff
 
         }
     }
