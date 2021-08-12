@@ -1,15 +1,23 @@
 #include "Solution.h"
 using namespace std;
 
+struct aSolution {
+    vector<vector<vector<int>>> list;
+    vector<vector<double>> arrivalTimes;
+    double score;
+};
+
 class LNS :  public Solution
 {
 private:
     int Iter;
     float T0, Alpha, Lambda, Nu, Xi;
 
-    double bestScore = (double)INT_MAX, curScore = (double)INT_MAX;
+    aSolution bestS, curS, newS;
 
-    vector<vector<vector<int>>> bestS, curS, newS;
+    //double bestScore = (double)INT_MAX, curScore = (double)INT_MAX;
+    //vector<vector<vector<int>>> bestS, curS, newS;
+    
     vector<vector<int>> rmdNodes; //day * tmp rmd nodes, 1~nNodes
 
     void genInitSolution();
@@ -26,7 +34,8 @@ private:
     int getu();
     vector<int> findMSTAndCutIntoTwo(vector<int> nodes);
 
-    void repair();
+    void insertion();
+    void randomInsertion();
     void greedyInsertion();
     void regretInsertion(int);
     void earliestInsertion();
