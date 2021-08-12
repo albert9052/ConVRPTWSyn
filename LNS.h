@@ -13,7 +13,8 @@ private:
     int Iter;
     float T0, Alpha, Lambda, Nu, Xi;
 
-    aSolution bestS, curS, newS;
+    vector<vector<vector<int>>> bestS, curS, newS;
+    double bestScore, curScore, newScore;
 
     //double bestScore = (double)INT_MAX, curScore = (double)INT_MAX;
     //vector<vector<vector<int>>> bestS, curS, newS;
