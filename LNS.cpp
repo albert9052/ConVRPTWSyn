@@ -234,7 +234,7 @@ void LNS::relatedRemoval(){
         else if (randIdx < rmdNodes[0].size() + rmdNodes[1].size())refNode = rmdNodes[1][randIdx - rmdNodes[0].size()];
         else refNode = rmdNodes[2][randIdx - rmdNodes[0].size() - rmdNodes[1].size()];
         for(int n = 1; n <= nCustomer; n++){
-            if(!in(n, rmdNodes[0])){
+            if(!in(n, rmdNodes[0])&& !in(n, rmdNodes[1])&& !in(n, rmdNodes[2])){
                 int similarity = R(refNode, n);
                 if(similarity < minSimilarity){
                     minSimilarity = similarity;
