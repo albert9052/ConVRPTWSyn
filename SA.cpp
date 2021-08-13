@@ -2,14 +2,6 @@
 
 bool SA::isFirstTime = true;
 
-SA::SA(/* args */) {
-
-	Ts = 100000000000;
-	Te = 0.0000000000001;
-	numberOfIterations = 100000;
-	Alpha = 0.1;
-}
-
 void SA::solve() {
 
 	//for (int i = 0; i < correspondingList.size(); i++) {
@@ -94,6 +86,9 @@ void SA::solve() {
 			//SAListOfEachDay[0] = {6, 7, 1, 20, 8, -1, 14, 19, 3, 9, -1, 11, 16, 13, 15, 10, -1, 18};
 			//SAListOfEachDay[1] = {6, 1, 8, -1, 19, -1, 11, 13, 10, -1, 12, 17, 2, 18};
 			//SAListOfEachDay[2] = {6, 7, 20, 8, -1, 14, 3, 9, -1, 16, 13, 15, 10, -1, 12, 17, 4, 5};
+			//SAListOfEachDay[0] = {6, -1, 1, 5, 3, -1, 4};
+			//SAListOfEachDay[1] = {4, -1, 2, 1, 5, -1, 7, 6};
+			//SAListOfEachDay[2] = {6, -1, 1, 3, -1};
 
 			// Adjust the arrival time and departure time to get the minimum violation. 
             calculateObjective(SAListOfEachDay);
@@ -144,9 +139,26 @@ void SA::solve() {
 			if (newScore == 0) {
 
 				//printGraph(SAListOfEachDay, GRAPH_LIMIT);
-				adjustDepartureTime(SAListOfEachDay);
 				//newScore += getObjectiveScore(SAListOfEachDay);
 				CheckConstraintsResult checkConstraintsResult = checkConstraints(SAListOfEachDay);
+				//std::cout << "checkConstraints done. " << std::endl;
+				if (checkConstraintsResult.result == false) {
+
+					printGraph(SAListOfEachDay, GRAPH_LIMIT);
+					std::cout << "After calculateObjective" << std::endl;
+					std::cout << "Violation detected ----------------------------------" << std::endl;
+					for (std::string message : checkConstraintsResult.messages) {
+
+						std::cout << message << std::endl;
+					}
+					std::cout << "-----------------------------------------------------" << std::endl;
+					exit(1);
+				}
+
+				//printGraph(SAListOfEachDay, GRAPH_LIMIT);
+				adjustDepartureTime(SAListOfEachDay);
+				//newScore += getObjectiveScore(SAListOfEachDay);
+				checkConstraintsResult = checkConstraints(SAListOfEachDay);
 				//std::cout << "checkConstraints done. " << std::endl;
 				if (checkConstraintsResult.result == false) {
 
@@ -168,7 +180,7 @@ void SA::solve() {
 				if (checkConstraintsResult.result == false) {
 
 					printGraph(SAListOfEachDay, GRAPH_LIMIT);
-					std::cout << "After adjustDepartureTime" << std::endl;
+					std::cout << "After improveTimeConsistency" << std::endl;
 					std::cout << "Violation detected ----------------------------------" << std::endl;
 					for (std::string message : checkConstraintsResult.messages) {
 
@@ -218,7 +230,7 @@ void SA::solve() {
 
                 bestSA.assign(SAListOfEachDay.begin(), SAListOfEachDay.end());
 				bestScore = newScore;
-				std::cout << "Best Score: " << newScore << std::endl;
+				//std::cout << "Best Score: " << newScore << std::endl;
 				//printGraph(SAListOfEachDay, GRAPH_LIMIT);
             }
 
@@ -244,18 +256,20 @@ void SA::solve() {
 
 	calculateObjective(bestSA);
 	adjustDepartureTime(bestSA);
-	CheckConstraintsResult checkConstraintsResult = checkConstraints(bestSA);
-	printGraph(bestSA, GRAPH_LIMIT);
-	std::cout << "Best score: " << bestScore << std::endl;
-	if (checkConstraintsResult.result == false) {
+	//CheckConstraintsResult checkConstraintsResult = checkConstraints(bestSA);
+	//printGraph(bestSA, GRAPH_LIMIT);
+	//std::cout << "Best score: " << bestScore << std::endl;
+	//if (checkConstraintsResult.result == false) {
 
-		std::cout << "Violation detected ----------------------------------" << std::endl;
-		for (std::string message : checkConstraintsResult.messages) {
+	//	std::cout << "Violation detected ----------------------------------" << std::endl;
+	//	for (std::string message : checkConstraintsResult.messages) {
 
-			std::cout << message << std::endl;
-		}
-		std::cout << "-----------------------------------------------------" << std::endl;
-	}
+	//		std::cout << message << std::endl;
+	//	}
+	//	std::cout << "-----------------------------------------------------" << std::endl;
+	//}
+
+	bestSolution = std::vector<std::vector<int>>(bestSA);
 }
 
 void SA::tweakSolutionByInsertion(std::vector<std::vector<int>>& SAListOfEachDay) {
@@ -360,4 +374,11 @@ void Smallest::resetAll(int _value) {
 
 		value[i] = _value;
 	}
+}
+
+double SA::getTheBestScore() {
+
+	calculateObjective(bestSolution);
+	adjustDepartureTime(bestSolution);
+	return getObjectiveScore(bestSolution) + getViolationScore(bestSolution, FACTOR_OF_VIOLATION);
 }

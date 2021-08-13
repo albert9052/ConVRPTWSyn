@@ -2,7 +2,7 @@
 
 void Solution::input() {
     
-	/*nCustomer = 7;
+	nCustomer = 7;
     nNodes = 8;
     nNormals = 5;
     nFictives = 2;
@@ -20,131 +20,131 @@ void Solution::input() {
                 {2.6174, 10.341, 0.717, 2.8158, 100000, 6.4784, 10.341, 0.717},
                 {9.0958, 5.2756, 5.809, 5.7838, 6.4784, 100000, 5.2756, 5.809},
                 {12.751, 100000, 9.8491, 8.2998, 10.341, 5.2756, 100000, 9.8491},
-                {3.302, 9.8491, 100000, 2.82, 0.717, 5.809, 9.8491, 100000} };*/
+                {3.302, 9.8491, 100000, 2.82, 0.717, 5.809, 9.8491, 100000} };
 	
 	// case_1_20_4_2_2
-	nCustomer = 20;
-	nNodes = 21;
-	nNormals = 18;
-	nFictives = 2;
-	nRoutes = 4;
-	nDays = 3;
-	fictiveLink = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3};
-	serviceTime = {
-		{0, 0, 0}, 
-		{139, 139, 139}, 
-		{37, 37, 37}, 
-		{32, 32, 32}, 
-		{102, 102, 102}, 
-		{72, 72, 72}, 
-		{75, 75, 75}, 
-		{49, 49, 49}, 
-		{98, 98, 98}, 
-		{107, 107, 107}, 
-		{37, 37, 37}, 
-		{25, 25, 25}, 
-		{88, 88, 88}, 
-		{47, 47, 47}, 
-		{118, 118, 118}, 
-		{131, 131, 131}, 
-		{63, 63, 63}, 
-		{52, 52, 52}, 
-		{69, 69, 69}, 
-		{139, 139, 139}, 
-		{32, 32, 32}, 
-	};
-	required = {
-		{0, 0, 0}, 
-		{1, 1, 0}, 
-		{0, 1, 0}, 
-		{1, 0, 1}, 
-		{0, 0, 1}, 
-		{0, 0, 1}, 
-		{1, 1, 1}, 
-		{1, 0, 1}, 
-		{1, 1, 1}, 
-		{1, 0, 1}, 
-		{1, 1, 1}, 
-		{1, 1, 0}, 
-		{0, 1, 1}, 
-		{1, 1, 1}, 
-		{1, 0, 1}, 
-		{1, 0, 1}, 
-		{1, 0, 1}, 
-		{0, 1, 1}, 
-		{1, 1, 0}, 
-		{1, 1, 0}, 
-		{1, 0, 1}, 
-	};
-	earliestTime = {
-		{0, 0, 0}, 
-		{170, 170, 170}, 
-		{284, 284, 284}, 
-		{339, 339, 339}, 
-		{447, 447, 447}, 
-		{536, 536, 536}, 
-		{0, 0, 0}, 
-		{38, 38, 38}, 
-		{413, 413, 413}, 
-		{358, 358, 358}, 
-		{566, 566, 566}, 
-		{0, 0, 0}, 
-		{0, 0, 0}, 
-		{97, 97, 97}, 
-		{165, 165, 165}, 
-		{355, 355, 355}, 
-		{0, 0, 0}, 
-		{4, 4, 4}, 
-		{270, 270, 270}, 
-		{170, 170, 170}, 
-		{339, 339, 339}, 
-	};
-	lastTime = {
-		{695, 695, 695}, 
-		{288, 288, 288}, 
-		{378, 378, 378}, 
-		{497, 497, 497}, 
-		{560, 560, 560}, 
-		{684, 684, 684}, 
-		{29, 29, 29}, 
-		{136, 136, 136}, 
-		{492, 492, 492}, 
-		{549, 549, 549}, 
-		{667, 667, 667}, 
-		{88, 88, 88}, 
-		{107, 107, 107}, 
-		{206, 206, 206}, 
-		{333, 333, 333}, 
-		{419, 419, 419}, 
-		{72, 72, 72}, 
-		{172, 172, 172}, 
-		{400, 400, 400}, 
-		{288, 288, 288}, 
-		{497, 497, 497}, 
-	};
-	timeMat = {
-		{0, 21, 18, 20, 22, 23, 7, 18, 13, 18, 13, 9, 11, 19, 19, 19, 17, 26, 13, 21, 20}, 
-		{21, 10000, 23, 3, 42, 43, 23, 25, 14, 4, 33, 29, 29, 38, 3, 39, 37, 40, 24, 10000, 3}, 
-		{18, 23, 10000, 23, 35, 36, 25, 35, 25, 20, 23, 22, 17, 35, 23, 31, 24, 19, 7, 23, 23}, 
-		{20, 3, 23, 10000, 40, 41, 22, 23, 12, 4, 32, 28, 28, 36, 2, 38, 36, 40, 24, 3, 10000}, 
-		{22, 42, 35, 40, 10000, 2, 20, 27, 31, 39, 13, 14, 18, 7, 39, 4, 14, 29, 28, 42, 40}, 
-		{23, 43, 36, 41, 2, 10000, 20, 27, 32, 40, 14, 15, 19, 7, 40, 6, 15, 30, 29, 43, 41}, 
-		{7, 23, 25, 22, 20, 20, 10000, 12, 12, 21, 15, 10, 15, 15, 21, 18, 20, 31, 20, 23, 22}, 
-		{18, 25, 35, 23, 27, 27, 12, 10000, 13, 24, 26, 22, 27, 21, 23, 27, 31, 43, 31, 25, 23}, 
-		{13, 14, 25, 12, 31, 32, 12, 13, 10000, 12, 25, 20, 23, 26, 11, 29, 30, 37, 23, 14, 12}, 
-		{18, 4, 20, 4, 39, 40, 21, 24, 12, 10000, 30, 26, 26, 35, 3, 36, 34, 36, 21, 4, 4}, 
-		{13, 33, 23, 32, 13, 14, 15, 26, 25, 30, 10000, 5, 6, 14, 31, 9, 6, 19, 16, 33, 32}, 
-		{9, 29, 22, 28, 14, 15, 10, 22, 20, 26, 5, 10000, 7, 13, 27, 11, 10, 22, 15, 29, 28}, 
-		{11, 29, 17, 28, 18, 19, 15, 27, 23, 26, 6, 7, 10000, 19, 27, 14, 8, 16, 10, 29, 28}, 
-		{19, 38, 35, 36, 7, 7, 15, 21, 26, 35, 14, 13, 19, 10000, 35, 8, 17, 32, 28, 38, 36}, 
-		{19, 3, 23, 2, 39, 40, 21, 23, 11, 3, 31, 27, 27, 35, 10000, 37, 35, 39, 23, 3, 2}, 
-		{19, 39, 31, 38, 4, 6, 18, 27, 29, 36, 9, 11, 14, 8, 37, 10000, 10, 25, 24, 39, 38}, 
-		{17, 37, 24, 36, 14, 15, 20, 31, 30, 34, 6, 10, 8, 17, 35, 10, 10000, 16, 17, 37, 36}, 
-		{26, 40, 19, 40, 29, 30, 31, 43, 37, 36, 19, 22, 16, 32, 39, 25, 16, 10000, 16, 40, 40}, 
-		{13, 24, 7, 24, 28, 29, 20, 31, 23, 21, 16, 15, 10, 28, 23, 24, 17, 16, 10000, 24, 24}, 
-		{21, 10000, 23, 3, 42, 43, 23, 25, 14, 4, 33, 29, 29, 38, 3, 39, 37, 40, 24, 10000, 3}, 
-		{20, 3, 23, 10000, 40, 41, 22, 23, 12, 4, 32, 28, 28, 36, 2, 38, 36, 40, 24, 3, 10000}, 
-	};
+	//nCustomer = 20;
+	//nNodes = 21;
+	//nNormals = 18;
+	//nFictives = 2;
+	//nRoutes = 4;
+	//nDays = 3;
+	//fictiveLink = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3};
+	//serviceTime = {
+	//	{0, 0, 0}, 
+	//	{139, 139, 139}, 
+	//	{37, 37, 37}, 
+	//	{32, 32, 32}, 
+	//	{102, 102, 102}, 
+	//	{72, 72, 72}, 
+	//	{75, 75, 75}, 
+	//	{49, 49, 49}, 
+	//	{98, 98, 98}, 
+	//	{107, 107, 107}, 
+	//	{37, 37, 37}, 
+	//	{25, 25, 25}, 
+	//	{88, 88, 88}, 
+	//	{47, 47, 47}, 
+	//	{118, 118, 118}, 
+	//	{131, 131, 131}, 
+	//	{63, 63, 63}, 
+	//	{52, 52, 52}, 
+	//	{69, 69, 69}, 
+	//	{139, 139, 139}, 
+	//	{32, 32, 32}, 
+	//};
+	//required = {
+	//	{0, 0, 0}, 
+	//	{1, 1, 0}, 
+	//	{0, 1, 0}, 
+	//	{1, 0, 1}, 
+	//	{0, 0, 1}, 
+	//	{0, 0, 1}, 
+	//	{1, 1, 1}, 
+	//	{1, 0, 1}, 
+	//	{1, 1, 1}, 
+	//	{1, 0, 1}, 
+	//	{1, 1, 1}, 
+	//	{1, 1, 0}, 
+	//	{0, 1, 1}, 
+	//	{1, 1, 1}, 
+	//	{1, 0, 1}, 
+	//	{1, 0, 1}, 
+	//	{1, 0, 1}, 
+	//	{0, 1, 1}, 
+	//	{1, 1, 0}, 
+	//	{1, 1, 0}, 
+	//	{1, 0, 1}, 
+	//};
+	//earliestTime = {
+	//	{0, 0, 0}, 
+	//	{170, 170, 170}, 
+	//	{284, 284, 284}, 
+	//	{339, 339, 339}, 
+	//	{447, 447, 447}, 
+	//	{536, 536, 536}, 
+	//	{0, 0, 0}, 
+	//	{38, 38, 38}, 
+	//	{413, 413, 413}, 
+	//	{358, 358, 358}, 
+	//	{566, 566, 566}, 
+	//	{0, 0, 0}, 
+	//	{0, 0, 0}, 
+	//	{97, 97, 97}, 
+	//	{165, 165, 165}, 
+	//	{355, 355, 355}, 
+	//	{0, 0, 0}, 
+	//	{4, 4, 4}, 
+	//	{270, 270, 270}, 
+	//	{170, 170, 170}, 
+	//	{339, 339, 339}, 
+	//};
+	//lastTime = {
+	//	{695, 695, 695}, 
+	//	{288, 288, 288}, 
+	//	{378, 378, 378}, 
+	//	{497, 497, 497}, 
+	//	{560, 560, 560}, 
+	//	{684, 684, 684}, 
+	//	{29, 29, 29}, 
+	//	{136, 136, 136}, 
+	//	{492, 492, 492}, 
+	//	{549, 549, 549}, 
+	//	{667, 667, 667}, 
+	//	{88, 88, 88}, 
+	//	{107, 107, 107}, 
+	//	{206, 206, 206}, 
+	//	{333, 333, 333}, 
+	//	{419, 419, 419}, 
+	//	{72, 72, 72}, 
+	//	{172, 172, 172}, 
+	//	{400, 400, 400}, 
+	//	{288, 288, 288}, 
+	//	{497, 497, 497}, 
+	//};
+	//timeMat = {
+	//	{0, 21, 18, 20, 22, 23, 7, 18, 13, 18, 13, 9, 11, 19, 19, 19, 17, 26, 13, 21, 20}, 
+	//	{21, 10000, 23, 3, 42, 43, 23, 25, 14, 4, 33, 29, 29, 38, 3, 39, 37, 40, 24, 10000, 3}, 
+	//	{18, 23, 10000, 23, 35, 36, 25, 35, 25, 20, 23, 22, 17, 35, 23, 31, 24, 19, 7, 23, 23}, 
+	//	{20, 3, 23, 10000, 40, 41, 22, 23, 12, 4, 32, 28, 28, 36, 2, 38, 36, 40, 24, 3, 10000}, 
+	//	{22, 42, 35, 40, 10000, 2, 20, 27, 31, 39, 13, 14, 18, 7, 39, 4, 14, 29, 28, 42, 40}, 
+	//	{23, 43, 36, 41, 2, 10000, 20, 27, 32, 40, 14, 15, 19, 7, 40, 6, 15, 30, 29, 43, 41}, 
+	//	{7, 23, 25, 22, 20, 20, 10000, 12, 12, 21, 15, 10, 15, 15, 21, 18, 20, 31, 20, 23, 22}, 
+	//	{18, 25, 35, 23, 27, 27, 12, 10000, 13, 24, 26, 22, 27, 21, 23, 27, 31, 43, 31, 25, 23}, 
+	//	{13, 14, 25, 12, 31, 32, 12, 13, 10000, 12, 25, 20, 23, 26, 11, 29, 30, 37, 23, 14, 12}, 
+	//	{18, 4, 20, 4, 39, 40, 21, 24, 12, 10000, 30, 26, 26, 35, 3, 36, 34, 36, 21, 4, 4}, 
+	//	{13, 33, 23, 32, 13, 14, 15, 26, 25, 30, 10000, 5, 6, 14, 31, 9, 6, 19, 16, 33, 32}, 
+	//	{9, 29, 22, 28, 14, 15, 10, 22, 20, 26, 5, 10000, 7, 13, 27, 11, 10, 22, 15, 29, 28}, 
+	//	{11, 29, 17, 28, 18, 19, 15, 27, 23, 26, 6, 7, 10000, 19, 27, 14, 8, 16, 10, 29, 28}, 
+	//	{19, 38, 35, 36, 7, 7, 15, 21, 26, 35, 14, 13, 19, 10000, 35, 8, 17, 32, 28, 38, 36}, 
+	//	{19, 3, 23, 2, 39, 40, 21, 23, 11, 3, 31, 27, 27, 35, 10000, 37, 35, 39, 23, 3, 2}, 
+	//	{19, 39, 31, 38, 4, 6, 18, 27, 29, 36, 9, 11, 14, 8, 37, 10000, 10, 25, 24, 39, 38}, 
+	//	{17, 37, 24, 36, 14, 15, 20, 31, 30, 34, 6, 10, 8, 17, 35, 10, 10000, 16, 17, 37, 36}, 
+	//	{26, 40, 19, 40, 29, 30, 31, 43, 37, 36, 19, 22, 16, 32, 39, 25, 16, 10000, 16, 40, 40}, 
+	//	{13, 24, 7, 24, 28, 29, 20, 31, 23, 21, 16, 15, 10, 28, 23, 24, 17, 16, 10000, 24, 24}, 
+	//	{21, 10000, 23, 3, 42, 43, 23, 25, 14, 4, 33, 29, 29, 38, 3, 39, 37, 40, 24, 10000, 3}, 
+	//	{20, 3, 23, 10000, 40, 41, 22, 23, 12, 4, 32, 28, 28, 36, 2, 38, 36, 40, 24, 3, 10000}, 
+	//};
 
     // below are data processing
 	requiredList.resize(nDays);
@@ -176,303 +176,302 @@ void Solution::input() {
 
 void Solution::readData(std::string input) {
 
-	//int RC = 80;
-	//int VN = 500;
-	//FILE* infile;
-	//char dispose[1000];
-	//// open input file
-	//infile = fopen(input.c_str(), "r");
-	//if (infile == NULL)
+	int VN = 500;
+	FILE* infile;
+	char dispose[1000];
+	// open input file
+	infile = fopen(input.c_str(), "r");
+	if (infile == NULL)
+	{
+		std::cout << "Can't find this file" << std::endl;
+		exit(0);
+	}
+	int counts1 = 0, counts2 = 0, counts3 = 0;
+	for (int i = 0; i < 8; i++)  // dispose first three rows
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	int Single_service[1000];
+	for (int i = 0; i < VN; i++)  // Read Single service nodes
+	{
+		fscanf(infile, "%d", &Single_service[i]);
+		if (Single_service[i] == 0)
+		{
+			Single_service[i] = -1;
+			break;
+		}
+		counts1++;
+	}
+	//std::cout << "Single service : ";
+	//for (int i = 0; i < counts1; i++)
 	//{
-	//	std::cout << "Can't find this file" << std::endl;
-	//	exit(0);
+	//	std::cout << Single_service[i] << "\t";
 	//}
-	//int counts1 = 0, counts2 = 0, counts3 = 0;
-	//for (int i = 0; i < 8; i++)  // dispose first three rows
+	//std::cout << std::endl;
+	for (int i = 0; i < 4; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	int* Synchronized_services = (int*)malloc(sizeof(int) * VN);
+	for (int i = 0; i < VN; i++)  // Read Synchronized services nodes
+	{
+		fscanf(infile, "%d", &Synchronized_services[i]);
+		if (Synchronized_services[i] == 0)
+		{
+			Synchronized_services[i] = -1;
+			break;
+		}
+		counts2++;
+	}
+	nNormals = counts1 + counts2 / 2;
+	//std::cout << "nNormals: " << nNormals << std::endl;
+	nFictives = counts2 / 2;
+	//td::cout << "nFictives: " << nFictives << std::endl;
+	nCustomer = nNormals + nFictives;
+	//std::cout << "nCustomer: " << nCustomer << std::endl;
+	nNodes = nCustomer + 1;
+	//std::cout << "nNodes: " << nNodes << std::endl;
+	//std::cout << "Synchronized services : ";
+	//for (int i = 0; i < counts2; i++)
 	//{
-	//	fscanf(infile, "%s", dispose);
+	//	std::cout << Synchronized_services[i] << "\t";
 	//}
-	//int Single_service[1000];
-	//for (int i = 0; i < VN; i++)  // Read Single service nodes
-	//{
-	//	fscanf(infile, "%d", &Single_service[i]);
-	//	if (Single_service[i] == 0)
-	//	{
-	//		Single_service[i] = -1;
-	//		break;
-	//	}
-	//	counts1++;
-	//}
-	////std::cout << "Single service : ";
-	////for (int i = 0; i < counts1; i++)
-	////{
-	////	std::cout << Single_service[i] << "\t";
-	////}
-	////std::cout << std::endl;
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//}
-	//int* Synchronized_services = (int*)malloc(sizeof(int) * VN);
-	//for (int i = 0; i < VN; i++)  // Read Synchronized services nodes
-	//{
-	//	fscanf(infile, "%d", &Synchronized_services[i]);
-	//	if (Synchronized_services[i] == 0)
-	//	{
-	//		Synchronized_services[i] = -1;
-	//		break;
-	//	}
-	//	counts2++;
-	//}
-	//nNormals = counts1 + counts2 / 2;
-	////std::cout << "nNormals: " << nNormals << std::endl;
-	//nFictives = counts2 / 2;
-	////td::cout << "nFictives: " << nFictives << std::endl;
-	//nCustomer = nNormals + nFictives;
-	////std::cout << "nCustomer: " << nCustomer << std::endl;
-	//nNodes = nCustomer + 1;
-	////std::cout << "nNodes: " << nNodes << std::endl;
-	////std::cout << "Synchronized services : ";
-	////for (int i = 0; i < counts2; i++)
-	////{
-	////	std::cout << Synchronized_services[i] << "\t";
-	////}
-	////std::cout << std::endl;
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//}
-	//char Real_node[1000];
-	//for (int i = 0; i < VN; i++)  // Read Shared1
-	//{
-	//	fscanf(infile, "%d", &Real_node[i]);
-	//	if (Real_node[i] == 0)
-	//	{
-	//		Real_node[i] = -1;
-	//		break;
-	//	}
-	//	counts3++;
-	//}
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//}
-	//for (int i = 0; i < nCustomer; i++) {
-	//	fictiveLink.push_back(0);
-	//}
-	//for (int i = 0; i < counts3; i++)  // Read Shared2
-	//{
-	//	int disposeInt;
-	//	fscanf(infile, "%d", &disposeInt);
-	//	fictiveLink[disposeInt - 1] = Real_node[i];
-	//}
-	//int node_number = nCustomer;  // Get Node numbers
-	////std::cout << "Synchronized Node : ";
-	////for (int i = 0; i < counts3; i++)
-	////	std::cout << Real_node[i] << "__" << Fictive_node[i] << "\t";
-	////std::cout << "hi" << std::endl;
-	////std::cout << std::endl;
-	//for (int i = 0; i < 6; i++)
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//}
-	//int vehicle_number;
-	//fscanf(infile, "%d", &vehicle_number);  // Read Vehicle numbers
-	//nRoutes = vehicle_number;
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//}
-	//fscanf(infile, "%d", &nDays);
-	////cout << "Vehicle : " << vehicle_number << endl;
-	//for (int i = 0; i < 3; i++)
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//}
-	//int T;
-	//fscanf(infile, "%d", &T);  // Read Total time
-	////std::cout << "T: " << T << std::endl;
-	////cout << "Total time : " << T << endl;
-	//for (int i = 0; i < 4 + nDays; i++)
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//}
-	//for (int i = 0; i < node_number + 1; i++)  // Read Service time
-	//{
-	//	//std::cout << serviceTime.size() << ": ";
-	//	fscanf(infile, "%s", dispose);
-	//	serviceTime.push_back(std::vector<float>());
-	//	for (int j = 0; j < nDays; j++)
-	//	{
-	//		serviceTime[i].push_back(0);
-	//		fscanf(infile, "%f", &serviceTime[i][j]);
-	//		if (i == 0 && serviceTime[i][j] != 0) {
+	//std::cout << std::endl;
+	for (int i = 0; i < 3; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	char Real_node[1000];
+	for (int i = 0; i < VN; i++)  // Read Shared1
+	{
+		fscanf(infile, "%d", &Real_node[i]);
+		if (Real_node[i] == 0)
+		{
+			Real_node[i] = -1;
+			break;
+		}
+		counts3++;
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	for (int i = 0; i < nCustomer; i++) {
+		fictiveLink.push_back(0);
+	}
+	for (int i = 0; i < counts3; i++)  // Read Shared2
+	{
+		int disposeInt;
+		fscanf(infile, "%d", &disposeInt);
+		fictiveLink[disposeInt - 1] = Real_node[i];
+	}
+	int node_number = nCustomer;  // Get Node numbers
+	//std::cout << "Synchronized Node : ";
+	//for (int i = 0; i < counts3; i++)
+	//	std::cout << Real_node[i] << "__" << Fictive_node[i] << "\t";
+	//std::cout << "hi" << std::endl;
+	//std::cout << std::endl;
+	for (int i = 0; i < 6; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	int vehicle_number;
+	fscanf(infile, "%d", &vehicle_number);  // Read Vehicle numbers
+	nRoutes = vehicle_number;
+	for (int i = 0; i < 3; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	fscanf(infile, "%d", &nDays);
+	//cout << "Vehicle : " << vehicle_number << endl;
+	for (int i = 0; i < 3; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	int T;
+	fscanf(infile, "%d", &T);  // Read Total time
+	//std::cout << "T: " << T << std::endl;
+	//cout << "Total time : " << T << endl;
+	for (int i = 0; i < 4 + nDays; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	for (int i = 0; i < node_number + 1; i++)  // Read Service time
+	{
+		//std::cout << serviceTime.size() << ": ";
+		fscanf(infile, "%s", dispose);
+		serviceTime.push_back(std::vector<float>());
+		for (int j = 0; j < nDays; j++)
+		{
+			serviceTime[i].push_back(0);
+			fscanf(infile, "%f", &serviceTime[i][j]);
+			if (i == 0 && serviceTime[i][j] != 0) {
 
-	//			exit(1);
-	//		}
-	//		//std::cout << serviceTime[i].size() << ", ";
-	//	}
-	//	//std::cout << std::endl;
-	//}
-	///*cout << "Service Time ~~~~~~~~~~~~~~~~" << endl;
-	//for (int i = 0; i < node_number + 1; i++)
-	//{
-	//	cout << i << "\t";
-	//	for (int j = 0; j < nDays; j++)
-	//	{
-	//		cout << service_time[i][j] << "\t";
-	//	}
-	//	cout << endl;
-	//}*/
-	//for (int i = 0; i < 4 + node_number + 1; i++)
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//}
-	////cout << dispose;
-	//for (int i = 0; i < node_number + 1; i++)  // Read Travelling time
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//	timeMat.push_back(std::vector<float>());
-	//	for (int j = 0; j < node_number + 1; j++)
-	//	{
-	//		timeMat[i].push_back(0);
-	//		fscanf(infile, "%f", &timeMat[i][j]);
-	//	}
-	//}
-	///*cout << "Distance Matrix ~~~~~~~~~~~~~~~~" << endl;
-	//cout << "\t";
-	//for (int i = 0; i < node_number + 1; i++)
-	//	cout << i << "\t";
-	//cout << endl;
-	//for (int i = 0; i < node_number + 1; i++)
-	//{
-	//	cout << i << "\t";
-	//	for (int j = 0; j < node_number + 1; j++)
-	//	{
-	//		cout << DistanceMatrix_Time[i][j] << "\t";
-	//	}
-	//	cout << endl;
-	//}*/
-	//for (int i = 0; i < 4 + nDays; i++)
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//}
-	//int w[1000][100];
-	//required.push_back(std::vector<bool>());
-	//for (int i = 0; i < nDays; i++) {
-	//	required[0].push_back(false);
-	//}
-	//for (int i = 1; i < node_number + 1; i++)  // Read w
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//	required.push_back(std::vector<bool>());
-	//	for (int j = 0; j < nDays; j++)
-	//	{
-	//		fscanf(infile, "%d", &w[i][j]);
-	//		if (w[i][j] == 0) 
-	//		{
-	//			required[i].push_back(false);
-	//		}
-	//		else 
-	//		{
-	//			required[i].push_back(true);
-	//		}
-	//	}
-	//}
-	///*cout << endl;
-	//cout << "w ~~~~~~~~~~~~~~~~" << endl;
-	//for (int i = 1; i < node_number + 1; i++)
-	//{
-	//	cout << i << "\t";
-	//	for (int j = 0; j < nDays; j++)
-	//	{
-	//		if (w[i][j] == 0)
-	//			service_time[i][j] = 0;
-	//		cout << w[i][j] << "\t";
-	//	}
-	//	cout << endl;
-	//}*/
-	//for (int i = 0; i < 4 + nDays; i++)
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//}
-	//for (int i = 0; i < node_number + 1; i++)  // Read Earliest time
-	//{
-	//	//std::cout << earliestTime.size() << ": " << std::endl;
-	//	fscanf(infile, "%s", dispose);
-	//	earliestTime.push_back(std::vector<float>());
-	//	for (int j = 0; j < nDays; j++)
-	//	{
-	//		earliestTime[i].push_back(0);
-	//		//std::cout << earliestTime[i].size() << std::endl;
-	//		fscanf(infile, "%f", &earliestTime[i][j]);
-	//	}
-	//}
-	///*cout << "Earliest Time ~~~~~~~~~~~~~~~~" << endl;
-	//for (int i = 0; i < node_number + 1; i++)
-	//{
-	//	cout << i << "\t";
-	//	for (int j = 0; j < nDays; j++)
-	//	{
-	//		cout << ready_time[i][j] << "\t";
-	//	}
-	//	cout << endl;
-	//}*/
-	//for (int i = 0; i < 4 + nDays; i++)
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//}
-	//for (int i = 0; i < node_number + 1; i++)  // Read Latest time
-	//{
-	//	fscanf(infile, "%s", dispose);
-	//	lastTime.push_back(std::vector<float>());
-	//	for (int j = 0; j < nDays; j++)
-	//	{
-	//		lastTime[i].push_back(0);
-	//		fscanf(infile, "%f", &lastTime[i][j]);
-	//	}
-	//}
-	///*cout << "Latest Time ~~~~~~~~~~~~~~~~" << endl;
-	//for (int i = 0; i < node_number + 1; i++)
-	//{
-	//	cout << i << "\t";
-	//	for (int j = 0; j < nDays; j++)
-	//	{
-	//		cout << due_time[i][j] << "\t";
-	//	}
-	//	cout << endl;
-	//}*/
+				exit(1);
+			}
+			//std::cout << serviceTime[i].size() << ", ";
+		}
+		//std::cout << std::endl;
+	}
+	/*cout << "Service Time ~~~~~~~~~~~~~~~~" << endl;
+	for (int i = 0; i < node_number + 1; i++)
+	{
+		cout << i << "\t";
+		for (int j = 0; j < nDays; j++)
+		{
+			cout << service_time[i][j] << "\t";
+		}
+		cout << endl;
+	}*/
+	for (int i = 0; i < 4 + node_number + 1; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	//cout << dispose;
+	for (int i = 0; i < node_number + 1; i++)  // Read Travelling time
+	{
+		fscanf(infile, "%s", dispose);
+		timeMat.push_back(std::vector<float>());
+		for (int j = 0; j < node_number + 1; j++)
+		{
+			timeMat[i].push_back(0);
+			fscanf(infile, "%f", &timeMat[i][j]);
+		}
+	}
+	/*cout << "Distance Matrix ~~~~~~~~~~~~~~~~" << endl;
+	cout << "\t";
+	for (int i = 0; i < node_number + 1; i++)
+		cout << i << "\t";
+	cout << endl;
+	for (int i = 0; i < node_number + 1; i++)
+	{
+		cout << i << "\t";
+		for (int j = 0; j < node_number + 1; j++)
+		{
+			cout << DistanceMatrix_Time[i][j] << "\t";
+		}
+		cout << endl;
+	}*/
+	for (int i = 0; i < 4 + nDays; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	int w[1000][100];
+	required.push_back(std::vector<bool>());
+	for (int i = 0; i < nDays; i++) {
+		required[0].push_back(false);
+	}
+	for (int i = 1; i < node_number + 1; i++)  // Read w
+	{
+		fscanf(infile, "%s", dispose);
+		required.push_back(std::vector<bool>());
+		for (int j = 0; j < nDays; j++)
+		{
+			fscanf(infile, "%d", &w[i][j]);
+			if (w[i][j] == 0) 
+			{
+				required[i].push_back(false);
+			}
+			else 
+			{
+				required[i].push_back(true);
+			}
+		}
+	}
+	/*cout << endl;
+	cout << "w ~~~~~~~~~~~~~~~~" << endl;
+	for (int i = 1; i < node_number + 1; i++)
+	{
+		cout << i << "\t";
+		for (int j = 0; j < nDays; j++)
+		{
+			if (w[i][j] == 0)
+				service_time[i][j] = 0;
+			cout << w[i][j] << "\t";
+		}
+		cout << endl;
+	}*/
+	for (int i = 0; i < 4 + nDays; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	for (int i = 0; i < node_number + 1; i++)  // Read Earliest time
+	{
+		//std::cout << earliestTime.size() << ": " << std::endl;
+		fscanf(infile, "%s", dispose);
+		earliestTime.push_back(std::vector<float>());
+		for (int j = 0; j < nDays; j++)
+		{
+			earliestTime[i].push_back(0);
+			//std::cout << earliestTime[i].size() << std::endl;
+			fscanf(infile, "%f", &earliestTime[i][j]);
+		}
+	}
+	/*cout << "Earliest Time ~~~~~~~~~~~~~~~~" << endl;
+	for (int i = 0; i < node_number + 1; i++)
+	{
+		cout << i << "\t";
+		for (int j = 0; j < nDays; j++)
+		{
+			cout << ready_time[i][j] << "\t";
+		}
+		cout << endl;
+	}*/
+	for (int i = 0; i < 4 + nDays; i++)
+	{
+		fscanf(infile, "%s", dispose);
+	}
+	for (int i = 0; i < node_number + 1; i++)  // Read Latest time
+	{
+		fscanf(infile, "%s", dispose);
+		lastTime.push_back(std::vector<float>());
+		for (int j = 0; j < nDays; j++)
+		{
+			lastTime[i].push_back(0);
+			fscanf(infile, "%f", &lastTime[i][j]);
+		}
+	}
+	/*cout << "Latest Time ~~~~~~~~~~~~~~~~" << endl;
+	for (int i = 0; i < node_number + 1; i++)
+	{
+		cout << i << "\t";
+		for (int j = 0; j < nDays; j++)
+		{
+			cout << due_time[i][j] << "\t";
+		}
+		cout << endl;
+	}*/
 
-	//std::cout << "Finish Read Data--------------------------------------------------------------------" << std::endl;
+	std::cout << "Finish Read Data--------------------------------------------------------------------" << std::endl;
 
-	//fclose(infile);
+	fclose(infile);
 
- //   // below are data processing
-	//requiredList.resize(nDays);
-	//for (int n = 0; n < nCustomer; n++)
-	//	for (int d = 0; d < nDays; d++)
-	//		if (required[n][d])
-	//			requiredList[d].push_back(n);
+ // // below are data processing
+	requiredList.resize(nDays);
+	for (int n = 0; n < nCustomer; n++)
+		for (int d = 0; d < nDays; d++)
+			if (required[n][d])
+				requiredList[d].push_back(n);
 
-	//correspondingList.resize(nNodes);
-	//correspondingList[0] = 0;
-	//for (int i = 1; i <= fictiveLink.size(); i++) {
+	correspondingList.resize(nNodes);
+	correspondingList[0] = 0;
+	for (int i = 1; i <= fictiveLink.size(); i++) {
 
-	//	correspondingList[i] = fictiveLink[i - 1];
-	//	if (fictiveLink[i - 1] != 0) {
+		correspondingList[i] = fictiveLink[i - 1];
+		if (fictiveLink[i - 1] != 0) {
 
-	//		correspondingList[fictiveLink[i - 1]] = i;
-	//	}
-	//}
+			correspondingList[fictiveLink[i - 1]] = i;
+		}
+	}
 
-	//arrivalTimes = std::vector<std::vector<double>>(nNodes, (std::vector<double>(nDays, -1)));
+	arrivalTimes = std::vector<std::vector<double>>(nNodes, (std::vector<double>(nDays, -1)));
 
-	//departureTimes = std::vector<std::vector<double>>(nNodes, (std::vector<double>(nDays, -1)));
-	//
-	//postponedDuration = std::vector<std::vector<std::vector<double>>>(nDays, std::vector<std::vector<double>>(nNodes, std::vector<double>(nNodes, 0)));
+	departureTimes = std::vector<std::vector<double>>(nNodes, (std::vector<double>(nDays, -1)));
+	
+	postponedDuration = std::vector<std::vector<std::vector<double>>>(nDays, std::vector<std::vector<double>>(nNodes, std::vector<double>(nNodes, 0)));
 
-	//daysOfEarliestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
-	//daysOfLatestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
+	daysOfEarliestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
+	daysOfLatestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
 }
 
 void Solution::printInput() {
@@ -888,6 +887,7 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 			sortedList.push_back(nonSortedLists[chosenRoute][currentIndexes[chosenRoute]]);
 			currentIndexes[chosenRoute]++;
 		}
+		delete currentIndexes;
 		//std::cout << "Sort result: " << std::endl;
 		//for (int result : sortedList) {
 
@@ -1112,6 +1112,7 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 						previousNode = theOneToCalculate;
 					}
 				}
+				delete affectedNodes;
 
 				// put our goal in it. 
 				typesAndDurations.push_back(TypeAndDuration(0, maxPostponedDuration));
@@ -2002,9 +2003,6 @@ void Solution::improveTimeConsistency(std::vector<std::vector<int>>& solutionLis
 		}
 		//std::cout << "section 4" << std::endl;
 		
-		std::vector<std::vector<int>> bestSolutionSoFar;
-		bestSolutionSoFar.resize(nDays);
-		
 		// Apply 2-opt to that day. 
 		for (int k = 0; k < solutionListOfEachDay[dayToReverse].size(); k++) {
 
@@ -2035,30 +2033,40 @@ void Solution::improveTimeConsistency(std::vector<std::vector<int>>& solutionLis
 						exit(1);
 					}
 					//std::cout << "Score: " << newScore << std::endl;
-				}
 				
-				if (newScore < originalScore) {
-				
-					betterOne = true;
-					originalScore = newScore;
-					for (int day = 0; day < nDays; day++) {
+					if (newScore < originalScore) {
+					
+						std::cout << "new score: " << newScore << std::endl;
+						std::cout << "original score: " << originalScore << std::endl;
+						CheckConstraintsResult checkConstraintsResult = checkConstraints(alternativeSolution);
+						//std::cout << "checkConstraints done. " << std::endl;
+						if (checkConstraintsResult.result == false) {
 
-						solutionListOfEachDay[day] = std::vector<int>(alternativeSolution[day]);
-					}
-					for (int day = 0; day < nDays; day++) {
+							printGraph(alternativeSolution, GRAPH_LIMIT);
+							std::cout << "After getting the score" << std::endl;
+							std::cout << "Violation detected ----------------------------------" << std::endl;
+							for (std::string message : checkConstraintsResult.messages) {
 
-						bestSolutionSoFar[day] = std::vector<int>(alternativeSolution[day]);
+								std::cout << message << std::endl;
+							}
+							std::cout << "-----------------------------------------------------" << std::endl;
+							exit(1);
+						}
+						betterOne = true;
+						originalScore = newScore;
+						for (int day = 0; day < nDays; day++) {
+
+							solutionListOfEachDay[day] = std::vector<int>(alternativeSolution[day]);
+						}
 					}
 				}
+
+				tweakADayOfSolutionWithTwoOptAlgorithm(alternativeSolution, dayToReverse, k, l);
 			}
 		}
 
 		if (betterOne) {
 
-			for (int day = 0; day < nDays; day++) {
-
-				solutionListOfEachDay[day] = std::vector<int>(bestSolutionSoFar[day]);
-			}
 			calculateObjective(solutionListOfEachDay);
 			adjustDepartureTime(solutionListOfEachDay);
 		}

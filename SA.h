@@ -33,11 +33,8 @@ class SA : public Solution{
 
 private:
 
-    double Ts;
-    double Te;
-    int numberOfIterations;
-    double Alpha;
 	int scaleOfViolationScore;
+	std::vector<std::vector<int>> bestSolution;
 
     static bool isFirstTime;
 
@@ -48,10 +45,17 @@ private:
     void tweakSolutionByReversion(std::vector<std::vector<int>>& solutionListOfEachDay);
     void tweakSolutionRandomly(std::vector<std::vector<int>>& solutionListOfEachDay);
 
+
 public:
 
-    SA();
+    double Ts;
+    double Te;
+    int numberOfIterations;
+    double Alpha;
+
+    SA(double _Ts, double _Te, int _numberOfIterations, double _alpha) : Ts(_Ts), Te(_Te), numberOfIterations(_numberOfIterations), Alpha(_alpha) {};
     void solve();
+	double getTheBestScore();
 };
 
 
