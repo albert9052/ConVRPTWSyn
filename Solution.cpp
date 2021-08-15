@@ -488,6 +488,12 @@ void Solution::printInput() {
 		std::cout << ", " << fictiveLink[i];
 	}
 	std::cout << "}" << std::endl;
+	std::cout << "correspondingList: {" << correspondingList[0];
+	for (int i = 1; i < correspondingList.size(); i++) {
+
+		std::cout << ", " << correspondingList[i];
+	}
+	std::cout << "}" << std::endl;
 	std::cout << "serviceTime: {" << std::endl;
 	for (int i = 0; i < serviceTime.size(); i++) {
 
@@ -1465,10 +1471,10 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 			break;
 		}
 		// Transform it into its normal node if it is a fictive node. (Just its number)
-		if (currentNode > nNormals) {
+		//if (currentNode > nNormals) {
 
-			currentNode = correspondingList[currentNode];
-		}
+		//	currentNode = correspondingList[currentNode];
+		//}
 
 		// Get nextNode. 
 		int nextNode = 0;
@@ -1492,6 +1498,8 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 		// Deal with the synchronized node. 
 		int correspondingNode = correspondingList[currentNode];
 		if (correspondingNode != 0) {
+
+			//std::cout << "We got a correspondingNode" << std::endl;
 
 			int positionOfCorrespondingNode = 0;
 			int routeOfCorrespondingNode = 0;
@@ -1565,16 +1573,23 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 		}
 
 		// Adjust PF. 
-		double tempPostponedDuration = postponedDuration[day][currentNode][nextNode];
-		if (PF <= tempPostponedDuration) {
+		if (nextNode != 0) {
 
-			postponedDuration[day][currentNode][nextNode] -= PF;
-			break;
+			double tempPostponedDuration = postponedDuration[day][currentNode][nextNode];
+			if (PF <= tempPostponedDuration) {
+
+				postponedDuration[day][currentNode][nextNode] -= PF;
+				break;
+			}
+			else {
+
+				postponedDuration[day][currentNode][nextNode] = 0; // This is equal to postponedDuration[day][currentNode][nextNode] -= tempPostponedDuration;
+				PF -= tempPostponedDuration;
+			}
 		}
 		else {
 
-			postponedDuration[day][currentNode][nextNode] = 0; // This is equal to postponedDuration[day][currentNode][nextNode] -= tempPostponedDuration;
-			PF -= tempPostponedDuration;
+			break;
 		}
 
 		// Add it into nodesBeingMoved
@@ -1748,11 +1763,15 @@ void Solution::adjustDepartureTime(std::vector<std::vector<int>>& solutionListOf
 		}
 
 		// We have to know which node have been pushed and recalculate their minimum arrival time difference and maximum arrival time difference. 
-		// The nodes in nodesBeingMoved are all normal nodes, not fictive nodes. 
 		std::vector<bool> nodesHavingBeenRecalculated(nNodes, false);
 		for (int i = 0; i < nodesBeingMovedPtr->size(); i++) {
 
+			// If the node being moved is a fictive node, we need to translate it into its normal node. 
 			int nodeBeingGoingToRecalculate = nodesBeingMovedPtr->at(i);
+			if (nodeBeingGoingToRecalculate > nNormals) {
+
+				nodeBeingGoingToRecalculate = correspondingList[nodeBeingGoingToRecalculate];
+			}
 			if (nodesHavingBeenRecalculated[nodeBeingGoingToRecalculate]) {
 
 				continue;
@@ -2036,8 +2055,8 @@ void Solution::improveTimeConsistency(std::vector<std::vector<int>>& solutionLis
 				
 					if (newScore < originalScore) {
 					
-						std::cout << "new score: " << newScore << std::endl;
-						std::cout << "original score: " << originalScore << std::endl;
+						//std::cout << "new score: " << newScore << std::endl;
+						//std::cout << "original score: " << originalScore << std::endl;
 						CheckConstraintsResult checkConstraintsResult = checkConstraints(alternativeSolution);
 						//std::cout << "checkConstraints done. " << std::endl;
 						if (checkConstraintsResult.result == false) {

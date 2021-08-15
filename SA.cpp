@@ -230,7 +230,7 @@ void SA::solve() {
 
                 bestSA.assign(SAListOfEachDay.begin(), SAListOfEachDay.end());
 				bestScore = newScore;
-				//std::cout << "Best Score: " << newScore << std::endl;
+				std::cout << "Best Score: " << newScore << std::endl;
 				//printGraph(SAListOfEachDay, GRAPH_LIMIT);
             }
 
