@@ -1258,20 +1258,6 @@ void Solution::calculateObjective(std::vector<std::vector<int>>& solutionListOfE
 double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double accumulatedPostponedDuration, bool firstLoop) {
 
 	//std::cout << "getMaxPF started" << std::endl;
-	static std::vector<int> routesHavingBeenCalculated;
-	if (firstLoop) {
-
-		routesHavingBeenCalculated.clear();
-		int route = 0;
-		for (int i = 0; i < positionOfNode; i++) {
-
-			if (solutionListOfEachDay[day][i] == -1) {
-
-				route++;
-			}
-		}
-		routesHavingBeenCalculated.push_back(route);
-	}
 	double maxPF = std::numeric_limits<double>::max();
 	while (positionOfNode < solutionListOfEachDay[day].size() && solutionListOfEachDay[day][positionOfNode] != -1) {
 
@@ -1368,24 +1354,19 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 				}
 			}
 			
-			// Check if we have taken this route into consideration. 
-			if (std::find(routesHavingBeenCalculated.begin(), routesHavingBeenCalculated.end(), routeOfCorrespondingNode) == routesHavingBeenCalculated.end()) {
+			//double oldMaxPF = maxPF; // For testing
 
-				routesHavingBeenCalculated.push_back(routeOfCorrespondingNode);
-				//double oldMaxPF = maxPF; // For testing
+			// Check if there are other node ahead of corresponding node. 
+			if (positionOfCorrespondingNode + 1 < solutionListOfEachDay[day].size() && solutionListOfEachDay[day][positionOfCorrespondingNode + 1] != -1) {
 
-				// Check if there are other node ahead of corresponding node. 
-				if (positionOfCorrespondingNode + 1 < solutionListOfEachDay[day].size() && solutionListOfEachDay[day][positionOfCorrespondingNode + 1] != -1) {
-
-					double accumulatedPostponedDurationForAnotherRoute;
-					accumulatedPostponedDurationForAnotherRoute = accumulatedPostponedDuration + postponedDuration[day][correspondingNode][solutionListOfEachDay[day][positionOfCorrespondingNode + 1]];
-					maxPF = std::min(maxPF, getMaxPF(solutionListOfEachDay, positionOfCorrespondingNode + 1, day, accumulatedPostponedDurationForAnotherRoute, false));
-				}
-				//if (oldMaxPF != maxPF) {
-
-				//	std::cout << "currentNode: " << currentNode << ", because of correspondingNode, change to : " << maxPF << std::endl;
-				//}
+				double accumulatedPostponedDurationForAnotherRoute;
+				accumulatedPostponedDurationForAnotherRoute = accumulatedPostponedDuration + postponedDuration[day][correspondingNode][solutionListOfEachDay[day][positionOfCorrespondingNode + 1]];
+				maxPF = std::min(maxPF, getMaxPF(solutionListOfEachDay, positionOfCorrespondingNode + 1, day, accumulatedPostponedDurationForAnotherRoute, false));
 			}
+			//if (oldMaxPF != maxPF) {
+
+			//	std::cout << "currentNode: " << currentNode << ", because of correspondingNode, change to : " << maxPF << std::endl;
+			//}
 		}
 		//std::cout << "seciont 3" << std::endl;
 
@@ -1426,8 +1407,6 @@ CustomerAndArrivalTimeDifference Solution::getTheCustomerWithLargestArrivalTimeD
 
 std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutionListOfEachDay, int positionOfNode, int day, double PF, bool firstLoop) {
 
-	static std::vector<int> routesHavingBeenApplied;
-
 	std::vector<int>* nodesBeingMovedPtr = new std::vector<int>();
 	int previousNode = 0;
 	if (positionOfNode > 0) {
@@ -1440,18 +1419,7 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 	}
 
 	if (firstLoop) {
-
-		routesHavingBeenApplied.clear();
-		int routeOfCurrentNode = 0;
-		for (int i = 0; i < positionOfNode; i++) {
-
-			if (solutionListOfEachDay[day][i] == -1) {
-
-				routeOfCurrentNode++;
-			}
-		}
-		routesHavingBeenApplied.push_back(routeOfCurrentNode);
-
+		
 		int currentNode = solutionListOfEachDay[day][positionOfNode];
 		postponedDuration[day][previousNode][currentNode] += PF;
 	}
@@ -1512,58 +1480,53 @@ std::vector<int>* Solution::applyPF(const std::vector<std::vector<int>>& solutio
 				}
 			}
 
-			// Avoid ReApplying. 
-			if (std::find(routesHavingBeenApplied.begin(), routesHavingBeenApplied.end(), routeOfCorrespondingNode) == routesHavingBeenApplied.end()) {
+			//std::cout << "deal with synchronized customer in applyPF" << std::endl;
+			//std::cout << "currentNode: " << currentNode << ", correspondingNode: " << correspondingNode << std::endl;
 
-				//std::cout << "deal with synchronized customer in applyPF" << std::endl;
-				//std::cout << "currentNode: " << currentNode << ", correspondingNode: " << correspondingNode << std::endl;
-				routesHavingBeenApplied.push_back(routeOfCorrespondingNode);
+			int previousNodeForCorrespondingNode = 0;
+			if (positionOfCorrespondingNode > 0) {
 
-				int previousNodeForCorrespondingNode = 0;
-				if (positionOfCorrespondingNode > 0) {
+				previousNodeForCorrespondingNode = solutionListOfEachDay[day][positionOfCorrespondingNode - 1];
+				if (previousNodeForCorrespondingNode == -1) {
 
-					previousNodeForCorrespondingNode = solutionListOfEachDay[day][positionOfCorrespondingNode - 1];
-					if (previousNodeForCorrespondingNode == -1) {
-
-						previousNodeForCorrespondingNode = 0;
-					}
+					previousNodeForCorrespondingNode = 0;
 				}
-				
-				int nextNodeForCorrespondingNode = 0;
-				if (positionOfCorrespondingNode < solutionListOfEachDay[day].size() - 1) {
+			}
+			
+			int nextNodeForCorrespondingNode = 0;
+			if (positionOfCorrespondingNode < solutionListOfEachDay[day].size() - 1) {
 
-					nextNodeForCorrespondingNode = solutionListOfEachDay[day][positionOfCorrespondingNode + 1];
-					if (nextNodeForCorrespondingNode == -1) {
+				nextNodeForCorrespondingNode = solutionListOfEachDay[day][positionOfCorrespondingNode + 1];
+				if (nextNodeForCorrespondingNode == -1) {
 
-						nextNodeForCorrespondingNode = 0;
-					}
+					nextNodeForCorrespondingNode = 0;
 				}
+			}
 
-				// Apply it. 
-				postponedDuration[day][previousNodeForCorrespondingNode][correspondingNode] += PF;
-				arrivalTimes[correspondingNode][day] += PF;
-				departureTimes[correspondingNode][day] += PF;
+			// Apply it. 
+			postponedDuration[day][previousNodeForCorrespondingNode][correspondingNode] += PF;
+			arrivalTimes[correspondingNode][day] += PF;
+			departureTimes[correspondingNode][day] += PF;
 
-				// Adjust PF for corresponding node. 
-				double tempPostponedDuration = postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode];
-				double tempPF = PF;
-				if (tempPF <= tempPostponedDuration) {
+			// Adjust PF for corresponding node. 
+			double tempPostponedDuration = postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode];
+			double tempPF = PF;
+			if (tempPF <= tempPostponedDuration) {
 
-					postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode] -= tempPF;
-				}
-				else {
+				postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode] -= tempPF;
+			}
+			else {
 
-					//std::cout << "tempPF: " << tempPF << std::endl;
-					//std::cout << "tempPostponedDuration: " << tempPostponedDuration << std::endl;
-					postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode] = 0; // This is equal to postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode] -= tempPostponedDuration;
-					tempPF -= tempPostponedDuration;
-					//std::cout << "Next applyPF!!!!!!!" << std::endl;
-					//std::cout << "positionOfCorrespondingNode" << positionOfCorrespondingNode << std::endl;
-					std::vector<int>* otherNodesBeingMovedPtr = applyPF(solutionListOfEachDay, positionOfCorrespondingNode + 1, day, tempPF, false);
-					nodesBeingMovedPtr->reserve(nodesBeingMovedPtr->size() + otherNodesBeingMovedPtr->size());
-					nodesBeingMovedPtr->insert(nodesBeingMovedPtr->end(), otherNodesBeingMovedPtr->begin(), otherNodesBeingMovedPtr->end());
-					delete otherNodesBeingMovedPtr;
-				}
+				//std::cout << "tempPF: " << tempPF << std::endl;
+				//std::cout << "tempPostponedDuration: " << tempPostponedDuration << std::endl;
+				postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode] = 0; // This is equal to postponedDuration[day][correspondingNode][nextNodeForCorrespondingNode] -= tempPostponedDuration;
+				tempPF -= tempPostponedDuration;
+				//std::cout << "Next applyPF!!!!!!!" << std::endl;
+				//std::cout << "positionOfCorrespondingNode" << positionOfCorrespondingNode << std::endl;
+				std::vector<int>* otherNodesBeingMovedPtr = applyPF(solutionListOfEachDay, positionOfCorrespondingNode + 1, day, tempPF, false);
+				nodesBeingMovedPtr->reserve(nodesBeingMovedPtr->size() + otherNodesBeingMovedPtr->size());
+				nodesBeingMovedPtr->insert(nodesBeingMovedPtr->end(), otherNodesBeingMovedPtr->begin(), otherNodesBeingMovedPtr->end());
+				delete otherNodesBeingMovedPtr;
 			}
 		}
 
@@ -2038,6 +2001,7 @@ void Solution::improveTimeConsistency(std::vector<std::vector<int>>& solutionLis
 					if (checkConstraintsResult.result == false) {
 
 						printGraph(alternativeSolution, GRAPH_LIMIT);
+						std::cout << "In improveTimeConsistency" << std::endl;
 						std::cout << "Violation detected ----------------------------------" << std::endl;
 						for (std::string message : checkConstraintsResult.messages) {
 

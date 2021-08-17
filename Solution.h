@@ -20,7 +20,7 @@
 #include <iomanip>
 #include <fstream>
 
-#define GRAPH_LIMIT 600
+#define GRAPH_LIMIT 1000
 #define FACTOR_OF_VIOLATION 100000
 
 class PointAndType {

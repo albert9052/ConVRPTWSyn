@@ -89,6 +89,9 @@ void SA::solve() {
 			//SAListOfEachDay[0] = {6, -1, 1, 5, 3, -1, 4};
 			//SAListOfEachDay[1] = {4, -1, 2, 1, 5, -1, 7, 6};
 			//SAListOfEachDay[2] = {6, -1, 1, 3, -1};
+			//SAListOfEachDay[0] = {6, 14, -1, 8, 18, 15, 17, -1, 7, 19, 5, 20, -1, 16, 3, 11, 13, 10, 2, 12, 4};
+			//SAListOfEachDay[0] = {2, 18, 12, 8, 4, 16, -1, 6, 15, 7, 14, 5, 11, -1, 17, 9, -1, 13, 20, 1};
+			//SAListOfEachDay[0] = {6, 17, 9, -1, 11, -1, -1, 15, 8, 5, 13, 7};
 
 			// Adjust the arrival time and departure time to get the minimum violation. 
             calculateObjective(SAListOfEachDay);
