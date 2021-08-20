@@ -1847,12 +1847,14 @@ double Solution::getObjectiveScore(const std::vector<std::vector<int>>& solution
 
 		double minArrivalTime = std::numeric_limits<double>::max();
 		double maxArrivalTime = -1;
+		bool hasRequired = false;
 		for (int day = 0; day < nDays; day++) {
 
 			if (required[i][day] == false) {
 
 				continue;
 			}
+			hasRequired = true;
 			if (arrivalTimes[i][day] < minArrivalTime) {
 
 				minArrivalTime = arrivalTimes[i][day];
@@ -1877,7 +1879,25 @@ double Solution::getObjectiveScore(const std::vector<std::vector<int>>& solution
 				}
 			}
 		}
+		if (hasRequired == false) {
+
+			continue;
+		}
 		score += maxArrivalTime - minArrivalTime;
+		if (maxArrivalTime - minArrivalTime < 0) {
+
+			std::cout << "Error: score < 0 in getObjectiveScore when calculating max arrival time differences" << std::endl;
+			std::cout << "maxArrivalTIme: " << maxArrivalTime << std::endl;
+			std::cout << "minArrivalTIme: " << minArrivalTime << std::endl;
+			std::cout << "maxArrivalTime - minArrivalTime: " << maxArrivalTime - minArrivalTime << std::endl;
+			exit(1);
+		}
+		if (score < 0) {
+
+			std::cout << "Error: score < 0 in getObjectiveScore when calculating max arrival time differences" << std::endl;
+			std::cout << "score: " << score << std::endl;
+			exit(1);
+		}
 	}
 
 	for (int day = 0; day < nDays; day++) {
@@ -1903,9 +1923,19 @@ double Solution::getObjectiveScore(const std::vector<std::vector<int>>& solution
 			previousNode = currentNode;
 		}
 		score += timeMat[currentNode][0];
+		if (score < 0) {
+
+			std::cout << "Error: score < 0 in getObjectiveScore when calculating commuting time" << std::endl;
+			exit(1);
+		}
 		//std::cout << "(" << currentNode << ", 0, " << timeMat[currentNode][0] << ")" << std::endl;
 	}
 	//std::cout << "getObjectiveScore: " << score << std::endl;
+	if (score < 0) {
+
+		std::cout << "Error: Total score < 0 in getObjectiveScore before returning" << std::endl;
+		exit(1);
+	}
 	return score;
 }
 

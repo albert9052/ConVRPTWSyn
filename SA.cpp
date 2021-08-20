@@ -125,6 +125,12 @@ void SA::solve() {
 			
 			// Temporary: 
 			newScore = getViolationScore(SAListOfEachDay, FACTOR_OF_VIOLATION);
+			if (newScore < 0) {
+
+				std::cout << "Error: violation < 0: " << std::endl;
+				std::cout << "Violation score: " << newScore << std::endl;
+				exit(1);
+			}
 			//CheckConstraintsResult checkConstraintsResult = checkConstraints(SAListOfEachDay);
 			////std::cout << "checkConstraints done. " << std::endl;
 			//if (checkConstraintsResult.result == false) {
@@ -229,11 +235,17 @@ void SA::solve() {
 			//std::cout << "Score: " << newScore << ", Best Score: " << bestScore << std::endl;
             
             // Store it if it's the best one so far. 
+			if (newScore < 0) {
+
+				std::cout << "Error: Total score < 0: " << std::endl;
+				std::cout << "Total score: " << newScore << std::endl;
+				exit(1);
+			}
             if (newScore < bestScore) {
 
                 bestSA.assign(SAListOfEachDay.begin(), SAListOfEachDay.end());
 				bestScore = newScore;
-				std::cout << "Best Score: " << newScore << std::endl;
+				//std::cout << "Best Score: " << newScore << std::endl;
 				//printGraph(SAListOfEachDay, GRAPH_LIMIT);
             }
 
@@ -258,7 +270,10 @@ void SA::solve() {
     }
 
 	calculateObjective(bestSA);
-	adjustDepartureTime(bestSA);
+	if (getViolationScore(bestSA, FACTOR_OF_VIOLATION) == 0) {
+
+		adjustDepartureTime(bestSA);
+	}
 	//CheckConstraintsResult checkConstraintsResult = checkConstraints(bestSA);
 	//printGraph(bestSA, GRAPH_LIMIT);
 	//std::cout << "Best score: " << bestScore << std::endl;
@@ -382,6 +397,27 @@ void Smallest::resetAll(int _value) {
 double SA::getTheBestScore() {
 
 	calculateObjective(bestSolution);
-	adjustDepartureTime(bestSolution);
-	return getObjectiveScore(bestSolution) + getViolationScore(bestSolution, FACTOR_OF_VIOLATION);
+	double violationScore = getViolationScore(bestSolution, FACTOR_OF_VIOLATION);
+	double objectiveScore = getObjectiveScore(bestSolution);
+	if (getViolationScore(bestSolution, FACTOR_OF_VIOLATION) == 0) {
+
+		std::cout << "no violation" << std::endl;
+		adjustDepartureTime(bestSolution);
+		violationScore = getViolationScore(bestSolution, FACTOR_OF_VIOLATION);
+		objectiveScore = getObjectiveScore(bestSolution);
+	}
+
+	if (violationScore < 0) {
+
+		std::cout << "Error: violation < 0: " << std::endl;
+		std::cout << "Violation score: " << violationScore << std::endl;
+		exit(1);
+	}
+	if (objectiveScore < 0) {
+
+		std::cout << "Error: objectiveScore < 0: " << std::endl;
+		std::cout << "Objective score: " << objectiveScore << std::endl;
+		exit(1);
+	}
+	return violationScore + objectiveScore;
 }
