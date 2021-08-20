@@ -179,7 +179,7 @@ void Solution::readData(std::string input) {
 	int VN = 500;
 	std::string dispose;
 	// open input file
-	std::ifstream infile("c101.dat");
+	std::ifstream infile(input);
 	if (!infile.is_open())
 	{
 		std::cout << "Can't find this file: " << input << std::endl;
@@ -212,10 +212,6 @@ void Solution::readData(std::string input) {
 	for (int i = 0; i < VN; i++)  // Read Synchronized services nodes
 	{
 		infile >> dispose;
-<<<<<<< HEAD
-		//std::cout << "////////" << dispose << std::endl;
-=======
->>>>>>> 668b3daac852174907c0f39a14bb59f990fc4552
 		if (dispose == ";")
 		{
 			break;
