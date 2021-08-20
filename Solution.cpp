@@ -182,7 +182,7 @@ void Solution::readData(std::string input) {
 	std::ifstream infile(input);
 	if (!infile.is_open())
 	{
-		std::cout << "Can't find this file" << std::endl;
+		std::cout << "Can't find this file: " << input << std::endl;
 		exit(1);
 	}
 	int counts1 = 0, counts2 = 0, counts3 = 0;
@@ -212,7 +212,6 @@ void Solution::readData(std::string input) {
 	for (int i = 0; i < VN; i++)  // Read Synchronized services nodes
 	{
 		infile >> dispose;
-		std::cout << "////////" << dispose << std::endl;
 		if (dispose == ";")
 		{
 			break;
@@ -1339,12 +1338,10 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 
 			int correspondingNode = correspondingList[currentNode];
 			int positionOfCorrespondingNode = 0;
-			int routeOfCorrespondingNode = 0;
 			for (int i = 0; i < solutionListOfEachDay[day].size(); i++) {
 
 				if (solutionListOfEachDay[day][i] == -1) {
 
-					routeOfCorrespondingNode++;
 					continue;
 				}
 				if (solutionListOfEachDay[day][i] == correspondingNode) {
@@ -1353,20 +1350,27 @@ double Solution::getMaxPF(const std::vector<std::vector<int>>& solutionListOfEac
 					break;
 				}
 			}
-			
-			//double oldMaxPF = maxPF; // For testing
 
-			// Check if there are other node ahead of corresponding node. 
-			if (positionOfCorrespondingNode + 1 < solutionListOfEachDay[day].size() && solutionListOfEachDay[day][positionOfCorrespondingNode + 1] != -1) {
+			if (arrivalTimes[correspondingNode] != arrivalTimes[currentNode]) {
 
-				double accumulatedPostponedDurationForAnotherRoute;
-				accumulatedPostponedDurationForAnotherRoute = accumulatedPostponedDuration + postponedDuration[day][correspondingNode][solutionListOfEachDay[day][positionOfCorrespondingNode + 1]];
-				maxPF = std::min(maxPF, getMaxPF(solutionListOfEachDay, positionOfCorrespondingNode + 1, day, accumulatedPostponedDurationForAnotherRoute, false));
+				maxPF = std::min(maxPF, accumulatedPostponedDuration);
 			}
-			//if (oldMaxPF != maxPF) {
+			else {
+			
+				//double oldMaxPF = maxPF; // For testing
 
-			//	std::cout << "currentNode: " << currentNode << ", because of correspondingNode, change to : " << maxPF << std::endl;
-			//}
+				// Check if there are other node ahead of corresponding node. 
+				if (positionOfCorrespondingNode + 1 < solutionListOfEachDay[day].size() && solutionListOfEachDay[day][positionOfCorrespondingNode + 1] != -1) {
+
+					double accumulatedPostponedDurationForAnotherRoute;
+					accumulatedPostponedDurationForAnotherRoute = accumulatedPostponedDuration + postponedDuration[day][correspondingNode][solutionListOfEachDay[day][positionOfCorrespondingNode + 1]];
+					maxPF = std::min(maxPF, getMaxPF(solutionListOfEachDay, positionOfCorrespondingNode + 1, day, accumulatedPostponedDurationForAnotherRoute, false));
+				}
+				//if (oldMaxPF != maxPF) {
+
+				//	std::cout << "currentNode: " << currentNode << ", because of correspondingNode, change to : " << maxPF << std::endl;
+				//}
+			}
 		}
 		//std::cout << "seciont 3" << std::endl;
 
