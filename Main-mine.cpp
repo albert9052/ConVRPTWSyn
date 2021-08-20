@@ -14,19 +14,19 @@ int main(){
 	//std::cout << "SA: " << sa.getTheBestScore() << std::endl;
 	//exit(1);
 
-	int counter = 0;
+	//int counter = 0;
 	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator("./Dataset")) {
 
 		string path = dirEntry.path();
-		if (path.find("80") != std::string::npos) {
+		//if (path.find("80") == std::string::npos) {
 
-			continue;
-		}
-		counter++;
-		if (counter < 8) {
+		//	continue;
+		//}
+		//counter++;
+		//if (counter < 8) {
 
-			continue;
-		}
+		//	continue;
+		//}
 		std::cout << dirEntry.path() << ": " << std::endl;
 
 		SA sa(100, 0.00000001, 51200, 0.3);

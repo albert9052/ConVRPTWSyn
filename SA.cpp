@@ -26,8 +26,8 @@ void SA::solve() {
     std::vector<std::vector<int>> SAListOfEachDay; // It contains all the normal and fictive nodes, and (nRoutes - 1) -1 for boundaries of routes. 
     std::vector<std::vector<int>> bestSA;
 	std::vector<std::vector<int>> currentSA;
-    double bestScore = INT_MAX;
-	double currentScore = INT_MAX;
+    double bestScore = std::numeric_limits<double>::max();
+	double currentScore = std::numeric_limits<double>::max();
 
     // Since we are doing SA, our algorithm will be running several times because nodes on different day can't swtich with each other. 
 
