@@ -27,9 +27,9 @@ Iter(_Iter), T0(_T0), Alpha(_Alpha), Lambda(_Lambda), Nu(_Nu), Xi(_Xi){
     // Lambdam, Nu, Xi : used in the related removal operator
 }
 
-vector<vector<int>> LNS::transFormat(const vector<vector<vector<int>>>& v) {
+vector<vector<int>> LNS::transFormat(const vector<vector<vector<int>>>& vvvbef) {
     vector<vector<int>> ans;
-    for (const vector<vector<int>>& vvbef : newS.list) {
+    for (const vector<vector<int>>& vvbef : vvvbef) {
         vector<int> v;
         for (const vector<int>& vbef : vvbef) {
             v.insert(v.end(), vbef.begin() + 1, vbef.end() - 1);
@@ -37,6 +37,26 @@ vector<vector<int>> LNS::transFormat(const vector<vector<vector<int>>>& v) {
         }
         v.pop_back();
         ans.push_back(v);
+    }
+    return ans;
+}
+vector<vector<vector<int>>> LNS::transFormat(const vector<vector<int>>& vvbef) {
+    vector<vector<vector<int>>> ans;
+    for (const vector<int>& vbef : vvbef) {
+        int route = 0;
+        vector<vector<int>> aft(nRoutes);
+        aft[route].push_back(0);
+        for (const int& node : vbef) {
+            if (node == -1) {
+                aft[route].push_back(0);
+                route++;
+                aft[route].push_back(0);
+            }
+            else
+                aft[route].push_back(node);
+        }
+        aft[route].push_back(0);
+        ans.push_back(aft);
     }
     return ans;
 }
@@ -66,11 +86,14 @@ void LNS::solve() {
         vector<vector<int>> Saft = transFormat(newS.list);
 
         calculateObjective(Saft);
-        adjustDepartureTime(Saft);
         newS.score = getViolationScore(Saft, FACTOR_OF_VIOLATION);
         newS.arrivalTimes = arrivalTimes;
 
-        if (newS.score == 0)  improveTimeConsistency(Saft); 
+        if (newS.score == 0) {
+            adjustDepartureTime(Saft);
+            improveTimeConsistency(Saft);
+            newS.list = transFormat(Saft);
+        }
 
         newS.score += getObjectiveScore(Saft);
 
@@ -80,7 +103,7 @@ void LNS::solve() {
         }
         if (newS.score < bestS.score) {
             bestS = newS;
-            std::cout << "Best Score: " << bestS.score << std::endl;
+            //std::cout << "Best Score: " << bestS.score << std::endl;
             int a = 1;
         }
         T *= Alpha;
@@ -89,8 +112,9 @@ void LNS::solve() {
     vector<vector<int>> Saft = transFormat(bestS.list);
     calculateObjective(Saft);
     adjustDepartureTime(Saft);
-    cout << getViolationScore(Saft, FACTOR_OF_VIOLATION) << endl;
-    CheckConstraintsResult checkConstraintsResult = checkConstraints(Saft);
+    cout << bestS.score << endl;
+    //cout << getViolationScore(Saft, FACTOR_OF_VIOLATION) << endl;
+    /*CheckConstraintsResult checkConstraintsResult = checkConstraints(Saft);
     printGraph(Saft, GRAPH_LIMIT);
     if (checkConstraintsResult.result == false) {
 
@@ -100,7 +124,7 @@ void LNS::solve() {
             std::cout << message << std::endl;
         }
         std::cout << "-----------------------------------------------------" << std::endl;
-    }
+    }*/
 }
 void LNS::genInitSolution(){
     curS.list.resize(nDays);
@@ -417,16 +441,12 @@ void LNS::insertion(){
         regretInsertion(4);
         break;
     case 5:
-        //cout << endl << " regretRepair" << endl;
-        regretInsertion(5);
+        //cout << endl << " latestInsertion" << endl;
+        earliestInsertion();
         break;
     case 6:
-        //cout << endl << " latestInsertion" << endl;
-        latestInsertion();
-        break;
-    case 7:
         //cout << endl << " regretInsertion" << endl;
-        earliestInsertion();
+        latestInsertion();
         break;
     }
 
@@ -508,9 +528,23 @@ void LNS::regretInsertion(int q){
 
 void LNS::earliestInsertion() {
     for (int d = 0; d < nDays; d++) {
-        int route = rand() % nRoutes;
-        for (int idx = 0; idx < newS.list[d][route].size(); idx++) {
-
+        for (int node : rmdNodes[d]) {
+            int route = rand() % nRoutes;
+            bool isInserted = false;
+            for (int idx = 0; idx < newS.list[d][route].size() - 1; idx++) {
+                int n = newS.list[d][route][idx], time = newS.arrivalTimes[n][d] + serviceTime[n][d] + timeMat[node][n];
+                if (time > earliestTime[node][d] && time < lastTime[node][d]) {
+                    newS.list[d][route].insert(newS.list[d][route].begin() + idx, node);
+                    newS.arrivalTimes[node][d] = time;
+                    isInserted = true;
+                }
+            }
+            if (!isInserted) {
+                int idx = newS.list[d][route].size() - 2;
+                newS.list[d][route].insert(newS.list[d][route].begin() + idx, node);
+                int n = newS.list[d][route][idx], time = newS.arrivalTimes[n][d] + serviceTime[n][d] + timeMat[node][n];
+                newS.arrivalTimes[node][d] = time;
+            }
         }
     }
 }

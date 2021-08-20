@@ -41,7 +41,7 @@ private:
     void earliestInsertion();
     void latestInsertion();
 
-
+    vector<vector<vector<int>>> transFormat(const vector<vector<int>>& v);
     vector<vector<int>> transFormat(const vector<vector<vector<int>>>& v);
     //void calculateObjectiveAndadjustDepartureTime(const vector<vector<vector<int>>>& bef);
 public:

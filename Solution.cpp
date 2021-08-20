@@ -179,7 +179,7 @@ void Solution::readData(std::string input) {
 	int VN = 500;
 	std::string dispose;
 	// open input file
-	std::ifstream infile(input);
+	std::ifstream infile("c101.dat");
 	if (!infile.is_open())
 	{
 		std::cout << "Can't find this file" << std::endl;
@@ -212,7 +212,7 @@ void Solution::readData(std::string input) {
 	for (int i = 0; i < VN; i++)  // Read Synchronized services nodes
 	{
 		infile >> dispose;
-		std::cout << "////////" << dispose << std::endl;
+		//std::cout << "////////" << dispose << std::endl;
 		if (dispose == ";")
 		{
 			break;
@@ -466,7 +466,7 @@ void Solution::readData(std::string input) {
 	daysOfEarliestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
 	daysOfLatestArrivalTimeOfEachCustomer = std::vector<std::vector<int>>(nNormals + 1, std::vector<int>());
 
-	std::cout << "Finish Read Data(" + input + ")--------------------------------------------------------------------" << std::endl;
+	//std::cout << "Finish Read Data(" + input + ")--------------------------------------------------------------------" << std::endl;
 }
 
 void Solution::printInput() {

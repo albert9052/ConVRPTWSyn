@@ -7,9 +7,10 @@ using namespace std;
 int main(){
     srand(time(NULL));
 
-	//LNS lns(100000, 200, 0.99, 12, 4, 7);
-	//lns.input();
-	//lns.solve();
+	LNS lns(200000, 200, 0.99, 12, 4, 7);
+	//lns.readData("Dataset/case_1_20_4_2_5.dat");
+	lns.input();
+	lns.solve();
 	
 	
 	//cout << "bold red text" << std::endl;
@@ -45,12 +46,12 @@ int main(){
 	//	std::cout << "Alpha: " << Alpha << ": " << result << std::endl;
 	//}
 	
-	SA sa(100, 0.00000001, 51200, 0.3);
+	/*SA sa(100, 0.00000001, 51200, 0.3);
 	sa.readData("Dataset/case_1_20_4_2_1.dat");
 	sa.printInput();
 	sa.solve();
 	double score = sa.getTheBestScore();
-	std::cout << score << std::endl;
+	std::cout << score << std::endl;*/
 }
 
 
