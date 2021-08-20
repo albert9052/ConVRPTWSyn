@@ -1,11 +1,25 @@
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
+#include <filesystem>
 #include "SA.h"
 #include "LNS.h"
-using namespace std;
 
 int main(){
     srand(time(NULL));
+
+	ifstream allFiles("allFiles.txt");
+	string file;
+	while (allFiles >> file) {
+		file = "Dataset/" + file;
+		LNS lns(200000, 200, 0.99, 12, 4, 7);
+		lns.readData(file);
+		lns.solve();
+
+		SA sa(100, 0.00000001, 51200, 0.3);
+		sa.readData(file);
+		sa.solve();
+	}
 
 	LNS lns(200000, 200, 0.99, 12, 4, 7);
 	//lns.readData("Dataset/case_1_20_4_2_5.dat");
