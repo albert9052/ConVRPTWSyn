@@ -401,7 +401,6 @@ double SA::getTheBestScore() {
 	double objectiveScore = getObjectiveScore(bestSolution);
 	if (getViolationScore(bestSolution, FACTOR_OF_VIOLATION) == 0) {
 
-		std::cout << "no violation" << std::endl;
 		adjustDepartureTime(bestSolution);
 		violationScore = getViolationScore(bestSolution, FACTOR_OF_VIOLATION);
 		objectiveScore = getObjectiveScore(bestSolution);
@@ -420,4 +419,14 @@ double SA::getTheBestScore() {
 		exit(1);
 	}
 	return violationScore + objectiveScore;
+}
+
+bool SA::checkIfTheBestSolutionIsValid() {
+
+	calculateObjective(bestSolution);
+	if (getViolationScore(bestSolution, FACTOR_OF_VIOLATION) == 0) {
+
+		return true;
+	}
+	return false;
 }

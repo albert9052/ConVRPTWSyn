@@ -9,38 +9,73 @@ int main(){
     srand(time(NULL));
 
 	//SA sa(100, 0.00000001, 51200, 0.3);
-	//sa.readData("Dataset/case_3_50_10_5_2.dat");
+	//sa.readData("Dataset/case_1_80_16_8_3.dat");
+	//sa.printInput();
+	//std::cout << "start" << std::endl;
 	//sa.solve();
+	//std::cout << "end" << std::endl;
 	//std::cout << "SA: " << sa.getTheBestScore() << std::endl;
 	//exit(1);
 
 	//int counter = 0;
-	for (const auto& dirEntry : std::filesystem::recursive_directory_iterator("./Dataset")) {
+	double bestFactor = 0;
+	int numberOfValid = -1;
+	for (double i = 10; i <= 100000000; i *= 10) {
 
-		string path = dirEntry.path();
-		//if (path.find("80") == std::string::npos) {
+		int counter = 0;
+		std::cout << "FACTOR_OF_VIOLATION = " << i << ": " << std::endl;
+		for (const auto& dirEntry : std::filesystem::recursive_directory_iterator("./Dataset")) {
 
-		//	continue;
-		//}
-		//counter++;
-		//if (counter < 8) {
+			string path = dirEntry.path();
+			if (path.find("c101.dat") != std::string::npos) {
 
-		//	continue;
-		//}
-		std::cout << dirEntry.path() << ": " << std::endl;
+				continue;
+			}
+			if (path.find("case_2_80_16_8_3") != std::string::npos) {
 
-		SA sa(100, 0.00000001, 51200, 0.3);
-		sa.readData(path);
-		sa.solve();
-		std::cout << "SA: " << sa.getTheBestScore() << std::endl;
+				continue;
+			}
+			if (path.find("case_1_80_16_8_3") != std::string::npos) {
 
-		LNS lns(200000, 200, 0.99, 12, 4, 7);
-		lns.readData(path);
-		//lns.input();
-		std::cout << "LNS: ";
-		lns.solve();
+				continue;
+			}
+			//if (path.find("80") == std::string::npos) {
+
+			//	continue;
+			//}
+			//counter++;
+			//if (counter < 8) {
+
+			//	continue;
+			//}
+			std::cout << dirEntry.path() << ": " << std::endl;
+
+			SA sa(100, 0.00000001, 51200, 0.3, i);
+			sa.readData(path);
+			sa.solve();
+			std::cout << "SA(" << ((sa.checkIfTheBestSolutionIsValid()) ? std::string("\033[1;32mvalid\033[0m") : std::string("\033[1;31minvalid\033[0m")) << "): " << sa.getTheBestScore() << std::endl;
+
+			if (sa.checkIfTheBestSolutionIsValid()) {
+
+				counter++;
+			}
+
+			//LNS lns(200000, 200, 0.99, 12, 4, 7);
+			//lns.readData(path);
+			////lns.input();
+			//std::cout << "LNS: ";
+			//lns.solve();
+			//std::cout << std::endl;
+		}
 		std::cout << std::endl;
+		if (counter > numberOfValid) {
+
+			numberOfValid = counter;
+			bestFactor = i;
+		}
 	}
+
+	std::cout << "Best factor: " << bestFactor << std::endl;
 	
 	
 	//cout << "bold red text" << std::endl;

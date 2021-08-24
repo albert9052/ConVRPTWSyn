@@ -21,7 +21,6 @@
 #include <fstream>
 
 #define GRAPH_LIMIT 1000
-#define FACTOR_OF_VIOLATION 100000
 
 class PointAndType {
 
@@ -115,6 +114,7 @@ public:
     int nFictives; // Number of fictive nodes
     int nDays; // Number of days
     int nRoutes; // Number of routes
+	double FACTOR_OF_VIOLATION = 1000;
     std::vector<int> fictiveLink; // 0 for normal nodes, n>0 for fictive nodes and it's normal node is n
     std::vector<std::vector<bool>> required; // Required day (false for not required, true for required.)
 	std::vector<std::vector<int>> requiredList;
@@ -125,7 +125,7 @@ public:
     std::vector<std::vector<std::vector<int>>> solutionList;
 
     Solution() {
-
+		
     }
     void input();
 	void readData(std::string input);

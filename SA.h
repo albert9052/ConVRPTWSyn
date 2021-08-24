@@ -53,9 +53,13 @@ public:
     int numberOfIterations;
     double Alpha;
 
-    SA(double _Ts, double _Te, int _numberOfIterations, double _alpha) : Ts(_Ts), Te(_Te), numberOfIterations(_numberOfIterations), Alpha(_alpha) {};
+    SA(double _Ts, double _Te, int _numberOfIterations, double _alpha, double _FACTOR_OF_VIOLATION) : Ts(_Ts), Te(_Te), numberOfIterations(_numberOfIterations), Alpha(_alpha) {
+
+		FACTOR_OF_VIOLATION = _FACTOR_OF_VIOLATION;
+	};
     void solve();
 	double getTheBestScore();
+	bool checkIfTheBestSolutionIsValid();
 };
 
 
