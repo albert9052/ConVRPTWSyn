@@ -176,6 +176,13 @@ protected:
 	double getViolationScore(const std::vector<std::vector<int>>& solutionListOfEachDay, double scaleOfViolationScore);
 	double getObjectiveScore(const std::vector<std::vector<int>>& solutionListOfEachDay);
 	CheckConstraintsResult checkConstraints(const std::vector<std::vector<int>>& solutionListOfEachDay);
+
+	// --------------------------- Jeff's method -----------------------------
+	void arrivalTimeCalculation(const std::vector<std::vector<int>>& solutionListOfEachDay);
+	void adjustDepartureTimeByJeff(const std::vector<std::vector<int>>& solutionListOfEachDay);
+
+	// ---------------------------- For testing --------------------------------------
+	void simpleArrivalTimeCalculation(const std::vector<std::vector<int>>& solutionListOfEachDay);
 };
 
 #endif
