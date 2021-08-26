@@ -92,9 +92,23 @@ void SA::solve() {
 			//SAListOfEachDay[0] = {6, 14, -1, 8, 18, 15, 17, -1, 7, 19, 5, 20, -1, 16, 3, 11, 13, 10, 2, 12, 4};
 			//SAListOfEachDay[0] = {2, 18, 12, 8, 4, 16, -1, 6, 15, 7, 14, 5, 11, -1, 17, 9, -1, 13, 20, 1};
 			//SAListOfEachDay[0] = {6, 17, 9, -1, 11, -1, -1, 15, 8, 5, 13, 7};
+			//SAListOfEachDay[0] = {6, 16, 5, -1, 2, 11, 4, 9, 13, -1, 12, 1, 8, 19, -1, 7};
+			//SAListOfEachDay[1] = {6, 16, 20, 5, 14, -1, 2, 11, 9, -1, 12, 1, 8, 15, -1, 7, 10, 18, 17};
+			//SAListOfEachDay[2] = {6, 16, 20, 14, -1, 2, 11, 3, 4, 9, 13, -1, 12, 19, 15, -1, 10, 17};
+
+			simpleArrivalTimeCalculation(SAListOfEachDay);
+			//double violationScoreOfSimpleOne = getViolationScore(SAListOfEachDay, FACTOR_OF_VIOLATION);
 
 			// Adjust the arrival time and departure time to get the minimum violation. 
-            calculateObjective(SAListOfEachDay);
+            //calculateObjective(SAListOfEachDay);
+			//double violationScoreOfMine = getViolationScore(SAListOfEachDay, FACTOR_OF_VIOLATION);
+			//if (violationScoreOfMine > violationScoreOfSimpleOne) {
+
+			//	std::cout << "Simple: " << violationScoreOfSimpleOne << std::endl;
+			//	std::cout << "Mine: " << violationScoreOfMine << std::endl;
+			//	std::cout << "Oh no" << std::endl;
+			//	exit(1);
+			//}
 			//std::cout << "calculateObjective done. " << std::endl;
 			//CheckConstraintsResult checkConstraintsResult = checkConstraints(SAListOfEachDay);
 			//std::cout << "checkConstraints done. " << std::endl;
