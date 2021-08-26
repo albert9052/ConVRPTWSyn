@@ -1,0 +1,99 @@
+This is the result of the simple one:
+"./Dataset/case_3_20_4_2_2.dat":
+SA(invalid): 1.94603e+08
+"./Dataset/case_4_20_4_2_1.dat":
+SA(invalid): 4.78803e+08
+"./Dataset/case_2_80_16_8_1.dat":
+SA(invalid): 2.68122e+09
+"./Dataset/case_1_80_16_8_2.dat":
+SA(invalid): 2.15082e+09
+"./Dataset/case_5_20_4_2_1.dat":
+SA(invalid): 4.99204e+08
+"./Dataset/case_4_20_4_2_2.dat":
+SA(invalid): 2.10403e+08
+"./Dataset/case_2_20_4_2_1.dat":
+SA(invalid): 4.76303e+08
+"./Dataset/case_1_20_4_2_3.dat":
+SA(invalid): 1.71303e+08
+"./Dataset/case_1_80_16_8_1.dat":
+SA(invalid): 2.40672e+09
+"./Dataset/case_5_20_4_2_5.dat":
+SA(valid): 1088
+"./Dataset/case_1_80_16_8_4.dat":
+SA(invalid): 1.27712e+09
+"./Dataset/case_1_80_16_8_5.dat":
+SA(invalid): 1.71195e+07
+"./Dataset/case_2_80_16_8_5.dat":
+SA(invalid): 4.61543e+06
+"./Dataset/case_3_20_4_2_4.dat":
+SA(invalid): 1.58603e+08
+"./Dataset/case_3_50_10_5_2.dat":
+SA(invalid): 9.16812e+08
+"./Dataset/case_2_50_10_5_4.dat":
+SA(invalid): 3.77409e+08
+"./Dataset/case_1_50_10_5_1.dat":
+SA(invalid): 1.41971e+09
+"./Dataset/case_4_20_4_2_5.dat":
+SA(invalid): 4.70428e+06
+"./Dataset/case_3_50_10_5_1.dat":
+SA(invalid): 1.18651e+09
+"./Dataset/case_4_20_4_2_3.dat":
+SA(invalid): 2.77104e+08
+"./Dataset/case_1_20_4_2_1.dat":
+SA(invalid): 3.93703e+08
+"./Dataset/case_1_50_10_5_3.dat":
+SA(invalid): 7.56911e+08
+"./Dataset/case_1_50_10_5_2.dat":
+SA(invalid): 1.10821e+09
+"./Dataset/case_1_20_4_2_4.dat":
+SA(invalid): 1.47304e+08
+"./Dataset/case_2_50_10_5_5.dat":
+SA(invalid): 4.13119e+07
+"./Dataset/case_5_20_4_2_3.dat":
+SA(invalid): 1.51104e+08
+"./Dataset/case_5_20_4_2_2.dat":
+SA(invalid): 2.46103e+08
+"./Dataset/case_3_50_10_5_3.dat":
+SA(invalid): 8.21112e+08
+"./Dataset/case_2_80_16_8_2.dat":
+SA(invalid): 1.85252e+09
+"./Dataset/case_5_20_4_2_4.dat":
+SA(invalid): 1.39904e+08
+"./Dataset/case_2_20_4_2_2.dat":
+SA(invalid): 2.09404e+08
+"./Dataset/case_1_50_10_5_4.dat":
+SA(invalid): 4.49009e+08
+"./Dataset/case_2_50_10_5_1.dat":
+SA(invalid): 1.58161e+09
+"./Dataset/case_2_20_4_2_5.dat":
+SA(valid): 932
+"./Dataset/case_3_20_4_2_5.dat":
+SA(valid): 1131
+"./Dataset/case_2_20_4_2_3.dat":
+SA(invalid): 8.5203e+07
+"./Dataset/case_3_20_4_2_3.dat":
+SA(invalid): 2.13504e+08
+"./Dataset/case_2_50_10_5_3.dat":
+SA(invalid): 7.37111e+08
+"./Dataset/case_1_20_4_2_5.dat":
+SA(valid): 1041
+"./Dataset/case_2_20_4_2_4.dat":
+SA(invalid): 9.95029e+07
+"./Dataset/case_4_20_4_2_4.dat":
+SA(invalid): 8.8403e+07
+"./Dataset/case_2_80_16_8_4.dat":
+SA(invalid): 1.10112e+09
+"./Dataset/case_3_50_10_5_5.dat":
+SA(invalid): 3.33139e+07
+"./Dataset/case_3_50_10_5_4.dat":
+SA(invalid): 4.88409e+08
+"./Dataset/case_2_50_10_5_2.dat":
+SA(invalid): 8.7641e+08
+"./Dataset/case_3_20_4_2_1.dat":
+SA(invalid): 4.54204e+08
+"./Dataset/case_1_20_4_2_2.dat":
+SA(invalid): 1.99504e+08
+"./Dataset/case_1_50_10_5_5.dat":
+SA(invalid): 1.03214e+08
+
+I had tested 5-3, and after inputting the best solution, i can get the same score as cplex.
